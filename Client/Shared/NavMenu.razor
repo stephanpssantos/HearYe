@@ -1,0 +1,23 @@
+﻿<AuthorizeView>
+    <Authorized>
+        <div>
+            Hear Ye
+        </div>
+        <div>
+            <NavLink href="/" Match="NavLinkMatch.All">
+                New
+            </NavLink>
+            <NavLink href="/">
+                Acknowledged
+            </NavLink>
+            <NavLink href="/">
+                Expired
+            </NavLink>
+        </div>
+        <AccountDropDown UserName="@context.User.Identity?.Name" />
+    </Authorized>
+</AuthorizeView>
+
+@code {
+
+}

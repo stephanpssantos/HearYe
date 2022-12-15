@@ -1,0 +1,39 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@inject NavigationManager Navigation
+
+<div>
+    <button @onclick="ToggleAccountDD">
+        @UserName
+        <span class=""></span>
+    </button>
+</div>
+
+<div class="@AccountDDCssClass">
+    <button @onclick="BeginEditProfile">Account settings</button>
+    <button @onclick="BeginLogOut">Log out</button>
+</div>
+
+@code {
+    private bool collapseAccountDD = true;
+
+    [Parameter]
+    public string? UserName { get; set; }
+
+    private string? AccountDDCssClass => collapseAccountDD ? "collapse" : null;
+
+    public void BeginEditProfile()
+    {
+        Navigation.NavigateToLogout("authentication/profile");
+    }
+
+    public void BeginLogOut()
+    {
+        Navigation.NavigateToLogout("authentication/logout");
+    }
+
+    private void ToggleAccountDD()
+    {
+        collapseAccountDD = !collapseAccountDD;
+    }
+}

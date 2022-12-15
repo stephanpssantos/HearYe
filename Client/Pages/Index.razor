@@ -1,0 +1,21 @@
+﻿@page "/landing"
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@inject NavigationManager Navigation
+
+<AuthorizeView>
+    <Authorized>
+        <RedirectToHome />
+    </Authorized>
+    <NotAuthorized>
+        <PageTitle>Hear Ye</PageTitle>
+
+        <h1>Hear Ye</h1>
+        <h3>Announcement Board</h3>
+
+        <div>
+        </div>
+        <button onclick="@(() => Navigation.NavigateToLogin("authentication/login"))">
+            Sign in
+        </button>
+    </NotAuthorized>
+</AuthorizeView>
