@@ -1,5 +1,4 @@
 ﻿@inherits LayoutComponentBase
-@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <div class="page">
     <div class="navbar">
@@ -12,23 +11,3 @@
         </article>
     </main>
 </div>
-
-@code
-{
-    protected override void OnInitialized()
-    {
-        //AuthenticationStateProvider.AuthenticationStateChanged += OnAuthStateChanged;
-    }
-
-    private async void OnAuthStateChanged(Task<AuthenticationState> authState)
-    {
-        var _authState = await authState;
-        var user = _authState.User;
-
-        if (user.Identity is not null && user.Identity.IsAuthenticated)
-        {
-            // @user.Claims.FirstOrDefault(x => x.Type.Equals("oid"))?.Value
-            // @user.Identity.Name
-        }
-    }
-}

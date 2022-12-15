@@ -2,13 +2,9 @@
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
-@inject IJSRuntime JsRuntime
 
-
-<RemoteAuthenticatorView Action="@Action">
-    <CompletingLoggingIn>
-        @InvokeAsync(() => OnLoggedIn())
-    </CompletingLoggingIn>
+@*For some reason, the OnLogOutSucceeded event handler does not work here*@
+<RemoteAuthenticatorView Action="@Action" OnLogInSucceeded="OnLogIn">
     <LogOutSucceeded>
         @InvokeAsync(() => NavigationManager.NavigateTo("/landing"))
     </LogOutSucceeded>
@@ -17,13 +13,12 @@
 @code{
     [Parameter] public string? Action { get; set; }
 
-    private async void OnLoggedIn()
+    private async void OnLogIn()
     {
         var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authenticationState.User;
         if (user.Identity is not null && user.Identity.IsAuthenticated)
         {
-            await JsRuntime.InvokeVoidAsync("alert", user.Identity.Name);
             // @user.Claims.FirstOrDefault(x => x.Type.Equals("oid"))?.Value
             // @user.Identity.Name
         }
