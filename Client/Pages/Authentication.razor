@@ -1,7 +1,31 @@
 ﻿@page "/authentication/{action}"
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
-<RemoteAuthenticatorView Action="@Action" />
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IJSRuntime JsRuntime
+
+
+<RemoteAuthenticatorView Action="@Action">
+    <CompletingLoggingIn>
+        @InvokeAsync(() => OnLoggedIn())
+    </CompletingLoggingIn>
+    <LogOutSucceeded>
+        @InvokeAsync(() => NavigationManager.NavigateTo("/landing"))
+    </LogOutSucceeded>
+</RemoteAuthenticatorView>
 
 @code{
     [Parameter] public string? Action { get; set; }
+
+    private async void OnLoggedIn()
+    {
+        var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authenticationState.User;
+        if (user.Identity is not null && user.Identity.IsAuthenticated)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", user.Identity.Name);
+            // @user.Claims.FirstOrDefault(x => x.Type.Equals("oid"))?.Value
+            // @user.Identity.Name
+        }
+    }
 }
