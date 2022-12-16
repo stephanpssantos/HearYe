@@ -31,10 +31,8 @@ namespace HearYe.Shared
 
         public DateTime? LastModifiedDate { get; set; }
 
-        //[InverseProperty("User")]
         public virtual ICollection<Post>? Posts { get; set;}
 
-        //[InverseProperty("User")]
         public virtual ICollection<Acknowledgement>? Acknowledgements { get; set; }
     }
 }

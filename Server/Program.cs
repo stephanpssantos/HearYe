@@ -29,8 +29,19 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseWebAssemblyDebugging();
-    var db = app.Services.GetRequiredService<HearYeContext>();
 
+    try
+    {
+        using (IServiceScope scope = app.Services.CreateScope())
+        {
+            HearYeContext db = scope.ServiceProvider.GetRequiredService<HearYeContext>();
+            DbInitializer.Initialize(db);
+        }
+    }
+    catch (Exception ex) 
+    {
+        app.Logger.LogError(ex, "An error occurred while creating the DB.");
+    }
 }
 else
 {

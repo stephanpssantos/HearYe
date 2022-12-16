@@ -31,11 +31,8 @@ namespace HearYe.Shared
 
         public DateTime? StaleDate { get; set; }
 
-        //[ForeignKey("UserId")]
-        //[InverseProperty("Posts")]
         public virtual User? User { get; set; }
 
-        //[InverseProperty("Post")]
         public virtual ICollection<Acknowledgement>? Acknowledgements { get; set; }
     }
 }

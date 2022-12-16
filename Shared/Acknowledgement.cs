@@ -23,12 +23,8 @@ namespace HearYe.Shared
         [Required]
         public DateTime CreatedDate { get; set; }
 
-        //[ForeignKey("UserId")]
-        //[InverseProperty("Acknowledgements")]
         public virtual User? User { get; set; }
 
-        //[ForeignKey("PostId")]
-        //[InverseProperty("Acknowledgements")]
         public virtual Post? Post { get; set; }
     }
 }
