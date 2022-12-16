@@ -1,7 +1,10 @@
+using HearYe.Shared;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Identity.Web;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +18,8 @@ builder.Services.Configure<JwtBearerOptions>(
         options.TokenValidationParameters.NameClaimType = "name";
     });
 
+builder.Services.AddHearYeContext(builder.Configuration.GetConnectionString("DefaultConnection")!);
+
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
@@ -24,6 +29,8 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseWebAssemblyDebugging();
+    var db = app.Services.GetRequiredService<HearYeContext>();
+
 }
 else
 {
@@ -40,7 +47,6 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
-
 
 app.MapRazorPages();
 app.MapControllers();

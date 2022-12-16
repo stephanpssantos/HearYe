@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using HearYe.Client;
+using HearYe.Client.Data;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -12,6 +13,7 @@ builder.Services.AddHttpClient("HearYe.ServerAPI", client => client.BaseAddress 
 
 // Supply HttpClient instances that include access tokens when making requests to the server project
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("HearYe.ServerAPI"));
+builder.Services.AddTransient<IHearYeService, HearYeService>();
 
 builder.Services.AddMsalAuthentication(options =>
 {

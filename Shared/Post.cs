@@ -8,11 +8,10 @@ using System.Threading.Tasks;
 
 namespace HearYe.Shared
 {
-    public class User
+    public class Post
     {
-        public User()
+        public Post()
         {
-            Posts = new HashSet<Post>();
             Acknowledgements = new HashSet<Acknowledgement>();
         }
 
@@ -21,20 +20,22 @@ namespace HearYe.Shared
         public int Id { get; set; }
 
         [Required]
-        public Guid AadOid { get; set; }
+        public int UserId { get; set; }
 
         [Required]
-        public string DisplayName { get; set; } = string.Empty;
+        [StringLength(255)]
+        public string Message { get; set; } = "";
 
         [Required]
         public DateTime CreatedDate { get; set; }
 
-        public DateTime? LastModifiedDate { get; set; }
+        public DateTime? StaleDate { get; set; }
 
-        //[InverseProperty("User")]
-        public virtual ICollection<Post>? Posts { get; set;}
+        //[ForeignKey("UserId")]
+        //[InverseProperty("Posts")]
+        public virtual User? User { get; set; }
 
-        //[InverseProperty("User")]
+        //[InverseProperty("Post")]
         public virtual ICollection<Acknowledgement>? Acknowledgements { get; set; }
     }
 }

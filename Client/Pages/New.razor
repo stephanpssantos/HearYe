@@ -1,6 +1,8 @@
 ﻿@page "/"
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using HearYe.Client.Data
+@inject IHearYeService service
 @attribute [Authorize]
 
 <PageTitle>Hear Ye</PageTitle>
@@ -34,3 +36,11 @@
         </div>
     </div>
 </div>
+
+@code
+{
+    protected async override Task OnParametersSetAsync()
+    {
+        var bleh = await service.GetUsersAsync();
+    }
+}
