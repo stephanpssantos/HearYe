@@ -23,15 +23,25 @@ namespace HearYe.Shared
         public int UserId { get; set; }
 
         [Required]
+        public int MessageGroupId { get; set; }
+
+        [Required]
         [StringLength(255)]
-        public string Message { get; set; } = "";
+        public string Message { get; set; } = String.Empty;
+
+        [Required]
+        public bool IsDeleted { get; set; } = false;
 
         [Required]
         public DateTime CreatedDate { get; set; }
 
         public DateTime? StaleDate { get; set; }
 
+        public DateTime? DeletedDate { get; set; }
+
         public virtual User? User { get; set; }
+
+        public virtual MessageGroup? MessageGroup { get; set; }
 
         public virtual ICollection<Acknowledgement>? Acknowledgements { get; set; }
     }

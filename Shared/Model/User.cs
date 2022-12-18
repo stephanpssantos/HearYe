@@ -14,6 +14,9 @@ namespace HearYe.Shared
         {
             Posts = new HashSet<Post>();
             Acknowledgements = new HashSet<Acknowledgement>();
+            MessageGroups = new HashSet<MessageGroupMember>();
+            MessageGroupInvitations = new HashSet<MessageGroupInvitation>();
+            MessageGroupInvitationsSent = new HashSet<MessageGroupInvitation>();
         }
 
         [Key]
@@ -24,15 +27,29 @@ namespace HearYe.Shared
         public Guid AadOid { get; set; }
 
         [Required]
-        public string DisplayName { get; set; } = string.Empty;
+        public string DisplayName { get; set; } = String.Empty;
+
+        [Required]
+        public bool AcceptGroupInvitations { get; set; } = true;
+
+        [Required]
+        public bool IsDeleted { get; set; } = false;
 
         [Required]
         public DateTime CreatedDate { get; set; }
 
         public DateTime? LastModifiedDate { get; set; }
 
+        public DateTime? DeletedDate { get; set; }
+
         public virtual ICollection<Post>? Posts { get; set;}
 
         public virtual ICollection<Acknowledgement>? Acknowledgements { get; set; }
+
+        public virtual ICollection<MessageGroupMember>? MessageGroups { get; set; }
+
+        public virtual ICollection<MessageGroupInvitation>? MessageGroupInvitations { get; set; }
+
+        public virtual ICollection<MessageGroupInvitation>? MessageGroupInvitationsSent { get; set; }
     }
 }

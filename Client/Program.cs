@@ -12,6 +12,8 @@ builder.Services.AddHttpClient("HearYe.ServerAPI", client => client.BaseAddress 
     .AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>();
 
 // Supply HttpClient instances that include access tokens when making requests to the server project
+// In Blazor, Scoped behaves like a singleton i.e. a single instance is created and shared.
+// Transient means you get a new instance of the service every time its requested.
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("HearYe.ServerAPI"));
 builder.Services.AddTransient<IHearYeService, HearYeService>();
 
