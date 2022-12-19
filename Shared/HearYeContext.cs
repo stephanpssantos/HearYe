@@ -24,6 +24,11 @@ namespace HearYe.Shared
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.HasIndex(e => e.AadOid).IsUnique();
+            });
+
             modelBuilder.Entity<Post>(entity =>
             {
                 entity.HasOne(e => e.User)
