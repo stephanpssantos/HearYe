@@ -55,6 +55,8 @@ namespace HearYe.Shared
                     .WithMany(parent => parent.Acknowledgements)
                     .HasForeignKey(e => e.PostId)
                     .OnDelete(DeleteBehavior.Cascade); // Delete Acknowledgement if Acknowledgement.Post is deleted.
+
+                entity.HasIndex(e => new { e.UserId, e.PostId }).IsUnique(); // Prevent same user same post.
             });
 
             modelBuilder.Entity<MessageGroupMember>(entity =>
@@ -73,6 +75,8 @@ namespace HearYe.Shared
                     .WithMany(parent => parent.MessageGroups)
                     .HasForeignKey(e => e.UserId)
                     .OnDelete(DeleteBehavior.Cascade); // Delete MessageGroupMember if User is deleted.
+
+                entity.HasIndex(e => new { e.UserId, e.MessageGroupId }).IsUnique(); // Prevent same user same group.
             });
 
             modelBuilder.Entity<MessageGroupInvitation>(entity =>
@@ -91,6 +95,8 @@ namespace HearYe.Shared
                     .WithMany(parent => parent.MessageGroupInvitations)
                     .HasForeignKey(e => e.InvitedUserId)
                     .OnDelete(DeleteBehavior.Cascade); // Delete MessageGroupInvitation if InvitedUser is deleted.
+
+                entity.HasIndex(e => new { e.MessageGroupId, e.InvitedUserId }).IsUnique(); // Prevent same user same group.
             });
 
             modelBuilder.Entity<MessageGroupRole>(entity =>
