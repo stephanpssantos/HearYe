@@ -19,11 +19,9 @@ namespace HearYe.Shared
         [Required]
         public int Id { get; set; }
 
-        [Required]
-        public int UserId { get; set; }
+        public int? UserId { get; set; }
 
-        [Required]
-        public int MessageGroupId { get; set; }
+        public int? MessageGroupId { get; set; }
 
         [Required]
         [StringLength(255)]
