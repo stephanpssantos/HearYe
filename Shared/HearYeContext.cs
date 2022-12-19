@@ -96,7 +96,12 @@ namespace HearYe.Shared
                     .HasForeignKey(e => e.InvitedUserId)
                     .OnDelete(DeleteBehavior.Cascade); // Delete MessageGroupInvitation if InvitedUser is deleted.
 
-                entity.HasIndex(e => new { e.MessageGroupId, e.InvitedUserId }).IsUnique(); // Prevent same user same group.
+                entity.HasIndex(e => 
+                    new { 
+                        e.MessageGroupId, 
+                        e.InvitedUserId, 
+                        e.InvitationActive 
+                    }).IsUnique(); // Prevent same user same group.
             });
 
             modelBuilder.Entity<MessageGroupRole>(entity =>
