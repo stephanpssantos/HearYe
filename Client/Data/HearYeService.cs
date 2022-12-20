@@ -14,17 +14,17 @@ namespace HearYe.Client.Data
 
         public Task<User?> GetUserAsync(string userId)
         {
-            return http.GetFromJsonAsync<User?>($"api/users/{userId}");
+            return http.GetFromJsonAsync<User?>($"api/user/{userId}");
         }
 
         public Task<User?> GetUserByOID(string userOidGuid)
         {
-            return http.GetFromJsonAsync<User?>($"api/users/?aadOid={userOidGuid}");
+            return http.GetFromJsonAsync<User?>($"api/user/?aadOid={userOidGuid}");
         }
 
         public Task<List<MessageGroup>?> GetUserMessageGroupsAsync(string userId) 
         {
-            return http.GetFromJsonAsync<List<MessageGroup>?>($"api/users/groups/{userId}");
+            return http.GetFromJsonAsync<List<MessageGroup>?>($"api/user/groups/{userId}");
         }
     }
 }

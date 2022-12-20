@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Identity.Web.Resource;
 using HearYe.Shared;
-using Microsoft.CodeAnalysis.Completion;
 
 namespace HearYe.Server.Controllers
 {
@@ -12,16 +11,16 @@ namespace HearYe.Server.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [RequiredScope(RequiredScopesConfigurationKey = "AzureAdB2C:Scopes")]
-    public class UsersController : ControllerBase
+    public class UserController : ControllerBase
     {
         private readonly HearYeContext db;
 
-        public UsersController(HearYeContext db) 
+        public UserController(HearYeContext db) 
         { 
             this.db = db;
         }
 
-        // GET: api/users/[id]
+        // GET: api/user/[id]
         [HttpGet("{id:int}", Name = nameof(GetUserAsync))]
         [ProducesResponseType(200, Type = typeof(User))]
         [ProducesResponseType(404)]
@@ -35,7 +34,7 @@ namespace HearYe.Server.Controllers
             return Ok(user);
         }
 
-        // GET: api/users/?aadOid=[aadOid]
+        // GET: api/user/?aadOid=[aadOid]
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(User))]
         [ProducesResponseType(404)]
@@ -53,6 +52,7 @@ namespace HearYe.Server.Controllers
             return Ok(user);
         }
 
+        // GET: api/user/groups/[id]
         [HttpGet("groups/{id:int}")]
         [ProducesResponseType(200, Type = typeof(MessageGroup))]
         public async Task<IActionResult> GetUserMessageGroups(int id)
@@ -65,7 +65,7 @@ namespace HearYe.Server.Controllers
             return Ok(mg);
         }
 
-        // POST: api/users
+        // POST: api/user
         // BODY: User (JSON)
         [HttpPost]
         [ProducesResponseType(201, Type = typeof(User))]
@@ -93,7 +93,7 @@ namespace HearYe.Server.Controllers
             }
         }
 
-        // PUT: api/users
+        // PUT: api/user
         // BODY: User (JSON)
         [HttpPut("{id:int}")]
         [ProducesResponseType(204)]
@@ -125,7 +125,7 @@ namespace HearYe.Server.Controllers
             }
         }
 
-        // DELETE: api/users/[id]
+        // DELETE: api/user/[id]
         [HttpDelete("{id:int}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
