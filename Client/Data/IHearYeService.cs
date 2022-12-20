@@ -6,5 +6,6 @@ namespace HearYe.Client.Data
     {
         Task<User?> GetUserAsync(string userId);
         Task<User?> GetUserByOID(string userOidGuid);
+        Task<List<MessageGroup>?> GetUserMessageGroupsAsync(string userId);
     }
 }

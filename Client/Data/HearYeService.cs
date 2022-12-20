@@ -21,5 +21,10 @@ namespace HearYe.Client.Data
         {
             return http.GetFromJsonAsync<User?>($"api/users/?aadOid={userOidGuid}");
         }
+
+        public Task<List<MessageGroup>?> GetUserMessageGroupsAsync(string userId) 
+        {
+            return http.GetFromJsonAsync<List<MessageGroup>?>($"api/users/groups/{userId}");
+        }
     }
 }
