@@ -4,6 +4,7 @@ namespace HearYe.Client.Data
 {
     public interface IHearYeService
     {
-        Task<List<User>?> GetUsersAsync();
+        Task<User?> GetUserAsync(string userId);
+        Task<User?> GetUserByOID(string userOidGuid);
     }
 }

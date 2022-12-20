@@ -23,6 +23,7 @@ builder.Services.AddMsalAuthentication(options =>
     options.ProviderOptions.DefaultAccessTokenScopes.Add("https://StephansDomain.onmicrosoft.com/148c352e-fae8-4c4b-b98f-bf2a440f3428/access_as_user");
     options.ProviderOptions.LoginMode = "redirect"; // Popup(default) or login.
     options.ProviderOptions.Cache.CacheLocation = "localStorage"; // Cache auth token. Local or session(default).
+    options.AuthenticationPaths.LogOutSucceededPath = "/landing";
 });
 
 await builder.Build().RunAsync();

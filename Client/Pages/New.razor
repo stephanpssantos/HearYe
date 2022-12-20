@@ -2,6 +2,8 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @using HearYe.Client.Data
+@using HearYe.Shared
+@inject NavigationManager Navigation
 @inject IHearYeService service
 @attribute [Authorize]
 
@@ -37,10 +39,44 @@
     </div>
 </div>
 
+<div>
+    <table>
+        <tr>
+            <td>@demoUser1?.Id.ToString();</td>
+            <td>@demoUser1?.AadOid.ToString();</td>
+            <td>@demoUser1?.DisplayName;</td>
+            <td>@demoUser1?.AcceptGroupInvitations;</td>
+            <td>@demoUser1?.IsDeleted</td>
+            <td>@demoUser1?.CreatedDate.ToString();</td>
+        </tr>
+        <tr>
+            <td>@demoUser2?.Id.ToString();</td>
+            <td>@demoUser2?.AadOid.ToString();</td>
+            <td>@demoUser2?.DisplayName;</td>
+            <td>@demoUser2?.AcceptGroupInvitations;</td>
+            <td>@demoUser2?.IsDeleted</td>
+            <td>@demoUser2?.CreatedDate.ToString();</td>
+        </tr>
+    </table>
+    
+</div>
+
 @code
 {
+    private User? demoUser1;
+    private User? demoUser2;
+
     protected async override Task OnParametersSetAsync()
     {
-        var bleh = await service.GetUsersAsync();
+        try
+        {
+            demoUser1 = await service.GetUserAsync("1");
+            demoUser2 = await service.GetUserByOID("f09cc0b1-f05d-40e0-9684-c4a945d4e7e0");
+        }
+        catch (AccessTokenNotAvailableException)
+        {
+            Navigation.NavigateToLogin("authentication/login");
+            //exception.Redirect(); Causes issues: interaction_in_progress exception and then loops.
+        }
     }
 }

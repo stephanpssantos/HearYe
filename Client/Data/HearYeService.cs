@@ -12,9 +12,14 @@ namespace HearYe.Client.Data
             this.http = http;
         }
 
-        public Task<List<User>?> GetUsersAsync()
+        public Task<User?> GetUserAsync(string userId)
         {
-            return http.GetFromJsonAsync<List<User>?>("api/users");
+            return http.GetFromJsonAsync<User?>($"api/users/{userId}");
+        }
+
+        public Task<User?> GetUserByOID(string userOidGuid)
+        {
+            return http.GetFromJsonAsync<User?>($"api/users/?aadOid={userOidGuid}");
         }
     }
 }

@@ -3,12 +3,7 @@
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
-@*For some reason, the OnLogOutSucceeded event handler does not work here*@
-<RemoteAuthenticatorView Action="@Action" OnLogInSucceeded="OnLogIn">
-    <LogOutSucceeded>
-        @InvokeAsync(() => NavigationManager.NavigateTo("/landing"))
-    </LogOutSucceeded>
-</RemoteAuthenticatorView>
+<RemoteAuthenticatorView Action="@Action" OnLogInSucceeded="OnLogIn" />
 
 @code{
     [Parameter] public string? Action { get; set; }
