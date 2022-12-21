@@ -20,7 +20,7 @@ builder.Services.AddTransient<IHearYeService, HearYeService>();
 builder.Services.AddMsalAuthentication(options =>
 {
     builder.Configuration.Bind("AzureAdB2C", options.ProviderOptions.Authentication);
-    options.ProviderOptions.DefaultAccessTokenScopes.Add("https://StephansDomain.onmicrosoft.com/148c352e-fae8-4c4b-b98f-bf2a440f3428/access_as_user");
+    options.ProviderOptions.DefaultAccessTokenScopes.Add("https://StephansDomain.onmicrosoft.com/5bcd9a8a-252d-4c87-af83-56d0638a4356/API.Access");
     options.ProviderOptions.LoginMode = "redirect"; // Popup(default) or login.
     options.ProviderOptions.Cache.CacheLocation = "localStorage"; // Cache auth token. Local or session(default).
     options.AuthenticationPaths.LogOutSucceededPath = "/landing";
