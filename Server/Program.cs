@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Identity.Web;
 using Microsoft.Extensions.DependencyInjection;
+using HearYe.Server;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +20,12 @@ builder.Services.Configure<JwtBearerOptions>(
     });
 
 builder.Services.AddHearYeContext(builder.Configuration.GetConnectionString("DefaultConnection")!);
+
+string[] graphScopes = builder.Configuration.GetSection("MicrosoftGraph:Scopes").Get<List<string>>()!.ToArray();
+string graphTenantId = builder.Configuration.GetSection("MicrosoftGraph")["TenantId"]!;
+string graphClientId = builder.Configuration.GetSection("MicrosoftGraph")["ClientId"]!;
+string graphAppRegSecret = builder.Configuration["Graph:AppRegSecret"]!;
+builder.Services.AddGraphClient(graphScopes, graphTenantId, graphClientId, graphAppRegSecret);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();

@@ -17,7 +17,7 @@ namespace HearYe.Client.Data
             return http.GetFromJsonAsync<User?>($"api/user/{userId}");
         }
 
-        public Task<User?> GetUserByOID(string userOidGuid)
+        public Task<User?> GetUserByOIDAsync(string userOidGuid)
         {
             return http.GetFromJsonAsync<User?>($"api/user/?aadOid={userOidGuid}");
         }
@@ -25,6 +25,13 @@ namespace HearYe.Client.Data
         public Task<List<MessageGroup>?> GetUserMessageGroupsAsync(string userId) 
         {
             return http.GetFromJsonAsync<List<MessageGroup>?>($"api/user/groups/{userId}");
+        }
+
+        public async Task<User?> NewUserAsync(User user)
+        {
+            HttpResponseMessage response = await http.PostAsJsonAsync("api/user", user);
+
+            return await response.Content.ReadFromJsonAsync<User>();
         }
     }
 }

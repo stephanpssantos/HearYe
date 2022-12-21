@@ -3,7 +3,9 @@ using Microsoft.EntityFrameworkCore; // ToListAsync, FirstOrDefaultAsync
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Identity.Web.Resource;
+using Microsoft.Graph;
 using HearYe.Shared;
+using User = HearYe.Shared.User;
 
 namespace HearYe.Server.Controllers
 {
@@ -14,10 +16,12 @@ namespace HearYe.Server.Controllers
     public class UserController : ControllerBase
     {
         private readonly HearYeContext db;
+        private readonly GraphServiceClient graph;
 
-        public UserController(HearYeContext db) 
+        public UserController(HearYeContext db, GraphServiceClient graph) 
         { 
             this.db = db;
+            this.graph = graph;
         }
 
         // GET: api/user/[id]
@@ -26,11 +30,16 @@ namespace HearYe.Server.Controllers
         [ProducesResponseType(404)]
         public async Task<IActionResult> GetUserAsync(int id)
         {
+            // Later:
+            // var blah = HttpContext.User.Claims.FirstOrDefault(x => x.Type.Equals("extension_DatabaseId"))?.Value;
+
             User? user = await db.Users!.FindAsync(id);
+            
             if (user == null)
             {
                 return NotFound();
             }
+
             return Ok(user);
         }
 
@@ -54,7 +63,7 @@ namespace HearYe.Server.Controllers
 
         // GET: api/user/groups/[id]
         [HttpGet("groups/{id:int}")]
-        [ProducesResponseType(200, Type = typeof(MessageGroup))]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<MessageGroup>))]
         public async Task<IActionResult> GetUserMessageGroups(int id)
         {
             IEnumerable<MessageGroup?> mg = await db.MessageGroupMembers!
@@ -74,22 +83,46 @@ namespace HearYe.Server.Controllers
         {
             if (user == null)
             {
-                return BadRequest();
+                return BadRequest("User object required.");
+            }
+
+            string? aadOid = HttpContext.User.Claims.FirstOrDefault(x => 
+                x.Type.Equals("http://schemas.microsoft.com/identity/claims/objectidentifier"))?.Value;
+
+            if (aadOid == null || aadOid != user.AadOid.ToString())
+            {
+                return BadRequest("Azure AD object ID (AadOid) missing or mismatched.");
             }
 
             EntityEntry<User> newUser = await db.Users!.AddAsync(user);
             int completed = await db.SaveChangesAsync();
 
-            if (completed == 1)
+            if (completed != 1)
             {
+                return BadRequest("Failed to create new user.");
+            }
+
+            try
+            {
+                Microsoft.Graph.User newGraphUser = new()
+                {
+                    AdditionalData = new Dictionary<string, object>()
+                    {
+                        { "extension_9ad29a8ab7fc468aa9c975e45b6eb34e_DatabaseId", newUser.Entity.Id.ToString() }
+                    }
+                };
+
+                await graph.Users[aadOid].Request().UpdateAsync(newGraphUser);
+
                 return CreatedAtRoute(
                     routeName: nameof(GetUserAsync),
                     routeValues: new { id = newUser.Entity.Id },
                     value: newUser.Entity);
             }
-            else
+            catch (Exception)
             {
-                return BadRequest("Failed to create new user.");
+                // Log this exception.
+                return BadRequest();
             }
         }
 
