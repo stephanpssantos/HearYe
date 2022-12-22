@@ -15,6 +15,9 @@ namespace HearYe.Shared
         public int Id { get; set; }
 
         [Required]
+        public int MessageGroupId { get; set; }
+
+        [Required]
         public int PostId { get; set; }
 
         [Required]
@@ -22,6 +25,8 @@ namespace HearYe.Shared
 
         [Required]
         public DateTime CreatedDate { get; set; }
+
+        public virtual MessageGroup? MessageGroup { get; set; }
 
         public virtual User? User { get; set; }
 

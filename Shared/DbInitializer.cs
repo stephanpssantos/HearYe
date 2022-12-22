@@ -105,12 +105,13 @@
                 Message = "This is test message 2. Amazing.",
                 IsDeleted = false,
                 CreatedDate = DateTime.Now,
-                StaleDate = null
+                StaleDate = DateTime.Now.AddDays(1)
             };
 
             Acknowledgement demoAcknowledgement1 = new()
             {
                 //Id = 1, // Set by DB
+                MessageGroupId = 1,
                 PostId = 1,
                 UserId = 1,
                 CreatedDate = DateTime.Now
@@ -119,6 +120,7 @@
             Acknowledgement demoAcknowledgement2 = new()
             {
                 //Id = 2, // Set by DB
+                MessageGroupId = 2,
                 PostId = 2,
                 UserId = 1,
                 CreatedDate = DateTime.Now

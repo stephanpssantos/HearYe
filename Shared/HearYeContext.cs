@@ -56,6 +56,11 @@ namespace HearYe.Shared
                     .HasForeignKey(e => e.PostId)
                     .OnDelete(DeleteBehavior.Cascade); // Delete Acknowledgement if Acknowledgement.Post is deleted.
 
+                entity.HasOne(e => e.MessageGroup)
+                    .WithMany(parent => parent.Acknowledgements)
+                    .HasForeignKey(e => e.MessageGroupId)
+                    .OnDelete(DeleteBehavior.Cascade); // Delete Acknowledgement if Acknowledgement.MessageGroup is deleted.
+
                 entity.HasIndex(e => new { e.UserId, e.PostId }).IsUnique(); // Prevent same user same post.
             });
 
