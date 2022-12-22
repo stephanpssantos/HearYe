@@ -27,11 +27,16 @@ namespace HearYe.Server.Controllers
         // GET: api/user/[id]
         [HttpGet("{id:int}", Name = nameof(GetUserAsync))]
         [ProducesResponseType(200, Type = typeof(User))]
+        [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> GetUserAsync(int id)
         {
-            // Later:
-            // var blah = HttpContext.User.Claims.FirstOrDefault(x => x.Type.Equals("extension_DatabaseId"))?.Value;
+            string? claimId = HttpContext.User.Claims.FirstOrDefault(x => x.Type.Equals("extension_DatabaseId"))?.Value;
+
+            if (claimId == null || claimId != id.ToString()) 
+            {
+                return Unauthorized();
+            }
 
             User? user = await db.Users!.FindAsync(id);
             
@@ -46,9 +51,17 @@ namespace HearYe.Server.Controllers
         // GET: api/user/?aadOid=[aadOid]
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(User))]
+        [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> GetUserByOidAsync(string aadOid)
         {
+            string? claimId = HttpContext.User.Claims.FirstOrDefault(x => x.Type.Equals("extension_DatabaseId"))?.Value;
+
+            if (claimId == null)
+            {
+                return Unauthorized();
+            }
+
             Guid input = new (aadOid);
             User? user = await db.Users!
                 .Where(u => u.AadOid == input)
@@ -58,14 +71,26 @@ namespace HearYe.Server.Controllers
             {
                 return NotFound();
             }
+            else if (user.Id.ToString() != claimId)
+            {
+                return Unauthorized();
+            }
             return Ok(user);
         }
 
         // GET: api/user/groups/[id]
         [HttpGet("groups/{id:int}")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<MessageGroup>))]
+        [ProducesResponseType(401)]
         public async Task<IActionResult> GetUserMessageGroups(int id)
         {
+            string? claimId = HttpContext.User.Claims.FirstOrDefault(x => x.Type.Equals("extension_DatabaseId"))?.Value;
+
+            if (claimId == null || claimId != id.ToString())
+            {
+                return Unauthorized();
+            }
+
             IEnumerable<MessageGroup?> mg = await db.MessageGroupMembers!
                 .Where(mgm => mgm.UserId == id)
                 .Select(mgm => mgm.MessageGroup)
@@ -131,12 +156,20 @@ namespace HearYe.Server.Controllers
         [HttpPut("{id:int}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] User user)
         {
+            string? claimId = HttpContext.User.Claims.FirstOrDefault(x => x.Type.Equals("extension_DatabaseId"))?.Value;
+
             if (user == null || user.Id != id)
             {
                 return BadRequest();
+            }
+
+            if (claimId == null || claimId != id.ToString())
+            {
+                return Unauthorized();
             }
 
             User? existing = await db.Users!.Where(u => u.Id == id).FirstAsync();
@@ -162,9 +195,17 @@ namespace HearYe.Server.Controllers
         [HttpDelete("{id:int}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> DeleteUser(int id)
         {
+            string? claimId = HttpContext.User.Claims.FirstOrDefault(x => x.Type.Equals("extension_DatabaseId"))?.Value;
+
+            if (claimId == null || claimId != id.ToString())
+            {
+                return Unauthorized();
+            }
+
             User? existing = await db.Users!.Where(u => u.Id == id).FirstAsync();
             if (existing == null)
             {
