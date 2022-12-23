@@ -152,12 +152,12 @@ namespace HearYe.Server.Controllers
         [ProducesResponseType(400)]
         public async Task<IActionResult> NewPost([FromBody] Post post)
         {
-            if (post == null)
+            if (post == null || post.MessageGroupId == null)
             {
-                return BadRequest("Post object required.");
+                return BadRequest("Complete post object required.");
             }
 
-            int userId = await UserAuthCheck(HttpContext.User.Claims, (int)post.MessageGroupId);
+            int userId = await UserAuthCheck(HttpContext.User.Claims, (int)post.MessageGroupId!);
 
             if (userId == -1)
             {
@@ -176,6 +176,41 @@ namespace HearYe.Server.Controllers
                 routeName: nameof(GetPost),
                 routeValues: new { id = newPost.Entity.Id },
                 value: newPost.Entity);
+        }
+
+        // DELETE: api/post/[id]
+        [HttpDelete("{id:int}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> DeletePost(int id)
+        {
+            Post post = await db.Posts!.Where(p => p.Id == id).FirstAsync();
+
+            if (post == null || post.MessageGroupId == null)
+            {
+                return NotFound();
+            }
+
+            int userId = await UserAuthCheck(HttpContext.User.Claims, (int)post.MessageGroupId!);
+
+            if (userId == -1 || userId != post.UserId)
+            {
+                return Unauthorized();
+            }
+
+            db.Posts!.Remove(post);
+            int completed = await db.SaveChangesAsync();
+
+            if (completed == 1)
+            {
+                return NoContent();
+            }
+            else
+            {
+                return BadRequest("Post found but failed to delete.");
+            }
         }
 
         /// <summary>
