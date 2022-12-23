@@ -25,11 +25,11 @@ namespace HearYe.Server.Controllers
         }
 
         // GET: api/user/[id]
-        [HttpGet("{id:int}", Name = nameof(GetUserAsync))]
+        [HttpGet("{id:int}", Name = nameof(GetUser))]
         [ProducesResponseType(200, Type = typeof(User))]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
-        public async Task<IActionResult> GetUserAsync(int id)
+        public async Task<IActionResult> GetUser(int id)
         {
             string? claimId = HttpContext.User.Claims.FirstOrDefault(x => x.Type.Equals("extension_DatabaseId"))?.Value;
 
@@ -53,7 +53,7 @@ namespace HearYe.Server.Controllers
         [ProducesResponseType(200, Type = typeof(User))]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
-        public async Task<IActionResult> GetUserByOidAsync(string aadOid)
+        public async Task<IActionResult> GetUserByOid(string aadOid)
         {
             string? claimId = HttpContext.User.Claims.FirstOrDefault(x => x.Type.Equals("extension_DatabaseId"))?.Value;
 
@@ -140,7 +140,7 @@ namespace HearYe.Server.Controllers
                 await graph.Users[aadOid].Request().UpdateAsync(newGraphUser);
 
                 return CreatedAtRoute(
-                    routeName: nameof(GetUserAsync),
+                    routeName: nameof(GetUser),
                     routeValues: new { id = newUser.Entity.Id },
                     value: newUser.Entity);
             }

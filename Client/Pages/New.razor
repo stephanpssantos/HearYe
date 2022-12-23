@@ -72,6 +72,13 @@
         {
             demoUser1 = await service.GetUserAsync("1");
             demoUser2 = await service.GetUserByOIDAsync("f09cc0b1-f05d-40e0-9684-c4a945d4e7e0");
+
+            var ble = await service.GetNewPostsAsync("1");
+            foreach(var eh in ble)
+            {
+                Console.WriteLine(eh.Id);
+                Console.WriteLine(eh.Message);
+            }
         }
         catch (AccessTokenNotAvailableException)
         {

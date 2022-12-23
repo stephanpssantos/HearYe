@@ -12,7 +12,6 @@ namespace HearYe.Shared
         public MessageGroup() 
         {
             Posts = new HashSet<Post>();
-            Acknowledgements = new HashSet<Acknowledgement>();
             MessageGroupMembers = new HashSet<MessageGroupMember>();
             MessageGroupInvitations = new HashSet<MessageGroupInvitation>();
         }
@@ -33,8 +32,6 @@ namespace HearYe.Shared
         public DateTime? DeletedDate { get; set; }
 
         public virtual ICollection<Post>? Posts { get; set; }
-
-        public virtual ICollection<Acknowledgement>? Acknowledgements { get; set; }
 
         public virtual ICollection<MessageGroupMember>? MessageGroupMembers { get; set; }
 

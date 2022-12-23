@@ -8,5 +8,6 @@ namespace HearYe.Client.Data
         Task<User?> GetUserByOIDAsync(string userOidGuid);
         Task<List<MessageGroup>?> GetUserMessageGroupsAsync(string userId);
         Task<User?> NewUserAsync(User user);
+        Task<List<Post>?> GetNewPostsAsync(string messageGroupId, int count = 15, int skip = 0);
     }
 }

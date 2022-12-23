@@ -33,5 +33,10 @@ namespace HearYe.Client.Data
 
             return await response.Content.ReadFromJsonAsync<User>();
         }
+
+        public Task<List<Post>?> GetNewPostsAsync(string messageGroupId, int count = 15, int skip = 0)
+        {
+            return http.GetFromJsonAsync<List<Post>?>($"api/post/new?messageGroupId={messageGroupId}&count={count}&skip={skip}");
+        }
     }
 }

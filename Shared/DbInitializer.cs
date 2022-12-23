@@ -108,10 +108,31 @@
                 StaleDate = DateTime.Now.AddDays(1)
             };
 
+            Post demoPost3 = new()
+            {
+                //Id = 3, // Set by DB
+                UserId = 1,
+                MessageGroupId = 1,
+                Message = "This is test message 3. Wow.",
+                IsDeleted = false,
+                CreatedDate = DateTime.Now,
+                StaleDate = null
+            };
+
+            Post demoPost4 = new()
+            {
+                //Id = 4, // Set by DB
+                UserId = 1,
+                MessageGroupId = 1,
+                Message = "This is test message 4. Wow.",
+                IsDeleted = false,
+                CreatedDate = DateTime.Now,
+                StaleDate = null
+            };
+
             Acknowledgement demoAcknowledgement1 = new()
             {
                 //Id = 1, // Set by DB
-                MessageGroupId = 1,
                 PostId = 1,
                 UserId = 1,
                 CreatedDate = DateTime.Now
@@ -120,7 +141,6 @@
             Acknowledgement demoAcknowledgement2 = new()
             {
                 //Id = 2, // Set by DB
-                MessageGroupId = 2,
                 PostId = 2,
                 UserId = 1,
                 CreatedDate = DateTime.Now
@@ -138,6 +158,8 @@
             context.MessageGroupMembers!.Add(demoMGM3);
             context.Posts!.Add(demoPost1);
             context.Posts!.Add(demoPost2);
+            context.Posts!.Add(demoPost3);
+            context.Posts!.Add(demoPost4);
             context.SaveChanges();
             context.Acknowledgements!.Add(demoAcknowledgement1);
             context.Acknowledgements!.Add(demoAcknowledgement2);
