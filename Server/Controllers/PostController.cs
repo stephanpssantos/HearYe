@@ -150,6 +150,7 @@ namespace HearYe.Server.Controllers
         [HttpPost]
         [ProducesResponseType(201, Type = typeof(User))]
         [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
         public async Task<IActionResult> NewPost([FromBody] Post post)
         {
             if (post == null || post.MessageGroupId == null)
@@ -214,7 +215,7 @@ namespace HearYe.Server.Controllers
         }
 
         /// <summary>
-        /// Checks that the user is authorized and belongs to the MessageGroup being requested.
+        /// Checks that the user is logged in and belongs to the MessageGroup being requested.
         /// </summary>
         /// <param name="claims">HttpContext.User.Claims object.</param>
         /// <param name="messageGroupId">MessageGroup.Id of specified group.</param>

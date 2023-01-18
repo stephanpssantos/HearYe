@@ -71,7 +71,7 @@ namespace HearYe.Server.Controllers
             {
                 return NotFound();
             }
-            else if (user.Id.ToString() != claimId)
+            else if (user.Id.ToString() != claimId) // && user.role != Admin
             {
                 return Unauthorized();
             }
@@ -192,6 +192,7 @@ namespace HearYe.Server.Controllers
         }
 
         // DELETE: api/user/[id]
+        // Deletes from app db only. B2C account remains.
         [HttpDelete("{id:int}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
