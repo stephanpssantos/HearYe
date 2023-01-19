@@ -15,8 +15,8 @@
                 {
                     using (var context = CreateContext())
                     {
-                        //DbInitializer.Initialize(context);
-                        context.Database.EnsureCreated();
+                        DbInitializer.Initialize(context);
+                        //context.Database.EnsureCreated();
                     }
 
                     _databaseInitialized = true;

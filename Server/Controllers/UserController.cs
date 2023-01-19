@@ -51,6 +51,7 @@ namespace HearYe.Server.Controllers
         // GET: api/user/?aadOid=[aadOid]
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(User))]
+        [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> GetUserByOid(string aadOid)
@@ -62,10 +63,15 @@ namespace HearYe.Server.Controllers
                 return Unauthorized();
             }
 
-            Guid input = new (aadOid);
+            bool validGuid = Guid.TryParse(aadOid, out Guid input);
+            if (!validGuid)
+            {
+                return BadRequest();
+            }
+
             User? user = await db.Users!
                 .Where(u => u.AadOid == input)
-                .FirstAsync();
+                .FirstOrDefaultAsync();
 
             if (user == null)
             {
@@ -106,29 +112,36 @@ namespace HearYe.Server.Controllers
         [ProducesResponseType(400)]
         public async Task<IActionResult> NewUser([FromBody] User user)
         {
-            if (user == null)
+            if (user == null || !ModelState.IsValid)
             {
-                return BadRequest("User object required.");
+                return BadRequest("Valid user object required.");
             }
 
             string? aadOid = HttpContext.User.Claims.FirstOrDefault(x => 
                 x.Type.Equals("http://schemas.microsoft.com/identity/claims/objectidentifier"))?.Value;
 
-            if (aadOid == null || aadOid != user.AadOid.ToString())
+            if (aadOid == null)
+            {
+                return Unauthorized();
+            }
+
+            if (aadOid != user.AadOid.ToString())
             {
                 return BadRequest("Azure AD object ID (AadOid) missing or mismatched.");
             }
 
-            EntityEntry<User> newUser = await db.Users!.AddAsync(user);
-            int completed = await db.SaveChangesAsync();
-
-            if (completed != 1)
-            {
-                return BadRequest("Failed to create new user.");
-            }
+            using var transaction = db.Database.BeginTransaction();
 
             try
             {
+                EntityEntry<User> newUser = await db.Users!.AddAsync(user);
+                int completed = await db.SaveChangesAsync();
+
+                if (completed != 1)
+                {
+                    return BadRequest("Failed to create new user.");
+                }
+
                 Microsoft.Graph.User newGraphUser = new()
                 {
                     AdditionalData = new Dictionary<string, object>()
@@ -139,6 +152,8 @@ namespace HearYe.Server.Controllers
 
                 await graph.Users[aadOid].Request().UpdateAsync(newGraphUser);
 
+                transaction.Commit();
+
                 return CreatedAtRoute(
                     routeName: nameof(GetUser),
                     routeValues: new { id = newUser.Entity.Id },
@@ -147,11 +162,12 @@ namespace HearYe.Server.Controllers
             catch (Exception)
             {
                 // Log this exception.
-                return BadRequest();
+                transaction.Rollback();
+                return BadRequest("Failed to register graph record for new user.");
             }
         }
 
-        // PUT: api/user
+        // PUT: api/user/[id]
         // BODY: User (JSON)
         [HttpPut("{id:int}")]
         [ProducesResponseType(204)]
@@ -164,7 +180,7 @@ namespace HearYe.Server.Controllers
 
             if (user == null || user.Id != id)
             {
-                return BadRequest();
+                return BadRequest("User ID mismatch.");
             }
 
             if (claimId == null || claimId != id.ToString())
@@ -172,7 +188,7 @@ namespace HearYe.Server.Controllers
                 return Unauthorized();
             }
 
-            User? existing = await db.Users!.Where(u => u.Id == id).FirstAsync();
+            User? existing = await db.Users!.Where(u => u.Id == id).FirstOrDefaultAsync();
             if (existing == null)
             {
                 return NotFound();
@@ -207,7 +223,7 @@ namespace HearYe.Server.Controllers
                 return Unauthorized();
             }
 
-            User? existing = await db.Users!.Where(u => u.Id == id).FirstAsync();
+            User? existing = await db.Users!.Where(u => u.Id == id).FirstOrDefaultAsync();
             if (existing == null)
             {
                 return NotFound();

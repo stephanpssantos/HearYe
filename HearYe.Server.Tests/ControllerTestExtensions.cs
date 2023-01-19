@@ -26,7 +26,8 @@ namespace HearYe.Server.Tests
             return controller;
         }
 
-        public static T WithAuthenticatedIdentity<T>(this T controller, string dbId) where T : ControllerBase
+        public static T WithAuthenticatedIdentity<T>(this T controller, string dbId, string aadOid = "f09cc0b1-f05d-40e0-9684-c4a945d4e7e0") 
+            where T : ControllerBase
         {
             if (controller.ControllerContext is null || controller.ControllerContext.HttpContext is null)
             {
@@ -40,7 +41,8 @@ namespace HearYe.Server.Tests
                 (
                     new Claim[]
                     {
-                        new Claim("extension_DatabaseId", dbId, "http://www.w3.org/2001/XMLSchema#string")
+                        new Claim("extension_DatabaseId", dbId, "http://www.w3.org/2001/XMLSchema#string"),
+                        new Claim("http://schemas.microsoft.com/identity/claims/objectidentifier", aadOid, "http://www.w3.org/2001/XMLSchema#string")
                     }, "AuthUserTest1"
                 )
             );

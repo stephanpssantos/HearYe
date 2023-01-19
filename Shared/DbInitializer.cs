@@ -34,6 +34,17 @@
                 LastModifiedDate = DateTime.Now
             };
 
+            User demoUser3 = new()
+            {
+                //Id = 3, // Set by DB
+                AadOid = new Guid("f09cc0b1-f05d-40e0-9684-c4a945d4e7e2"),
+                DisplayName = "TestUser3",
+                AcceptGroupInvitations = true,
+                IsDeleted = false,
+                CreatedDate = DateTime.Now,
+                LastModifiedDate = DateTime.Now
+            };
+
             MessageGroup demoMG1 = new()
             {
                 //Id = 1,
@@ -148,6 +159,7 @@
 
             context.Users!.Add(demoUser1);
             context.Users!.Add(demoUser2);
+            context.Users!.Add(demoUser3);
             context.MessageGroups!.Add(demoMG1);
             context.MessageGroups!.Add(demoMG2);
             context.MessageGroupRoles!.Add(demoMGR1);
