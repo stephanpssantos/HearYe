@@ -1,10 +1,11 @@
-using HearYe.Shared;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Identity.Web;
 using Microsoft.Extensions.DependencyInjection;
+using System.Text.Json.Serialization;
+using HearYe.Shared;
 using HearYe.Server;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -27,7 +28,8 @@ string graphClientId = builder.Configuration.GetSection("MicrosoftGraph")["Clien
 string graphAppRegSecret = builder.Configuration["Graph:AppRegSecret"]!;
 builder.Services.AddGraphClient(graphScopes, graphTenantId, graphClientId, graphAppRegSecret);
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews()
+    .AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 builder.Services.AddRazorPages();
 
 var app = builder.Build();
