@@ -38,7 +38,7 @@ namespace HearYe.Server.Controllers
                 return Unauthorized();
             }
 
-            User? user = await db.Users!.FindAsync(id);
+            User? user = await db.Users!.FirstOrDefaultAsync(user => user.Id == id);
             
             if (user == null)
             {

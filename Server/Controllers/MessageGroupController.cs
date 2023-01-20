@@ -28,7 +28,7 @@ namespace HearYe.Server.Controllers
         [ProducesResponseType(404)]
         public async Task<IActionResult> GetMessageGroup(int id)
         {
-            MessageGroup? messageGroup = await db.MessageGroups!.Where(mg => mg.Id == id).FirstAsync();
+            MessageGroup? messageGroup = await db.MessageGroups!.Where(mg => mg.Id == id).FirstOrDefaultAsync();
 
             if (messageGroup == null)
             {
@@ -86,39 +86,65 @@ namespace HearYe.Server.Controllers
                 return Unauthorized();
             }
 
-            if (groupName == null)
+            if (string.IsNullOrEmpty(groupName))
             {
                 return BadRequest("New group name required.");
             }
 
-            // Make group
-            MessageGroup newGroup = new MessageGroup()
+            if (groupName.Length > 50 || groupName.Length < 4)
             {
-                MessageGroupName = groupName,
-                IsDeleted = false,
-                CreatedDate = DateTime.Now,
-            };
-            EntityEntry<MessageGroup> newGroupEntry = await db.MessageGroups!.AddAsync(newGroup);
-
-            // Assign user requesting new group as group admin
-            MessageGroupMember newGroupAdmin = new MessageGroupMember()
-            {
-                MessageGroupId = newGroupEntry.Entity.Id,
-                MessageGroupRoleId = 1, // Admin
-                UserId = claimIdInt
-            };
-            EntityEntry<MessageGroupMember> newGroupAdminEntry = await db.MessageGroupMembers!.AddAsync(newGroupAdmin);
-
-            int completed = await db.SaveChangesAsync();
-            if (completed != 1)
-            {
-                return BadRequest("Failed to create new message group.");
+                return BadRequest("New group name must be between 4 and 50 characters.");
             }
 
-            return CreatedAtRoute(
-                routeName: nameof(GetMessageGroup),
-                routeValues: new { id = newGroupEntry.Entity.Id },
-                value: newGroupEntry.Entity);
+            using var transaction = db.Database.BeginTransaction();
+
+            try
+            {
+                // Make group
+                MessageGroup newGroup = new MessageGroup()
+                {
+                    MessageGroupName = groupName,
+                    IsDeleted = false,
+                    CreatedDate = DateTime.Now,
+                };
+                EntityEntry<MessageGroup> newGroupEntry = await db.MessageGroups!.AddAsync(newGroup);
+
+                int completedGroup = await db.SaveChangesAsync();
+                if (completedGroup != 1)
+                {
+                    transaction.Rollback();
+                    return BadRequest("Failed to create new message group.");
+                }
+
+                // Assign user requesting new group as group admin
+                MessageGroupMember newGroupAdmin = new MessageGroupMember()
+                {
+                    MessageGroupId = newGroupEntry.Entity.Id,
+                    MessageGroupRoleId = 1, // Admin
+                    UserId = claimIdInt
+                };
+                EntityEntry<MessageGroupMember> newGroupAdminEntry = await db.MessageGroupMembers!.AddAsync(newGroupAdmin);
+
+                int completedAdmin = await db.SaveChangesAsync();
+                if (completedAdmin != 1)
+                {
+                    transaction.Rollback();
+                    return BadRequest("Failed to add users to group.");
+                }
+
+                transaction.Commit();
+
+                return CreatedAtRoute(
+                    routeName: nameof(GetMessageGroup),
+                    routeValues: new { id = newGroupEntry.Entity.Id },
+                    value: newGroupEntry.Entity);
+            }
+            catch (Exception)
+            {
+                // Log this exception.
+                transaction.Rollback();
+                return BadRequest("Failed to create new message group.");
+            }
         }
 
         // PUT: api/messagegroup/setrole
@@ -128,7 +154,7 @@ namespace HearYe.Server.Controllers
         [ProducesResponseType(400)]
         public async Task<IActionResult> SetMessageGroupRole([FromBody] MessageGroupMember mgm)
         {
-            if (mgm == null)
+            if (mgm == null || !ModelState.IsValid)
             {
                 return BadRequest();
             }
@@ -159,7 +185,7 @@ namespace HearYe.Server.Controllers
         [ProducesResponseType(404)]
         public async Task<IActionResult> DeleteMessageGroup(int id)
         {
-            MessageGroup mg = await db.MessageGroups!.Where(mg => mg.Id == id).FirstAsync();
+            MessageGroup? mg = await db.MessageGroups!.Where(mg => mg.Id == id).FirstOrDefaultAsync();
 
             if (mg == null || id == 0)
             {
@@ -210,7 +236,7 @@ namespace HearYe.Server.Controllers
 
             MessageGroupMember? mgm = await db.MessageGroupMembers!
                 .Where(mgm => mgm.UserId == claimIdInt && mgm.MessageGroupId == messageGroupId)
-                .FirstAsync();
+                .FirstOrDefaultAsync();
 
             return mgm != null ? mgm.MessageGroupRoleId ?? -1 : -1;
         }

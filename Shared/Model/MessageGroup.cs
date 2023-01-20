@@ -21,6 +21,8 @@ namespace HearYe.Shared
         public int Id { get; set; }
 
         [Required]
+        [StringLength(50, MinimumLength = 4, 
+            ErrorMessage = "Group name must be between 4 and 50 characters.")]
         public string MessageGroupName { get; set; } = String.Empty;
 
         [Required]

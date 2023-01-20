@@ -72,6 +72,14 @@
                 CreatedDate = DateTime.Now
             };
 
+            MessageGroup demoMG3 = new()
+            {
+                //Id = 3,
+                MessageGroupName = "Test Message_Group3",
+                IsDeleted = false,
+                CreatedDate = DateTime.Now
+            };
+
             MessageGroupRole demoMGR1 = new()
             {
                 //Id = 1,
@@ -114,6 +122,14 @@
                 MessageGroupId = 1,
                 MessageGroupRoleId = 2,
                 UserId = 4
+            };
+
+            MessageGroupMember demoMGM5 = new()
+            {
+                //Id = 5,
+                MessageGroupId = 3,
+                MessageGroupRoleId = 1,
+                UserId = 1
             };
 
             Post demoPost1 = new()
@@ -220,6 +236,7 @@
             context.Users!.Add(demoUser4);
             context.MessageGroups!.Add(demoMG1);
             context.MessageGroups!.Add(demoMG2);
+            context.MessageGroups!.Add(demoMG3);
             context.MessageGroupRoles!.Add(demoMGR1);
             context.MessageGroupRoles!.Add(demoMGR2);
             context.SaveChanges();
@@ -227,6 +244,7 @@
             context.MessageGroupMembers!.Add(demoMGM2);
             context.MessageGroupMembers!.Add(demoMGM3);
             context.MessageGroupMembers!.Add(demoMGM4);
+            context.MessageGroupMembers!.Add(demoMGM5);
             context.Posts!.Add(demoPost1);
             context.Posts!.Add(demoPost2);
             context.Posts!.Add(demoPost3);

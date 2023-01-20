@@ -1,6 +1,4 @@
-﻿using Microsoft.Graph;
-
-namespace HearYe.Server.Tests
+﻿namespace HearYe.Server.Tests
 {
     public class PostControllerTests : IClassFixture<HearYeDatabaseFixture>
     {
