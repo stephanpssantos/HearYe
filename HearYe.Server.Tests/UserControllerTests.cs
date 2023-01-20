@@ -350,7 +350,7 @@ namespace HearYe.Server.Tests
                 // Assert
                 Assert.IsType<BadRequestObjectResult>(result);
                 Assert.Equal(resultBody!.Value, "Failed to register graph record for new user.");
-                Assert.Equal(3, context.Users!.Count());
+                Assert.DoesNotContain(context.Users!, users => users.DisplayName == "TestUser_1");
             }
         }
 

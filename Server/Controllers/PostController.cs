@@ -28,7 +28,7 @@ namespace HearYe.Server.Controllers
         [ProducesResponseType(404)]
         public async Task<IActionResult> GetPost(int id)
         {
-            Post? post = await db.Posts!.Where(p => p.Id == id).FirstAsync();
+            Post? post = await db.Posts!.Where(p => p.Id == id).FirstOrDefaultAsync();
 
             if (post == null)
             {
@@ -70,7 +70,7 @@ namespace HearYe.Server.Controllers
                 (
                     p => p.MessageGroupId == messageGroupId
                     && (p.StaleDate == null || p.StaleDate > DateTime.Now)
-                    && (p.Acknowledgements!.Where(a => a.UserId == userId)).All(a => p.Id != a.PostId)
+                    && (p.Acknowledgements!.All(a => a.UserId != userId))
                 )
                 .OrderByDescending(p => p.CreatedDate)
                 .Skip(skip)
@@ -105,7 +105,7 @@ namespace HearYe.Server.Controllers
                 (
                     p => p.MessageGroupId == messageGroupId
                     && (p.StaleDate == null || p.StaleDate > DateTime.Now)
-                    && (p.Acknowledgements!.Where(a => a.UserId == userId)).All(a => p.Id == a.PostId)
+                    && (p.Acknowledgements!.Any(a => a.UserId == userId))
                 )
                 .OrderByDescending(p => p.CreatedDate)
                 .Skip(skip)
@@ -153,7 +153,7 @@ namespace HearYe.Server.Controllers
         [ProducesResponseType(401)]
         public async Task<IActionResult> NewPost([FromBody] Post post)
         {
-            if (post == null || post.MessageGroupId == null)
+            if (post == null || post.MessageGroupId == null || !ModelState.IsValid)
             {
                 return BadRequest("Complete post object required.");
             }
@@ -187,7 +187,7 @@ namespace HearYe.Server.Controllers
         [ProducesResponseType(404)]
         public async Task<IActionResult> DeletePost(int id)
         {
-            Post post = await db.Posts!.Where(p => p.Id == id).FirstAsync();
+            Post? post = await db.Posts!.Where(p => p.Id == id).FirstOrDefaultAsync();
 
             if (post == null || post.MessageGroupId == null)
             {
@@ -201,7 +201,10 @@ namespace HearYe.Server.Controllers
                 return Unauthorized();
             }
 
-            db.Posts!.Remove(post);
+            post.IsDeleted = true;
+            post.DeletedDate = DateTime.Now;
+            db.Posts!.Update(post);
+
             int completed = await db.SaveChangesAsync();
 
             if (completed == 1)
@@ -235,7 +238,7 @@ namespace HearYe.Server.Controllers
 
             MessageGroupMember? mgm = await db.MessageGroupMembers!
                 .Where(mgm => mgm.UserId == claimIdInt && mgm.MessageGroupId == messageGroupId)
-                .FirstAsync();
+                .FirstOrDefaultAsync();
 
             return mgm != null ? claimIdInt : -1;
         }
