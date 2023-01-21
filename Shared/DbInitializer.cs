@@ -39,7 +39,7 @@
                 //Id = 3, // Set by DB
                 AadOid = new Guid("f09cc0b1-f05d-40e0-9684-c4a945d4e7e2"),
                 DisplayName = "TestUser3",
-                AcceptGroupInvitations = true,
+                AcceptGroupInvitations = false,
                 IsDeleted = false,
                 CreatedDate = DateTime.Now,
                 LastModifiedDate = DateTime.Now
@@ -50,6 +50,28 @@
                 //Id = 4, // Set by DB
                 AadOid = new Guid("f09cc0b1-f05d-40e0-9684-c4a945d4e7e4"),
                 DisplayName = "TestUser4",
+                AcceptGroupInvitations = true,
+                IsDeleted = false,
+                CreatedDate = DateTime.Now,
+                LastModifiedDate = DateTime.Now
+            };
+
+            User demoUser5 = new()
+            {
+                //Id = 5, // Set by DB
+                AadOid = new Guid("f09cc0b1-f05d-40e0-9684-c4a945d4e8ec"),
+                DisplayName = "TestUser5",
+                AcceptGroupInvitations = true,
+                IsDeleted = false,
+                CreatedDate = DateTime.Now,
+                LastModifiedDate = DateTime.Now
+            };
+
+            User demoUser6 = new()
+            {
+                //Id = 6, // Set by DB
+                AadOid = new Guid("f09cc0b1-f05d-40e0-9684-c4a945d4efec"),
+                DisplayName = "TestUser6",
                 AcceptGroupInvitations = true,
                 IsDeleted = false,
                 CreatedDate = DateTime.Now,
@@ -130,6 +152,73 @@
                 MessageGroupId = 3,
                 MessageGroupRoleId = 1,
                 UserId = 1
+            };
+
+            MessageGroupInvitation demoMGI1 = new()
+            {
+                //Id = 1,
+                MessageGroupId = 1,
+                InvitedUserId = 2,
+                InvitingUserId = 1,
+                InvitationActive = true,
+                InvitationAccepted = false,
+                CreatedDate = DateTime.Now
+            };
+
+            MessageGroupInvitation demoMGI2 = new()
+            {
+                //Id = 2,
+                MessageGroupId = 2,
+                InvitedUserId = 4,
+                InvitingUserId = 1,
+                InvitationActive = true,
+                InvitationAccepted = false,
+                CreatedDate = DateTime.Now
+            };
+
+            MessageGroupInvitation demoMGI3 = new()
+            {
+                //Id = 3,
+                MessageGroupId = 3,
+                InvitedUserId = 4,
+                InvitingUserId = 1,
+                InvitationActive = false,
+                InvitationAccepted = false,
+                CreatedDate = DateTime.Now.AddDays(-1),
+                ActionDate = DateTime.Now,
+            };
+
+            MessageGroupInvitation demoMGI4 = new()
+            {
+                //Id = 4,
+                MessageGroupId = 2,
+                InvitedUserId = 5,
+                InvitingUserId = 1,
+                InvitationActive = true,
+                InvitationAccepted = false,
+                CreatedDate = DateTime.Now
+            };
+
+            MessageGroupInvitation demoMGI5 = new()
+            {
+                //Id = 5,
+                MessageGroupId = 1,
+                InvitedUserId = 6,
+                InvitingUserId = 4,
+                InvitationActive = true,
+                InvitationAccepted = false,
+                CreatedDate = DateTime.Now
+            };
+
+            MessageGroupInvitation demoMGI6 = new()
+            {
+                //Id = 6,
+                MessageGroupId = 2,
+                InvitedUserId = 6,
+                InvitingUserId = 2,
+                InvitationActive = true,
+                InvitationAccepted = false,
+                CreatedDate = DateTime.Now
             };
 
             Post demoPost1 = new()
@@ -234,6 +323,8 @@
             context.Users!.Add(demoUser2);
             context.Users!.Add(demoUser3);
             context.Users!.Add(demoUser4);
+            context.Users!.Add(demoUser5);
+            context.Users!.Add(demoUser6);
             context.MessageGroups!.Add(demoMG1);
             context.MessageGroups!.Add(demoMG2);
             context.MessageGroups!.Add(demoMG3);
@@ -252,6 +343,12 @@
             context.Posts!.Add(demoPost5);
             context.Posts!.Add(demoPost6);
             context.SaveChanges();
+            context.MessageGroupInvitations!.Add(demoMGI1);
+            context.MessageGroupInvitations!.Add(demoMGI2);
+            context.MessageGroupInvitations!.Add(demoMGI3);
+            context.MessageGroupInvitations!.Add(demoMGI4);
+            context.MessageGroupInvitations!.Add(demoMGI5);
+            context.MessageGroupInvitations!.Add(demoMGI6);
             context.Acknowledgements!.Add(demoAcknowledgement1);
             context.Acknowledgements!.Add(demoAcknowledgement2);
             context.Acknowledgements!.Add(demoAcknowledgement3);

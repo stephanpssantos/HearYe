@@ -251,7 +251,7 @@ namespace HearYe.Server.Tests
                 Assert.IsType<OkObjectResult>(result);
                 Assert.NotNull(resultBody);
                 Assert.IsAssignableFrom<IEnumerable<MessageGroup>>(resultBody);
-                Assert.Equal(2, resultBody.Count());
+                Assert.Equal(3, resultBody.Where(mg => mg.MessageGroupName != "UnitTestGroup").Count());
             }
         }
 
