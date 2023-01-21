@@ -319,6 +319,14 @@
                 CreatedDate = DateTime.Now
             };
 
+            Acknowledgement demoAcknowledgement5 = new()
+            {
+                //Id = 5, // Set by DB
+                PostId = 2,
+                UserId = 2,
+                CreatedDate = DateTime.Now
+            };
+
             context.Users!.Add(demoUser1);
             context.Users!.Add(demoUser2);
             context.Users!.Add(demoUser3);
@@ -353,6 +361,7 @@
             context.Acknowledgements!.Add(demoAcknowledgement2);
             context.Acknowledgements!.Add(demoAcknowledgement3);
             context.Acknowledgements!.Add(demoAcknowledgement4);
+            context.Acknowledgements!.Add(demoAcknowledgement5);
             context.SaveChanges();
         }
     }
