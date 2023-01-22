@@ -171,15 +171,34 @@ namespace HearYe.Server.Controllers
                 return Unauthorized();
             }
 
-            db.MessageGroupMembers!.Update(mgm);
-            int completed = await db.SaveChangesAsync();
-
-            if (completed != 1)
+            using var transaction = db.Database.BeginTransaction();
+            try
             {
-                return BadRequest("Failed to set message group member role.");
-            }
+                EntityEntry<MessageGroupMember> mgmUpdate = db.MessageGroupMembers!.Update(mgm);
 
-            return new NoContentResult();
+                if (mgmUpdate.State == EntityState.Added)
+                {
+                    transaction.Rollback();
+                    return BadRequest("Specified user is not group member.");
+                }
+
+                int completed = await db.SaveChangesAsync();
+
+                if (completed != 1)
+                {
+                    transaction.Rollback();
+                    return BadRequest("Failed to set message group member role.");
+                }
+
+                transaction.Commit();
+                return new NoContentResult();
+            }
+            catch (Exception)
+            {
+                // Log this exception.
+                transaction.Rollback();
+                return BadRequest("Error when setting message group member role.");
+            }
         }
 
         // DELETE: api/messagegroup/[id]

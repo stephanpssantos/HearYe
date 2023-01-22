@@ -298,6 +298,28 @@ namespace HearYe.Server.Tests
         }
 
         [Fact]
+        public async void SetMessageGroupRole_ReturnsBadRequestWhenNotAlreadyMember()
+        {
+            // Arrange
+            using (HearYeContext context = Fixture.CreateContext())
+            {
+                var controller = new MessageGroupController(context).WithAuthenticatedIdentity("1");
+                var mgm = new MessageGroupMember();
+                mgm.MessageGroupId = 1;
+                mgm.MessageGroupRoleId = 1;
+                mgm.UserId = 2;
+
+                // Act
+                var result = await controller.SetMessageGroupRole(mgm);
+                var resultObject = result as BadRequestObjectResult;
+
+                // Assert
+                Assert.IsType<BadRequestObjectResult>(result);
+                Assert.Equal("Specified user is not group member.", resultObject!.Value);
+            }
+        }
+
+        [Fact]
         public async void SetMessageGroupRole_NoContentResultWhenRequestIsValid()
         {
             // Arrange
