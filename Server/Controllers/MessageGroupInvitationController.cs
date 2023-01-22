@@ -1,11 +1,11 @@
-﻿using HearYe.Shared;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Identity.Web.Resource;
-using System.ComponentModel;
 using System.Security.Claims;
+using HearYe.Shared;
+using HearYe.Server.Helpers;
 
 namespace HearYe.Server.Controllers
 {
@@ -36,8 +36,10 @@ namespace HearYe.Server.Controllers
                 return NotFound();
             }
 
-            int authCheck = await UserInviteAuthCheck(HttpContext.User.Claims, id);
-            if (authCheck == 0)
+            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
+            int roleId = await AuthCheck.UserInviteAuthCheck(db, claimId, id);
+
+            if (roleId == 0)
             {
                 return Unauthorized();
             }
@@ -51,8 +53,8 @@ namespace HearYe.Server.Controllers
         [ProducesResponseType(401)]
         public async Task<IActionResult> GetMessageGroupInvitations(int userId)
         {
-            int authCheck = UserClaimCheck(HttpContext.User.Claims);
-            if (authCheck == 0 || userId != authCheck)
+            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
+            if (claimId == 0 || userId != claimId)
             {
                 return Unauthorized();
             }
@@ -79,8 +81,10 @@ namespace HearYe.Server.Controllers
                 return BadRequest();
             }
 
-            int claimCheck = await UserGroupAuthCheck(HttpContext.User.Claims, invite.MessageGroupId);
-            if (claimCheck == 0)
+            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
+            int roleId = await AuthCheck.UserGroupAuthCheck(db, claimId, invite.MessageGroupId);
+
+            if (roleId == 0)
             {
                 return Unauthorized();
             }
@@ -138,8 +142,8 @@ namespace HearYe.Server.Controllers
                 return BadRequest("Invalid invite id.");
             }
 
-            int claimCheck = UserClaimCheck(HttpContext.User.Claims);
-            if (claimCheck == 0)
+            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
+            if (claimId == 0)
             {
                 return Unauthorized();
             }
@@ -156,7 +160,7 @@ namespace HearYe.Server.Controllers
             {
                 return BadRequest("Invitation already used.");
             }
-            else if (claimCheck != mgi.InvitedUserId)
+            else if (claimId != mgi.InvitedUserId)
             {
                 return Unauthorized("Not invite recipient.");
             }
@@ -199,8 +203,8 @@ namespace HearYe.Server.Controllers
                 return BadRequest("Invalid invite id.");
             }
 
-            int claimCheck = UserClaimCheck(HttpContext.User.Claims);
-            if (claimCheck == 0)
+            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
+            if (claimId == 0)
             {
                 return Unauthorized();
             }
@@ -217,7 +221,7 @@ namespace HearYe.Server.Controllers
             {
                 return BadRequest("Invitation already used.");
             }
-            else if (claimCheck != mgi.InvitedUserId)
+            else if (claimId != mgi.InvitedUserId)
             {
                 return Unauthorized("Not invite recipient.");
             }
@@ -276,8 +280,8 @@ namespace HearYe.Server.Controllers
                 return BadRequest("Invalid invite id.");
             }
 
-            int claimCheck = UserClaimCheck(HttpContext.User.Claims);
-            if (claimCheck == 0)
+            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
+            if (claimId == 0)
             {
                 return Unauthorized();
             }
@@ -290,7 +294,7 @@ namespace HearYe.Server.Controllers
             {
                 return NotFound();
             }
-            else if (claimCheck != mgi.InvitingUserId)
+            else if (claimId != mgi.InvitingUserId)
             {
                 return Unauthorized("Not invite sender.");
             }
@@ -313,96 +317,6 @@ namespace HearYe.Server.Controllers
             {
                 // Log this exception
                 return BadRequest("Error when deleting invitation.");
-            }
-        }
-
-        /// <summary>
-        /// Checks that the user is logged in finds their database ID within their claims.
-        /// </summary>
-        /// <param name="claims">HttpContext.User.Claims object.</param>
-        /// <returns>
-        /// The user's database ID or 0 if the user is not logged in or does not have the correct claims.
-        /// </returns>
-        private int UserClaimCheck(IEnumerable<Claim> claims)
-        {
-            string? claimId = claims.FirstOrDefault(x => x.Type.Equals("extension_DatabaseId"))?.Value;
-            bool success = int.TryParse(claimId, out int claimIdInt);
-
-            if (claimId == null || !success)
-            {
-                return 0;
-            }
-
-            return claimIdInt;
-        }
-
-        /// <summary>
-        /// Checks that the user is logged in and is involved with the invite being requested.
-        /// </summary>
-        /// <param name="claims">HttpContext.User.Claims object.</param>
-        /// <param name="inviteId">Invite.Id of specified invite.</param>
-        /// <returns>
-        /// 0 if the user is not involved in the invite.
-        /// 1 if the user is the inviting user of the specified invite.
-        /// 2 if the user is the invited user of the specified invite.
-        /// </returns>
-        private async Task<int> UserInviteAuthCheck(IEnumerable<Claim> claims, int inviteId)
-        {
-            int claimCheck = UserClaimCheck(claims);
-
-            if (claimCheck == 0 || inviteId == 0)
-            {
-                return 0;
-            }
-
-            MessageGroupInvitation? mgi = await db.MessageGroupInvitations!
-                .Where(inv => inv.Id == inviteId 
-                    && (inv.InvitedUserId == claimCheck || inv.InvitingUserId == claimCheck))
-                .FirstOrDefaultAsync();
-
-            if (mgi is not null && mgi.InvitingUserId == claimCheck)
-            {
-                return 1;
-            }
-
-            if (mgi is not null && mgi.InvitedUserId == claimCheck)
-            {
-                return 2;
-            }
-
-            return 0;
-        }
-
-        /// <summary>
-        /// Checks that the user is logged in and has a role in the specified group.
-        /// </summary>
-        /// <param name="claims">HttpContext.User.Claims object.</param>
-        /// <param name="groupId">Group.Id of the requested group.</param>
-        /// <returns>
-        /// 0 if the user is not a group member.
-        /// 1 if the user is a group admin.
-        /// 2 if the user is a group member.
-        /// </returns>
-        private async Task<int> UserGroupAuthCheck(IEnumerable<Claim> claims, int groupId)
-        {
-            int claimCheck = UserClaimCheck(claims);
-
-            if (claimCheck == 0 || groupId == 0)
-            {
-                return 0;
-            }
-
-            MessageGroupMember? mgm = await db.MessageGroupMembers!
-                .Where(members => members.MessageGroupId == groupId && members.UserId == claimCheck)
-                .FirstOrDefaultAsync();
-
-            if (mgm is null || mgm.MessageGroupRoleId is null) 
-            { 
-                return 0; 
-            }
-            else
-            {
-                return (int)mgm.MessageGroupRoleId;
             }
         }
     }

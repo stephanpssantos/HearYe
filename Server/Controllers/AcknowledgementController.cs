@@ -1,4 +1,5 @@
-﻿using HearYe.Shared;
+﻿using HearYe.Server.Helpers;
+using HearYe.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -34,9 +35,8 @@ namespace HearYe.Server.Controllers
                 return BadRequest("Complete acknowledgement object required.");
             }
 
-            int userId = UserClaimCheck(HttpContext.User.Claims);
-
-            if (userId == 0 || acknowledgement.UserId != userId)
+            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
+            if (claimId == 0 || acknowledgement.UserId != claimId)
             {
                 return Unauthorized();
             }
@@ -50,11 +50,13 @@ namespace HearYe.Server.Controllers
                 return BadRequest();
             }
 
-            MessageGroupMember? membershipCheck = await db.MessageGroupMembers!
-                .Where(mgm => mgm.UserId == userId && mgm.MessageGroupId == postCheck.MessageGroupId)
-                .FirstOrDefaultAsync();
+            //MessageGroupMember? membershipCheck = await db.MessageGroupMembers!
+            //    .Where(mgm => mgm.UserId == claimId && mgm.MessageGroupId == postCheck.MessageGroupId)
+            //    .FirstOrDefaultAsync();
 
-            if (membershipCheck == null || membershipCheck.MessageGroupRoleId == null) 
+            int membershipCheck = await AuthCheck.UserGroupAuthCheck(db, claimId, (int)postCheck.MessageGroupId);
+
+            if (membershipCheck == 0) 
             {
                 return Unauthorized();
             }
@@ -92,9 +94,8 @@ namespace HearYe.Server.Controllers
                 return BadRequest();
             }
 
-            int userId = UserClaimCheck(HttpContext.User.Claims);
-
-            if (userId == 0)
+            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
+            if (claimId == 0)
             {
                 return Unauthorized();
             }
@@ -108,7 +109,7 @@ namespace HearYe.Server.Controllers
                 return NotFound();
             }
 
-            if (acknowledgement!.UserId != userId)
+            if (acknowledgement!.UserId != claimId)
             {
                 return Unauthorized("Not poster of acknowledgement.");
             }
@@ -132,26 +133,6 @@ namespace HearYe.Server.Controllers
                 // Log this exception
                 return BadRequest("Error when deleting acknowledgement.");
             }
-        }
-
-        /// <summary>
-        /// Checks that the user is logged in finds their database ID within their claims.
-        /// </summary>
-        /// <param name="claims">HttpContext.User.Claims object.</param>
-        /// <returns>
-        /// The user's database ID or 0 if the user is not logged in or does not have the correct claims.
-        /// </returns>
-        private int UserClaimCheck(IEnumerable<Claim> claims)
-        {
-            string? claimId = claims.FirstOrDefault(x => x.Type.Equals("extension_DatabaseId"))?.Value;
-            bool success = int.TryParse(claimId, out int claimIdInt);
-
-            if (claimId == null || !success)
-            {
-                return 0;
-            }
-
-            return claimIdInt;
         }
     }
 }

@@ -5,6 +5,7 @@ using Microsoft.Identity.Web.Resource;
 using System.Security.Claims;
 using HearYe.Shared;
 using Microsoft.EntityFrameworkCore;
+using HearYe.Server.Helpers;
 
 namespace HearYe.Server.Controllers
 {
@@ -35,8 +36,10 @@ namespace HearYe.Server.Controllers
                 return NotFound();
             }
 
-            int authCheck = await UserAuthCheck(HttpContext.User.Claims, id);
-            if (authCheck == -1)
+            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
+            int roleId = await AuthCheck.UserGroupAuthCheck(db, claimId, id);
+
+            if (roleId == 0)
             {
                 return Unauthorized();
             }
@@ -56,8 +59,10 @@ namespace HearYe.Server.Controllers
                 return BadRequest();
             }
 
-            int authCheck = await UserAuthCheck(HttpContext.User.Claims, id);
-            if (authCheck == -1)
+            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
+            int roleId = await AuthCheck.UserGroupAuthCheck(db, claimId, id);
+
+            if (roleId == 0)
             {
                 return Unauthorized();
             }
@@ -78,10 +83,9 @@ namespace HearYe.Server.Controllers
         [ProducesResponseType(401)]
         public async Task<IActionResult> NewMessageGroup([FromBody] string groupName)
         {
-            string? claimId = HttpContext.User.Claims.FirstOrDefault(x => x.Type.Equals("extension_DatabaseId"))?.Value;
-            bool parseClaimId = int.TryParse(claimId, out int claimIdInt);
+            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
 
-            if (claimId == null || !parseClaimId)
+            if (claimId == 0)
             {
                 return Unauthorized();
             }
@@ -121,7 +125,7 @@ namespace HearYe.Server.Controllers
                 {
                     MessageGroupId = newGroupEntry.Entity.Id,
                     MessageGroupRoleId = 1, // Admin
-                    UserId = claimIdInt
+                    UserId = claimId
                 };
                 EntityEntry<MessageGroupMember> newGroupAdminEntry = await db.MessageGroupMembers!.AddAsync(newGroupAdmin);
 
@@ -159,8 +163,10 @@ namespace HearYe.Server.Controllers
                 return BadRequest();
             }
 
-            int authCheck = await UserAuthCheck(HttpContext.User.Claims, mgm.MessageGroupId);
-            if (authCheck != 1) // if user does not have group admin role
+            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
+            int roleId = await AuthCheck.UserGroupAuthCheck(db, claimId, mgm.MessageGroupId);
+
+            if (roleId != 1)
             {
                 return Unauthorized();
             }
@@ -192,9 +198,10 @@ namespace HearYe.Server.Controllers
                 return NotFound();
             }
 
-            int authCheck = await UserAuthCheck(HttpContext.User.Claims, id!);
+            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
+            int roleId = await AuthCheck.UserGroupAuthCheck(db, claimId, id);
 
-            if (authCheck != 1) // If requester is not message group admin
+            if (roleId != 1)
             {
                 return Unauthorized();
             }
@@ -213,32 +220,6 @@ namespace HearYe.Server.Controllers
             {
                 return BadRequest("Message group found but failed to delete.");
             }
-        }
-
-        /// <summary>
-        /// Checks that the user is logged in and belongs to the MessageGroup being requested.
-        /// </summary>
-        /// <param name="claims">HttpContext.User.Claims object.</param>
-        /// <param name="messageGroupId">MessageGroup.Id of specified group.</param>
-        /// <returns>
-        /// An int with the user's role id within the specified group. If the user
-        /// is not authorized (not a member or not assigned a role) returns -1.
-        /// </returns>
-        private async Task<int> UserAuthCheck(IEnumerable<Claim> claims, int messageGroupId)
-        {
-            string? claimId = claims.FirstOrDefault(x => x.Type.Equals("extension_DatabaseId"))?.Value;
-            bool success = int.TryParse(claimId, out int claimIdInt);
-
-            if (claimId == null || messageGroupId == 0 || !success)
-            {
-                return -1;
-            }
-
-            MessageGroupMember? mgm = await db.MessageGroupMembers!
-                .Where(mgm => mgm.UserId == claimIdInt && mgm.MessageGroupId == messageGroupId)
-                .FirstOrDefaultAsync();
-
-            return mgm != null ? mgm.MessageGroupRoleId ?? -1 : -1;
         }
     }
 }

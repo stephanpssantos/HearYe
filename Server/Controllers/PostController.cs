@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Web.Resource;
 using System.Security.Claims;
 using HearYe.Shared;
+using HearYe.Server.Helpers;
 
 namespace HearYe.Server.Controllers
 {
@@ -35,9 +36,10 @@ namespace HearYe.Server.Controllers
                 return NotFound();
             }
 
-            int userId = await UserAuthCheck(HttpContext.User.Claims, (int)post.MessageGroupId!);
+            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
+            int roleId = await AuthCheck.UserGroupAuthCheck(db, claimId, id);
 
-            if (userId == -1)
+            if (roleId == 0)
             {
                 return Unauthorized();
             }
@@ -57,9 +59,10 @@ namespace HearYe.Server.Controllers
                 return BadRequest();
             }
 
-            int userId = await UserAuthCheck(HttpContext.User.Claims, (int)messageGroupId);
+            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
+            int roleId = await AuthCheck.UserGroupAuthCheck(db, claimId, (int)messageGroupId);
 
-            if (userId == -1)
+            if (roleId == 0)
             {
                 return Unauthorized();
             }
@@ -70,7 +73,7 @@ namespace HearYe.Server.Controllers
                 (
                     p => p.MessageGroupId == messageGroupId
                     && (p.StaleDate == null || p.StaleDate > DateTime.Now)
-                    && (p.Acknowledgements!.All(a => a.UserId != userId))
+                    && (p.Acknowledgements!.All(a => a.UserId != claimId))
                 )
                 .OrderByDescending(p => p.CreatedDate)
                 .Skip(skip)
@@ -92,9 +95,10 @@ namespace HearYe.Server.Controllers
                 return BadRequest();
             }
 
-            int userId = await UserAuthCheck(HttpContext.User.Claims, (int)messageGroupId);
+            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
+            int roleId = await AuthCheck.UserGroupAuthCheck(db, claimId, (int)messageGroupId);
 
-            if (userId == -1)
+            if (roleId == 0)
             {
                 return Unauthorized();
             }
@@ -105,7 +109,7 @@ namespace HearYe.Server.Controllers
                 (
                     p => p.MessageGroupId == messageGroupId
                     && (p.StaleDate == null || p.StaleDate > DateTime.Now)
-                    && (p.Acknowledgements!.Any(a => a.UserId == userId))
+                    && (p.Acknowledgements!.Any(a => a.UserId == claimId))
                 )
                 .OrderByDescending(p => p.CreatedDate)
                 .Skip(skip)
@@ -127,9 +131,10 @@ namespace HearYe.Server.Controllers
                 return BadRequest();
             }
 
-            int userId = await UserAuthCheck(HttpContext.User.Claims, (int)messageGroupId);
+            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
+            int roleId = await AuthCheck.UserGroupAuthCheck(db, claimId, (int)messageGroupId);
 
-            if (userId == -1)
+            if (roleId == 0)
             {
                 return Unauthorized();
             }
@@ -158,9 +163,10 @@ namespace HearYe.Server.Controllers
                 return BadRequest("Complete post object required.");
             }
 
-            int userId = await UserAuthCheck(HttpContext.User.Claims, (int)post.MessageGroupId!);
+            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
+            int roleId = await AuthCheck.UserGroupAuthCheck(db, claimId, (int)post.MessageGroupId!);
 
-            if (userId == -1)
+            if (roleId == 0)
             {
                 return Unauthorized();
             }
@@ -194,9 +200,10 @@ namespace HearYe.Server.Controllers
                 return NotFound();
             }
 
-            int userId = await UserAuthCheck(HttpContext.User.Claims, (int)post.MessageGroupId!);
+            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
+            int roleId = await AuthCheck.UserGroupAuthCheck(db, claimId, (int)post.MessageGroupId!);
 
-            if (userId == -1 || userId != post.UserId)
+            if (roleId == 0 || claimId != post.UserId)
             {
                 return Unauthorized();
             }
@@ -215,32 +222,6 @@ namespace HearYe.Server.Controllers
             {
                 return BadRequest("Post found but failed to delete.");
             }
-        }
-
-        /// <summary>
-        /// Checks that the user is logged in and belongs to the MessageGroup being requested.
-        /// </summary>
-        /// <param name="claims">HttpContext.User.Claims object.</param>
-        /// <param name="messageGroupId">MessageGroup.Id of specified group.</param>
-        /// <returns>
-        /// An int with the authorized user's database Id or a -1 indicating that the 
-        /// user is not authorized to access the specified MessageGroup.
-        /// </returns>
-        private async Task<int> UserAuthCheck(IEnumerable<Claim> claims, int messageGroupId)
-        {
-            string? claimId = claims.FirstOrDefault(x => x.Type.Equals("extension_DatabaseId"))?.Value;
-            bool success = int.TryParse(claimId, out int claimIdInt);
-
-            if (claimId == null || messageGroupId == 0 || !success)
-            {
-                return -1;
-            }
-
-            MessageGroupMember? mgm = await db.MessageGroupMembers!
-                .Where(mgm => mgm.UserId == claimIdInt && mgm.MessageGroupId == messageGroupId)
-                .FirstOrDefaultAsync();
-
-            return mgm != null ? claimIdInt : -1;
         }
     }
 }

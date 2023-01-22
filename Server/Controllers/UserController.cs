@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Identity.Web.Resource;
 using Microsoft.Graph;
 using HearYe.Shared;
+using HearYe.Server.Helpers;
 using User = HearYe.Shared.User;
 
 namespace HearYe.Server.Controllers
@@ -31,9 +32,9 @@ namespace HearYe.Server.Controllers
         [ProducesResponseType(404)]
         public async Task<IActionResult> GetUser(int id)
         {
-            string? claimId = HttpContext.User.Claims.FirstOrDefault(x => x.Type.Equals("extension_DatabaseId"))?.Value;
+            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
 
-            if (claimId == null || claimId != id.ToString()) 
+            if (claimId == 0 || id != claimId) 
             {
                 return Unauthorized();
             }
@@ -56,9 +57,9 @@ namespace HearYe.Server.Controllers
         [ProducesResponseType(404)]
         public async Task<IActionResult> GetUserByOid(string aadOid)
         {
-            string? claimId = HttpContext.User.Claims.FirstOrDefault(x => x.Type.Equals("extension_DatabaseId"))?.Value;
+            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
 
-            if (claimId == null)
+            if (claimId == 0)
             {
                 return Unauthorized();
             }
@@ -77,7 +78,7 @@ namespace HearYe.Server.Controllers
             {
                 return NotFound();
             }
-            else if (user.Id.ToString() != claimId) // && user.role != Admin
+            else if (user.Id != claimId) // && user.role != Admin
             {
                 return Unauthorized();
             }
@@ -90,9 +91,9 @@ namespace HearYe.Server.Controllers
         [ProducesResponseType(401)]
         public async Task<IActionResult> GetUserMessageGroups(int id)
         {
-            string? claimId = HttpContext.User.Claims.FirstOrDefault(x => x.Type.Equals("extension_DatabaseId"))?.Value;
+            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
 
-            if (claimId == null || claimId != id.ToString())
+            if (claimId == 0 || id != claimId)
             {
                 return Unauthorized();
             }
@@ -176,14 +177,14 @@ namespace HearYe.Server.Controllers
         [ProducesResponseType(404)]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] User user)
         {
-            string? claimId = HttpContext.User.Claims.FirstOrDefault(x => x.Type.Equals("extension_DatabaseId"))?.Value;
-
             if (user == null || user.Id != id)
             {
                 return BadRequest("User ID mismatch.");
             }
 
-            if (claimId == null || claimId != id.ToString())
+            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
+
+            if (claimId == 0 || id != claimId)
             {
                 return Unauthorized();
             }
@@ -216,9 +217,9 @@ namespace HearYe.Server.Controllers
         [ProducesResponseType(404)]
         public async Task<IActionResult> DeleteUser(int id)
         {
-            string? claimId = HttpContext.User.Claims.FirstOrDefault(x => x.Type.Equals("extension_DatabaseId"))?.Value;
+            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
 
-            if (claimId == null || claimId != id.ToString())
+            if (claimId == 0 || id != claimId)
             {
                 return Unauthorized();
             }
