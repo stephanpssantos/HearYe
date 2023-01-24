@@ -76,6 +76,8 @@ builder.Services.AddSwaggerGen(c =>
         });
 });
 
+builder.Services.AddHealthChecks().AddDbContextCheck<HearYeContext>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -127,6 +129,8 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseHealthChecks(path: "/healthcheck");
 
 app.MapRazorPages();
 app.MapControllers();
