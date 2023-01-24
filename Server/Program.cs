@@ -5,11 +5,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Identity.Web;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.HttpLogging; // HttpLoggingFields
+using Microsoft.Net.Http.Headers;
 using System.Text.Json.Serialization;
 using Swashbuckle.AspNetCore.SwaggerUI; // SubmitMethod
 using HearYe.Shared;
 using HearYe.Server;
-using Microsoft.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,6 +35,13 @@ builder.Services.AddGraphClient(graphScopes, graphTenantId, graphClientId, graph
 builder.Services.AddControllersWithViews()
     .AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 builder.Services.AddRazorPages();
+
+builder.Services.AddHttpLogging(options =>
+{
+    options.LoggingFields = HttpLoggingFields.All;
+    options.RequestBodyLogLimit = 4096; // default is  32k
+    options.ResponseBodyLogLimit= 4096; // default is  32k
+});
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -74,6 +82,8 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseWebAssemblyDebugging();
+
+    app.UseHttpLogging();
 
     app.UseSwagger();
     app.UseSwaggerUI(c =>
