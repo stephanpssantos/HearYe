@@ -111,6 +111,7 @@ namespace HearYe.Server.Controllers
         [HttpPost]
         [ProducesResponseType(201, Type = typeof(User))]
         [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
         public async Task<IActionResult> NewUser([FromBody] User user)
         {
             if (user == null || !ModelState.IsValid)

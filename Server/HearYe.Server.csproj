@@ -4,6 +4,7 @@
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <IncludeOpenAPIAnalyzers>true</IncludeOpenAPIAnalyzers>
     <UserSecretsId>HearYe.Server-eab250e9-e483-44b4-aa9f-ffd99e4b7432</UserSecretsId>
   </PropertyGroup>
 

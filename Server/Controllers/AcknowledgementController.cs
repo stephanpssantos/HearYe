@@ -45,14 +45,10 @@ namespace HearYe.Server.Controllers
                 .Where(post => post.Id == acknowledgement.PostId)
                 .FirstOrDefaultAsync();
 
-            if (postCheck == null)
+            if (postCheck == null || postCheck.MessageGroupId == null)
             {
                 return BadRequest();
             }
-
-            //MessageGroupMember? membershipCheck = await db.MessageGroupMembers!
-            //    .Where(mgm => mgm.UserId == claimId && mgm.MessageGroupId == postCheck.MessageGroupId)
-            //    .FirstOrDefaultAsync();
 
             int membershipCheck = await AuthCheck.UserGroupAuthCheck(db, claimId, (int)postCheck.MessageGroupId);
 

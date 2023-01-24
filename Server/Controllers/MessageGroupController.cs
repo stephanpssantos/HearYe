@@ -50,6 +50,7 @@ namespace HearYe.Server.Controllers
         // GET: api/messagegroup/members/[id]
         [HttpGet("members/{id:int}", Name = nameof(GetMessageGroupMembers))]
         [ProducesResponseType(200, Type = typeof(IEnumerable<MessageGroupMember>))]
+        [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> GetMessageGroupMembers(int id)
@@ -155,6 +156,7 @@ namespace HearYe.Server.Controllers
         // BODY: MessageGroupMember (JSON)
         [HttpPut("setrole")]
         [ProducesResponseType(204)]
+        [ProducesResponseType(401)]
         [ProducesResponseType(400)]
         public async Task<IActionResult> SetMessageGroupRole([FromBody] MessageGroupMember mgm)
         {
