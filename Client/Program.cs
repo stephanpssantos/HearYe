@@ -9,7 +9,9 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddHttpClient("HearYe.ServerAPI", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))
-    .AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>();
+    .AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>()
+    .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+    .AddPolicyHandler(Policies.GetRetryPolicy());
 
 // Supply HttpClient instances that include access tokens when making requests to the server project
 // In Blazor, Scoped behaves like a singleton i.e. a single instance is created and shared.
