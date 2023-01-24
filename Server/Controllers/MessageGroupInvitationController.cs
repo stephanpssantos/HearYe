@@ -47,8 +47,8 @@ namespace HearYe.Server.Controllers
             return Ok(messageGroupInvitation);
         }
 
-        // GET: api/messagegroupinvitations/[id]
-        [HttpGet("{id:int}", Name = nameof(GetMessageGroupInvitations))]
+        // GET: api/messagegroupinvitation/user/[id]
+        [HttpGet("user/{id:int}", Name = nameof(GetMessageGroupInvitations))]
         [ProducesResponseType(200, Type = typeof(IEnumerable<MessageGroupInvitation>))]
         [ProducesResponseType(401)]
         public async Task<IActionResult> GetMessageGroupInvitations(int userId)

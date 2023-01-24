@@ -16,6 +16,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Graph" Version="4.49.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
 
   <ItemGroup>
