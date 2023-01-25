@@ -3,7 +3,6 @@
 // </copyright>
 
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using HearYe.Server.Helpers;
 using HearYe.Shared;
 using Microsoft.AspNetCore.Authorization;
