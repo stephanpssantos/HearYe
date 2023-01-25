@@ -1,11 +1,15 @@
-﻿using HearYe.Server.Controllers;
+﻿using Microsoft.Extensions.Logging;
 
 namespace HearYe.Server.Tests
 {
     public class AcknowledgementControllerTests : IClassFixture<HearYeDatabaseFixture>
     {
+        private readonly ILogger<AcknowledgementController> logger;
+
         public AcknowledgementControllerTests(HearYeDatabaseFixture fixture)
         {
+            Mock<ILogger<AcknowledgementController>> mockLogger = new ();
+            this.logger = mockLogger.Object;
             Fixture = fixture;
         }
 
@@ -17,7 +21,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new AcknowledgementController(context).WithAnonymousIdentity();
+                var controller = new AcknowledgementController(context, this.logger).WithAnonymousIdentity();
                 var acknowledgement = new Acknowledgement();
 
                 // Act
@@ -34,7 +38,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new AcknowledgementController(context).WithAuthenticatedIdentity("1");
+                var controller = new AcknowledgementController(context, this.logger).WithAuthenticatedIdentity("1");
                 var acknowledgement = new Acknowledgement()
                 {
                     PostId = 1,
@@ -56,7 +60,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new AcknowledgementController(context).WithAuthenticatedIdentity("2");
+                var controller = new AcknowledgementController(context, this.logger).WithAuthenticatedIdentity("2");
                 var acknowledgement = new Acknowledgement()
                 {
                     PostId = 9999,
@@ -78,7 +82,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new AcknowledgementController(context).WithAuthenticatedIdentity("2");
+                var controller = new AcknowledgementController(context, this.logger).WithAuthenticatedIdentity("2");
                 var acknowledgement = new Acknowledgement()
                 {
                     PostId = 1,
@@ -100,7 +104,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new AcknowledgementController(context).WithAuthenticatedIdentity("4");
+                var controller = new AcknowledgementController(context, this.logger).WithAuthenticatedIdentity("4");
                 var acknowledgement = new Acknowledgement()
                 {
                     PostId = 3,
@@ -126,7 +130,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new AcknowledgementController(context).WithAuthenticatedIdentity("4");
+                var controller = new AcknowledgementController(context, this.logger).WithAuthenticatedIdentity("4");
                 var acknowledgement = new Acknowledgement()
                 {
                     PostId = 4,
@@ -150,7 +154,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new AcknowledgementController(context).WithAnonymousIdentity();
+                var controller = new AcknowledgementController(context, this.logger).WithAnonymousIdentity();
 
                 // Act
                 var result = await controller.DeleteAcknowledgement(1);
@@ -166,7 +170,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new AcknowledgementController(context).WithAuthenticatedIdentity("1");
+                var controller = new AcknowledgementController(context, this.logger).WithAuthenticatedIdentity("1");
 
                 // Act
                 var result = await controller.DeleteAcknowledgement(0);
@@ -182,7 +186,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new AcknowledgementController(context).WithAuthenticatedIdentity("1");
+                var controller = new AcknowledgementController(context, this.logger).WithAuthenticatedIdentity("1");
 
                 // Act
                 var result = await controller.DeleteAcknowledgement(9999);
@@ -198,7 +202,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new AcknowledgementController(context).WithAuthenticatedIdentity("4");
+                var controller = new AcknowledgementController(context, this.logger).WithAuthenticatedIdentity("4");
 
                 // Act
                 var result = await controller.DeleteAcknowledgement(1);
@@ -216,7 +220,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new AcknowledgementController(context).WithAuthenticatedIdentity("2");
+                var controller = new AcknowledgementController(context, this.logger).WithAuthenticatedIdentity("2");
 
                 // Act
                 var result = await controller.DeleteAcknowledgement(5);

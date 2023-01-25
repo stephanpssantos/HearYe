@@ -1,12 +1,15 @@
-﻿using HearYe.Shared;
-using System.Text;
+﻿using Microsoft.Extensions.Logging;
 
 namespace HearYe.Server.Tests
 {
     public class MessageGroupControllerTests : IClassFixture<HearYeDatabaseFixture>
     {
+        private readonly ILogger<MessageGroupController> logger;
+
         public MessageGroupControllerTests(HearYeDatabaseFixture fixture) 
         {
+            Mock<ILogger<MessageGroupController>> mockLogger = new();
+            this.logger = mockLogger.Object;
             Fixture = fixture;
         }
 
@@ -18,7 +21,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new MessageGroupController(context).WithAnonymousIdentity();
+                var controller = new MessageGroupController(context, this.logger).WithAnonymousIdentity();
 
                 // Act
                 var result = await controller.GetMessageGroup(9999);
@@ -34,7 +37,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new MessageGroupController(context).WithAnonymousIdentity();
+                var controller = new MessageGroupController(context, this.logger).WithAnonymousIdentity();
 
                 // Act
                 var result = await controller.GetMessageGroup(1);
@@ -50,7 +53,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new MessageGroupController(context).WithAuthenticatedIdentity("2");
+                var controller = new MessageGroupController(context, this.logger).WithAuthenticatedIdentity("2");
 
                 // Act
                 var result = await controller.GetMessageGroup(1);
@@ -66,7 +69,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new MessageGroupController(context).WithAuthenticatedIdentity("1");
+                var controller = new MessageGroupController(context, this.logger).WithAuthenticatedIdentity("1");
 
                 // Act
                 var result = await controller.GetMessageGroup(1);
@@ -86,7 +89,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new MessageGroupController(context).WithAnonymousIdentity();
+                var controller = new MessageGroupController(context, this.logger).WithAnonymousIdentity();
 
                 // Act
                 var result = await controller.GetMessageGroupMembers(1);
@@ -102,7 +105,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new MessageGroupController(context).WithAuthenticatedIdentity("2");
+                var controller = new MessageGroupController(context, this.logger).WithAuthenticatedIdentity("2");
 
                 // Act
                 var result = await controller.GetMessageGroupMembers(1);
@@ -118,7 +121,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new MessageGroupController(context).WithAuthenticatedIdentity("1");
+                var controller = new MessageGroupController(context, this.logger).WithAuthenticatedIdentity("1");
 
                 // Act
                 var result = await controller.GetMessageGroupMembers(1);
@@ -139,7 +142,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new MessageGroupController(context).WithAnonymousIdentity();
+                var controller = new MessageGroupController(context, this.logger).WithAnonymousIdentity();
 
                 // Act
                 var result = await controller.NewMessageGroup("UnitTestGroup1");
@@ -155,7 +158,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new MessageGroupController(context).WithAuthenticatedIdentity("1");
+                var controller = new MessageGroupController(context, this.logger).WithAuthenticatedIdentity("1");
 
                 // Act
                 var result = await controller.NewMessageGroup("");
@@ -171,7 +174,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new MessageGroupController(context).WithAuthenticatedIdentity("1");
+                var controller = new MessageGroupController(context, this.logger).WithAuthenticatedIdentity("1");
 
                 // Act
                 var result = await controller.NewMessageGroup("a");
@@ -187,7 +190,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new MessageGroupController(context).WithAuthenticatedIdentity("1");
+                var controller = new MessageGroupController(context, this.logger).WithAuthenticatedIdentity("1");
 
                 // Act
                 var result = await controller.NewMessageGroup(new string('a', 51));
@@ -203,7 +206,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new MessageGroupController(context).WithAuthenticatedIdentity("1");
+                var controller = new MessageGroupController(context, this.logger).WithAuthenticatedIdentity("1");
 
                 // Act
                 var result = await controller.NewMessageGroup("UnitTestGroup") as CreatedAtRouteResult;
@@ -229,7 +232,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new MessageGroupController(context).WithAnonymousIdentity();
+                var controller = new MessageGroupController(context, this.logger).WithAnonymousIdentity();
                 controller.ModelState.AddModelError("MessageGroupId", "Required key missing.");
                 var mgm = new MessageGroupMember();
 
@@ -247,7 +250,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new MessageGroupController(context).WithAnonymousIdentity();
+                var controller = new MessageGroupController(context, this.logger).WithAnonymousIdentity();
                 var mgm = new MessageGroupMember();
 
                 // Act
@@ -264,7 +267,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new MessageGroupController(context).WithAuthenticatedIdentity("2");
+                var controller = new MessageGroupController(context, this.logger).WithAuthenticatedIdentity("2");
                 var mgm = new MessageGroupMember();
                 mgm.MessageGroupId = 1;
 
@@ -282,7 +285,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new MessageGroupController(context).WithAuthenticatedIdentity("2");
+                var controller = new MessageGroupController(context, this.logger).WithAuthenticatedIdentity("2");
                 var mgm = new MessageGroupMember();
                 mgm.Id = 3;
                 mgm.MessageGroupId = 2;
@@ -303,7 +306,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new MessageGroupController(context).WithAuthenticatedIdentity("1");
+                var controller = new MessageGroupController(context, this.logger).WithAuthenticatedIdentity("1");
                 var mgm = new MessageGroupMember();
                 mgm.MessageGroupId = 1;
                 mgm.MessageGroupRoleId = 1;
@@ -325,7 +328,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new MessageGroupController(context).WithAuthenticatedIdentity("1");
+                var controller = new MessageGroupController(context, this.logger).WithAuthenticatedIdentity("1");
                 var mgm = new MessageGroupMember();
                 mgm.Id = 4;
                 mgm.MessageGroupId = 1;
@@ -350,7 +353,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new MessageGroupController(context).WithAnonymousIdentity();
+                var controller = new MessageGroupController(context, this.logger).WithAnonymousIdentity();
 
                 // Act
                 var result = await controller.DeleteMessageGroup(9999);
@@ -366,7 +369,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new MessageGroupController(context).WithAnonymousIdentity();
+                var controller = new MessageGroupController(context, this.logger).WithAnonymousIdentity();
 
                 // Act
                 var result = await controller.DeleteMessageGroup(1);
@@ -382,7 +385,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new MessageGroupController(context).WithAuthenticatedIdentity("2");
+                var controller = new MessageGroupController(context, this.logger).WithAuthenticatedIdentity("2");
 
                 // Act
                 var result = await controller.DeleteMessageGroup(2);
@@ -398,7 +401,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new MessageGroupController(context).WithAuthenticatedIdentity("1");
+                var controller = new MessageGroupController(context, this.logger).WithAuthenticatedIdentity("1");
 
                 // Act
                 var result = await controller.DeleteMessageGroup(3);

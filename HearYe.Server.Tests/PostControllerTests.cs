@@ -1,9 +1,15 @@
-﻿namespace HearYe.Server.Tests
+﻿using Microsoft.Extensions.Logging;
+
+namespace HearYe.Server.Tests
 {
     public class PostControllerTests : IClassFixture<HearYeDatabaseFixture>
     {
+        private readonly ILogger<PostController> logger;
+
         public PostControllerTests(HearYeDatabaseFixture fixture) 
         {
+            Mock<ILogger<PostController>> mockLogger = new();
+            this.logger = mockLogger.Object;
             Fixture = fixture;
         }
 
@@ -15,7 +21,7 @@
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new PostController(context).WithAnonymousIdentity();
+                var controller = new PostController(context, this.logger).WithAnonymousIdentity();
 
                 // Act
                 var result = await controller.GetPost(9999);
@@ -31,7 +37,7 @@
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new PostController(context).WithAnonymousIdentity();
+                var controller = new PostController(context, this.logger).WithAnonymousIdentity();
 
                 // Act
                 var result = await controller.GetPost(1);
@@ -47,7 +53,7 @@
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new PostController(context).WithAuthenticatedIdentity("2");
+                var controller = new PostController(context, this.logger).WithAuthenticatedIdentity("2");
 
                 // Act
                 var result = await controller.GetPost(1);
@@ -63,7 +69,7 @@
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new PostController(context).WithAuthenticatedIdentity("1");
+                var controller = new PostController(context, this.logger).WithAuthenticatedIdentity("1");
 
                 // Act
                 var result = await controller.GetPost(1);
@@ -84,7 +90,7 @@
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new PostController(context).WithAuthenticatedIdentity("3");
+                var controller = new PostController(context, this.logger).WithAuthenticatedIdentity("3");
 
                 // Act
                 var result = await controller.GetNewPosts(1);
@@ -100,7 +106,7 @@
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new PostController(context).WithAuthenticatedIdentity("1");
+                var controller = new PostController(context, this.logger).WithAuthenticatedIdentity("1");
 
                 // Act
                 var result = await controller.GetNewPosts(1);
@@ -121,7 +127,7 @@
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new PostController(context).WithAuthenticatedIdentity("1");
+                var controller = new PostController(context, this.logger).WithAuthenticatedIdentity("1");
 
                 // Act
                 var result = await controller.GetNewPosts(1);
@@ -143,7 +149,7 @@
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new PostController(context).WithAuthenticatedIdentity("3");
+                var controller = new PostController(context, this.logger).WithAuthenticatedIdentity("3");
 
                 // Act
                 var result = await controller.GetAcknowledgedPosts(1);
@@ -159,7 +165,7 @@
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new PostController(context).WithAuthenticatedIdentity("1");
+                var controller = new PostController(context, this.logger).WithAuthenticatedIdentity("1");
 
                 // Act
                 var result = await controller.GetAcknowledgedPosts(1);
@@ -179,7 +185,7 @@
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new PostController(context).WithAuthenticatedIdentity("1");
+                var controller = new PostController(context, this.logger).WithAuthenticatedIdentity("1");
 
                 // Act
                 var result = await controller.GetAcknowledgedPosts(1);
@@ -201,7 +207,7 @@
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new PostController(context).WithAuthenticatedIdentity("3");
+                var controller = new PostController(context, this.logger).WithAuthenticatedIdentity("3");
 
                 // Act
                 var result = await controller.GetStalePosts(1);
@@ -217,7 +223,7 @@
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new PostController(context).WithAuthenticatedIdentity("1");
+                var controller = new PostController(context, this.logger).WithAuthenticatedIdentity("1");
 
                 // Act
                 var result = await controller.GetStalePosts(1);
@@ -237,7 +243,7 @@
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new PostController(context).WithAuthenticatedIdentity("1");
+                var controller = new PostController(context, this.logger).WithAuthenticatedIdentity("1");
 
                 // Act
                 var result = await controller.GetStalePosts(1);
@@ -259,7 +265,7 @@
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new PostController(context).WithAnonymousIdentity();
+                var controller = new PostController(context, this.logger).WithAnonymousIdentity();
                 controller.ModelState.AddModelError("MessageGroupId", "Required key missing.");
                 var newPost = new Shared.Post();
 
@@ -279,7 +285,7 @@
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new PostController(context).WithAnonymousIdentity();
+                var controller = new PostController(context, this.logger).WithAnonymousIdentity();
                 var newPost = new Shared.Post()
                 {
                     UserId = 2,
@@ -303,7 +309,7 @@
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new PostController(context).WithAuthenticatedIdentity("2");
+                var controller = new PostController(context, this.logger).WithAuthenticatedIdentity("2");
                 var newPost = new Shared.Post()
                 {
                     UserId = 2,
@@ -327,7 +333,7 @@
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new PostController(context).WithAuthenticatedIdentity("1");
+                var controller = new PostController(context, this.logger).WithAuthenticatedIdentity("1");
                 var newPost = new Shared.Post()
                 {
                     UserId = 1,
@@ -351,7 +357,7 @@
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new PostController(context).WithAuthenticatedIdentity("1");
+                var controller = new PostController(context, this.logger).WithAuthenticatedIdentity("1");
 
                 // Act
                 var result = await controller.DeletePost(99);
@@ -367,7 +373,7 @@
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new PostController(context).WithAnonymousIdentity();
+                var controller = new PostController(context, this.logger).WithAnonymousIdentity();
 
                 // Act
                 var result = await controller.DeletePost(1);
@@ -383,7 +389,7 @@
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new PostController(context).WithAuthenticatedIdentity("2");
+                var controller = new PostController(context, this.logger).WithAuthenticatedIdentity("2");
 
                 // Act
                 var result = await controller.DeletePost(1);
@@ -400,7 +406,7 @@
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new PostController(context).WithAuthenticatedIdentity("2");
+                var controller = new PostController(context, this.logger).WithAuthenticatedIdentity("2");
 
                 // Act
                 var result = await controller.DeletePost(6);

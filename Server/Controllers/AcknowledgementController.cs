@@ -22,14 +22,17 @@ namespace HearYe.Server.Controllers
     public class AcknowledgementController : ControllerBase
     {
         private readonly HearYeContext db;
+        private readonly ILogger<AcknowledgementController> logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AcknowledgementController"/> class.
         /// </summary>
         /// <param name="db">HearYeContext instance.</param>
-        public AcknowledgementController(HearYeContext db)
+        /// <param name="logger">ILogger instance.</param>
+        public AcknowledgementController(HearYeContext db, ILogger<AcknowledgementController> logger)
         {
             this.db = db;
+            this.logger = logger;
         }
 
         /// <summary>

@@ -22,14 +22,17 @@ namespace HearYe.Server.Controllers
     public class PostController : ControllerBase
     {
         private readonly HearYeContext db;
+        private readonly ILogger<PostController> logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PostController"/> class.
         /// </summary>
         /// <param name="db">HearYeContext instance.</param>
-        public PostController(HearYeContext db)
+        /// <param name="logger">ILogger instance.</param>
+        public PostController(HearYeContext db, ILogger<PostController> logger)
         {
             this.db = db;
+            this.logger = logger;
         }
 
         /// <summary>

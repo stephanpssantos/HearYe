@@ -25,16 +25,19 @@ namespace HearYe.Server.Controllers
     {
         private readonly HearYeContext db;
         private readonly GraphServiceClient graph;
+        private readonly ILogger<UserController> logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UserController"/> class.
         /// </summary>
         /// <param name="db">HearYeContext instance.</param>
         /// <param name="graph">GraphServiceClient instance.</param>
-        public UserController(HearYeContext db, GraphServiceClient graph)
+        /// <param name="logger">ILogger instance.</param>
+        public UserController(HearYeContext db, GraphServiceClient graph, ILogger<UserController> logger)
         {
             this.db = db;
             this.graph = graph;
+            this.logger = logger;
         }
 
         /// <summary>

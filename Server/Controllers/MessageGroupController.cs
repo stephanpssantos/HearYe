@@ -22,14 +22,17 @@ namespace HearYe.Server.Controllers
     public class MessageGroupController : ControllerBase
     {
         private readonly HearYeContext db;
+        private readonly ILogger<MessageGroupController> logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MessageGroupController"/> class.
         /// </summary>
         /// <param name="db">HearYeContext instance.</param>
-        public MessageGroupController(HearYeContext db)
+        /// <param name="logger">ILogger instance.</param>
+        public MessageGroupController(HearYeContext db, ILogger<MessageGroupController> logger)
         {
             this.db = db;
+            this.logger = logger;
         }
 
         /// <summary>

@@ -2,6 +2,7 @@
 // And: https://learn.microsoft.com/en-us/ef/core/testing/testing-with-the-database
 // And: https://gunnarpeipman.com/aspnet-core-test-controller-fake-user/
 
+using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
 
 namespace HearYe.Server.Tests
@@ -10,14 +11,17 @@ namespace HearYe.Server.Tests
     {
         private readonly IAuthenticationProvider _authenticationProvider;
         private readonly IHttpProvider _httpProvider;
+        private readonly ILogger<UserController> _logger;
         private readonly GraphServiceClient _graphServiceClient;
 
         public UserControllerTests(HearYeDatabaseFixture fixture)
         {
-            Mock<IAuthenticationProvider> mockAuthProvider = new();
-            Mock<IHttpProvider> mockHttpProvider = new();
+            Mock<IAuthenticationProvider> mockAuthProvider = new ();
+            Mock<IHttpProvider> mockHttpProvider = new ();
+            Mock<ILogger<UserController>> mockLogger = new ();
             _authenticationProvider = mockAuthProvider.Object;
             _httpProvider = mockHttpProvider.Object;
+            _logger = mockLogger.Object;
 
             Mock<GraphServiceClient> mockGraphClient = new(_authenticationProvider, _httpProvider);
             _graphServiceClient = mockGraphClient.Object;
@@ -33,7 +37,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new UserController(context, _graphServiceClient).WithAnonymousIdentity();
+                var controller = new UserController(context, _graphServiceClient, _logger).WithAnonymousIdentity();
 
                 // Act
                 var result = await controller.GetUser(1);
@@ -49,7 +53,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new UserController(context, _graphServiceClient).WithAuthenticatedIdentity("1");
+                var controller = new UserController(context, _graphServiceClient, _logger).WithAuthenticatedIdentity("1");
 
                 // Act
                 var result = await controller.GetUser(2);
@@ -65,7 +69,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new UserController(context, _graphServiceClient).WithAuthenticatedIdentity("9999");
+                var controller = new UserController(context, _graphServiceClient, _logger).WithAuthenticatedIdentity("9999");
 
                 // Act
                 var result = await controller.GetUser(9999);
@@ -81,7 +85,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new UserController(context, _graphServiceClient).WithAuthenticatedIdentity("1");
+                var controller = new UserController(context, _graphServiceClient, _logger).WithAuthenticatedIdentity("1");
 
                 // Act
                 var result = await controller.GetUser(1);
@@ -102,7 +106,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new UserController(context, _graphServiceClient).WithAnonymousIdentity();
+                var controller = new UserController(context, _graphServiceClient, _logger).WithAnonymousIdentity();
 
                 // Act
                 var result = await controller.GetUserByOid("test");
@@ -118,7 +122,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new UserController(context, _graphServiceClient).WithAuthenticatedIdentity("1");
+                var controller = new UserController(context, _graphServiceClient, _logger).WithAuthenticatedIdentity("1");
 
                 // Act
                 var result = await controller.GetUserByOid("test");
@@ -134,7 +138,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new UserController(context, _graphServiceClient).WithAuthenticatedIdentity("1");
+                var controller = new UserController(context, _graphServiceClient, _logger).WithAuthenticatedIdentity("1");
 
                 // Act
                 var result = await controller.GetUserByOid("f09cc0b1-f05d-40e0-9684-c4a945d4e7ff");
@@ -150,7 +154,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new UserController(context, _graphServiceClient).WithAuthenticatedIdentity("1");
+                var controller = new UserController(context, _graphServiceClient, _logger).WithAuthenticatedIdentity("1");
 
                 // Act
                 var result = await controller.GetUserByOid("f09cc0b1-f05d-40e0-9684-c4a945d4e7e1");
@@ -166,7 +170,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new UserController(context, _graphServiceClient).WithAuthenticatedIdentity("1");
+                var controller = new UserController(context, _graphServiceClient, _logger).WithAuthenticatedIdentity("1");
 
                 // Act
                 var result = await controller.GetUserByOid("f09cc0b1-f05d-40e0-9684-c4a945d4e7e0");
@@ -187,7 +191,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new UserController(context, _graphServiceClient).WithAnonymousIdentity();
+                var controller = new UserController(context, _graphServiceClient, _logger).WithAnonymousIdentity();
 
                 // Act
                 var result = await controller.GetUserMessageGroups(1);
@@ -203,7 +207,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new UserController(context, _graphServiceClient).WithAuthenticatedIdentity("1");
+                var controller = new UserController(context, _graphServiceClient, _logger).WithAuthenticatedIdentity("1");
 
                 // Act
                 var result = await controller.GetUserMessageGroups(2);
@@ -219,7 +223,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new UserController(context, _graphServiceClient).WithAuthenticatedIdentity("3");
+                var controller = new UserController(context, _graphServiceClient, _logger).WithAuthenticatedIdentity("3");
 
                 // Act
                 var result = await controller.GetUserMessageGroups(3);
@@ -240,7 +244,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new UserController(context, _graphServiceClient).WithAuthenticatedIdentity("1");
+                var controller = new UserController(context, _graphServiceClient, _logger).WithAuthenticatedIdentity("1");
 
                 // Act
                 var result = await controller.GetUserMessageGroups(1);
@@ -261,7 +265,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new UserController(context, _graphServiceClient).WithAnonymousIdentity();
+                var controller = new UserController(context, _graphServiceClient, _logger).WithAnonymousIdentity();
                 controller.ModelState.AddModelError("AadOid", "Required key missing.");
                 var newUser = new Shared.User();
 
@@ -281,7 +285,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new UserController(context, _graphServiceClient).WithAnonymousIdentity();
+                var controller = new UserController(context, _graphServiceClient, _logger).WithAnonymousIdentity();
                 Shared.User newUser = new()
                 {
                     AadOid = new Guid("f09cc0b1-f05d-40e0-9684-c4a945d4e7f9"),
@@ -306,7 +310,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new UserController(context, _graphServiceClient).WithAuthenticatedIdentity("1");
+                var controller = new UserController(context, _graphServiceClient, _logger).WithAuthenticatedIdentity("1");
                 Shared.User newUser = new()
                 {
                     AadOid = new Guid("f09cc0b1-f05d-40e0-9684-c4a945d4e7f9"),
@@ -341,7 +345,7 @@ namespace HearYe.Server.Tests
                     LastModifiedDate = DateTime.Now
                 };
 
-                var controller = new UserController(context, _graphServiceClient).WithAuthenticatedIdentity("1", "f09cc0b1-f05d-40e0-9684-c4a945d4e7f9");
+                var controller = new UserController(context, _graphServiceClient, _logger).WithAuthenticatedIdentity("1", "f09cc0b1-f05d-40e0-9684-c4a945d4e7f9");
 
                 // Act
                 var result = await controller.NewUser(newUser);
@@ -384,7 +388,7 @@ namespace HearYe.Server.Tests
                     .UpdateAsync(newGraphUser, CancellationToken.None))
                     .ReturnsAsync(() => null);
 
-                var controller = new UserController(context, customMockGraphClient.Object)
+                var controller = new UserController(context, customMockGraphClient.Object, _logger)
                     .WithAuthenticatedIdentity("1", "f09cc0b1-f05d-40e0-9684-c4a945d4e7f9");
 
                 // Act
@@ -401,7 +405,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new UserController(context, _graphServiceClient).WithAnonymousIdentity();
+                var controller = new UserController(context, _graphServiceClient, _logger).WithAnonymousIdentity();
                 Shared.User newUser = new()
                 {
                     AadOid = new Guid("f09cc0b1-f05d-40e0-9684-c4a945d4e7f9"),
@@ -428,7 +432,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new UserController(context, _graphServiceClient).WithAnonymousIdentity();
+                var controller = new UserController(context, _graphServiceClient, _logger).WithAnonymousIdentity();
                 Shared.User newUser = new()
                 {
                     Id = 4,
@@ -454,7 +458,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new UserController(context, _graphServiceClient).WithAuthenticatedIdentity("1");
+                var controller = new UserController(context, _graphServiceClient, _logger).WithAuthenticatedIdentity("1");
                 Shared.User newUser = new()
                 {
                     Id = 4,
@@ -480,7 +484,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new UserController(context, _graphServiceClient).WithAuthenticatedIdentity("99");
+                var controller = new UserController(context, _graphServiceClient, _logger).WithAuthenticatedIdentity("99");
                 Shared.User newUser = new()
                 {
                     Id = 99,
@@ -506,7 +510,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new UserController(context, _graphServiceClient).WithAuthenticatedIdentity("3");
+                var controller = new UserController(context, _graphServiceClient, _logger).WithAuthenticatedIdentity("3");
                 Shared.User existingUser = context.Users!.Where(x => x.Id == 3).First();
                 existingUser.DisplayName = "TestUser3_Updated";
 
@@ -525,7 +529,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new UserController(context, _graphServiceClient).WithAnonymousIdentity();
+                var controller = new UserController(context, _graphServiceClient, _logger).WithAnonymousIdentity();
 
                 // Act
                 var result = await controller.DeleteUser(4);
@@ -541,7 +545,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new UserController(context, _graphServiceClient).WithAuthenticatedIdentity("1");
+                var controller = new UserController(context, _graphServiceClient, _logger).WithAuthenticatedIdentity("1");
 
                 // Act
                 var result = await controller.DeleteUser(4);
@@ -557,7 +561,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new UserController(context, _graphServiceClient).WithAuthenticatedIdentity("99");
+                var controller = new UserController(context, _graphServiceClient, _logger).WithAuthenticatedIdentity("99");
 
                 // Act
                 var result = await controller.DeleteUser(99);
@@ -573,7 +577,7 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new UserController(context, _graphServiceClient).WithAuthenticatedIdentity("3");
+                var controller = new UserController(context, _graphServiceClient, _logger).WithAuthenticatedIdentity("3");
 
                 // Act
                 var result = await controller.DeleteUser(3);
