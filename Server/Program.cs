@@ -1,16 +1,20 @@
+// <copyright file="Program.cs" company="Stephan Santos">
+// Copyright (c) Stephan Santos. All rights reserved.
+// </copyright>
+
+using System.Text.Json.Serialization;
+using HearYe.Server;
+using HearYe.Shared;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpLogging; // HttpLoggingFields
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Identity.Web;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.OpenApi.Models;
-using Microsoft.AspNetCore.HttpLogging; // HttpLoggingFields
+using Microsoft.Identity.Web;
 using Microsoft.Net.Http.Headers;
-using System.Text.Json.Serialization;
+using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerUI; // SubmitMethod
-using HearYe.Shared;
-using HearYe.Server;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,12 +28,12 @@ builder.Services.Configure<JwtBearerOptions>(
         options.TokenValidationParameters.NameClaimType = "name";
     });
 
-builder.Services.AddHearYeContext(builder.Configuration.GetConnectionString("DefaultConnection")!);
+builder.Services.AddHearYeContext(builder.Configuration.GetConnectionString("DefaultConnection") !);
 
-string[] graphScopes = builder.Configuration.GetSection("MicrosoftGraph:Scopes").Get<List<string>>()!.ToArray();
-string graphTenantId = builder.Configuration.GetSection("MicrosoftGraph")["TenantId"]!;
-string graphClientId = builder.Configuration.GetSection("MicrosoftGraph")["ClientId"]!;
-string graphAppRegSecret = builder.Configuration["Graph:AppRegSecret"]!;
+string[] graphScopes = builder.Configuration.GetSection("MicrosoftGraph:Scopes").Get<List<string>>() !.ToArray();
+string graphTenantId = builder.Configuration.GetSection("MicrosoftGraph")["TenantId"] !;
+string graphClientId = builder.Configuration.GetSection("MicrosoftGraph")["ClientId"] !;
+string graphAppRegSecret = builder.Configuration["Graph:AppRegSecret"] !;
 builder.Services.AddGraphClient(graphScopes, graphTenantId, graphClientId, graphAppRegSecret);
 
 builder.Services.AddControllersWithViews()
@@ -40,40 +44,38 @@ builder.Services.AddHttpLogging(options =>
 {
     options.LoggingFields = HttpLoggingFields.All;
     options.RequestBodyLogLimit = 4096; // default is  32k
-    options.ResponseBodyLogLimit= 4096; // default is  32k
+    options.ResponseBodyLogLimit = 4096; // default is  32k
 });
 
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new()
-    {
-        Title = "HearYe Service API",
-        Version = "v1"
-    });
+    c.SwaggerDoc("v1", new () { Title = "HearYe Service API", Version = "v1" });
 
-    c.AddSecurityDefinition("AuthToken",
+    c.AddSecurityDefinition(
+        "AuthToken",
         new OpenApiSecurityScheme
         {
             Type = SecuritySchemeType.Http,
             BearerFormat = "JWT",
             Scheme = "Bearer",
             In = ParameterLocation.Header,
-            Name = HeaderNames.Authorization
+            Name = HeaderNames.Authorization,
         });
 
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement {
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
             {
-                new OpenApiSecurityScheme
+                Reference = new OpenApiReference
                 {
-                    Reference = new OpenApiReference
-                    {
-                        Type = ReferenceType.SecurityScheme,
-                        Id = "AuthToken"
-                    },
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "AuthToken",
                 },
-                Array.Empty<string>()
-            }
-        });
+            },
+            Array.Empty<string>()
+        },
+    });
 });
 
 builder.Services.AddHealthChecks().AddDbContextCheck<HearYeContext>();
@@ -90,34 +92,33 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json",
+        c.SwaggerEndpoint(
+            "/swagger/v1/swagger.json",
             "HearYe Service API Version 1");
 
         c.SupportedSubmitMethods(new[]
         {
             SubmitMethod.Get, SubmitMethod.Post,
             SubmitMethod.Put, SubmitMethod.Patch,
-            SubmitMethod.Delete
+            SubmitMethod.Delete,
         });
     });
 
     try
     {
-        using (IServiceScope scope = app.Services.CreateScope())
-        {
-            HearYeContext db = scope.ServiceProvider.GetRequiredService<HearYeContext>();
-            DbInitializer.Initialize(db);
-        }
+        using IServiceScope scope = app.Services.CreateScope();
+        HearYeContext db = scope.ServiceProvider.GetRequiredService<HearYeContext>();
+        DbInitializer.Initialize(db);
     }
-    catch (Exception ex) 
+    catch (Exception ex)
     {
         app.Logger.LogError(ex, "An error occurred while creating the DB.");
     }
 }
 else
 {
-    app.UseExceptionHandler("/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseExceptionHandler("/Error");
     app.UseHsts();
 }
 

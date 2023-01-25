@@ -1,9 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore; // ToListAsync, FirstOrDefaultAsync
+﻿// <copyright file="AuthCheck.cs" company="Stephan Santos">
+// Copyright (c) Stephan Santos. All rights reserved.
+// </copyright>
+
 using System.Security.Claims;
 using HearYe.Shared;
+using Microsoft.EntityFrameworkCore; // ToListAsync, FirstOrDefaultAsync
 
 namespace HearYe.Server.Helpers
 {
+    /// <summary>
+    /// Methods to verify user's authorization status. Checks auth token claims.
+    /// </summary>
     public static class AuthCheck
     {
         /// <summary>

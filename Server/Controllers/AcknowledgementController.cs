@@ -1,14 +1,20 @@
-﻿using HearYe.Server.Helpers;
+﻿// <copyright file="AcknowledgementController.cs" company="Stephan Santos">
+// Copyright (c) Stephan Santos. All rights reserved.
+// </copyright>
+
+using HearYe.Server.Helpers;
 using HearYe.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Identity.Web.Resource;
-using System.Security.Claims;
 
 namespace HearYe.Server.Controllers
 {
+    /// <summary>
+    /// Handles requests related to post acknowledgements.
+    /// </summary>
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
@@ -17,67 +23,79 @@ namespace HearYe.Server.Controllers
     {
         private readonly HearYeContext db;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AcknowledgementController"/> class.
+        /// </summary>
+        /// <param name="db">HearYeContext instance.</param>
         public AcknowledgementController(HearYeContext db)
         {
             this.db = db;
         }
 
-        // POST: api/acknowledgement
-        // BODY: Post (JSON)
+        /// <summary>
+        /// POST: api/acknowledgement; <br />
+        /// Create new acknowledgement record.
+        /// </summary>
+        /// <param name="acknowledgement">Acknowledgement object included in request body in JSON format.</param>
+        /// <returns>204, 400, or 401.</returns>
         [HttpPost]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         public async Task<IActionResult> NewAcknowledgement([FromBody] Acknowledgement acknowledgement)
         {
-            if (acknowledgement == null || !ModelState.IsValid)
+            if (acknowledgement == null || !this.ModelState.IsValid)
             {
-                return BadRequest("Complete acknowledgement object required.");
+                return this.BadRequest("Complete acknowledgement object required.");
             }
 
-            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
+            int claimId = AuthCheck.UserClaimCheck(this.HttpContext.User.Claims);
             if (claimId == 0 || acknowledgement.UserId != claimId)
             {
-                return Unauthorized();
+                return this.Unauthorized();
             }
 
-            Post? postCheck = await db.Posts!
+            Post? postCheck = await this.db.Posts!
                 .Where(post => post.Id == acknowledgement.PostId)
                 .FirstOrDefaultAsync();
 
             if (postCheck == null || postCheck.MessageGroupId == null)
             {
-                return BadRequest();
+                return this.BadRequest();
             }
 
-            int membershipCheck = await AuthCheck.UserGroupAuthCheck(db, claimId, (int)postCheck.MessageGroupId);
+            int membershipCheck = await AuthCheck.UserGroupAuthCheck(this.db, claimId, (int)postCheck.MessageGroupId);
 
-            if (membershipCheck == 0) 
+            if (membershipCheck == 0)
             {
-                return Unauthorized();
+                return this.Unauthorized();
             }
 
             try
             {
-                EntityEntry<Acknowledgement> newAcknowledgement = await db.Acknowledgements!.AddAsync(acknowledgement);
-                int completed = await db.SaveChangesAsync();
+                EntityEntry<Acknowledgement> newAcknowledgement = await this.db.Acknowledgements!.AddAsync(acknowledgement);
+                int completed = await this.db.SaveChangesAsync();
 
                 if (completed != 1)
                 {
-                    return BadRequest("Failed to create new acknowledgement.");
+                    return this.BadRequest("Failed to create new acknowledgement.");
                 }
 
-                return NoContent();
+                return this.NoContent();
             }
             catch (Exception)
             {
                 // Log this exception
-                return BadRequest("Error when creating new acknowledgement.");
+                return this.BadRequest("Error when creating new acknowledgement.");
             }
-            
         }
 
-        // DELETE: api/acknowledgement/[id]
+        /// <summary>
+        /// DELETE: api/acknowledgement/[id]; <br />
+        /// Delete specified post acknowledgement.
+        /// </summary>
+        /// <param name="acknowledgementId">ID of acknowledgement to delete.</param>
+        /// <returns>204, 400, 401, or 404.</returns>
         [HttpDelete("{id:int}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
@@ -87,47 +105,47 @@ namespace HearYe.Server.Controllers
         {
             if (acknowledgementId < 1)
             {
-                return BadRequest();
+                return this.BadRequest();
             }
 
-            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
+            int claimId = AuthCheck.UserClaimCheck(this.HttpContext.User.Claims);
             if (claimId == 0)
             {
-                return Unauthorized();
+                return this.Unauthorized();
             }
 
-            Acknowledgement? acknowledgement = await db.Acknowledgements!
+            Acknowledgement? acknowledgement = await this.db.Acknowledgements!
                 .Where(a => a.Id == acknowledgementId)
                 .FirstOrDefaultAsync();
 
             if (acknowledgement == null)
             {
-                return NotFound();
+                return this.NotFound();
             }
 
             if (acknowledgement!.UserId != claimId)
             {
-                return Unauthorized("Not poster of acknowledgement.");
+                return this.Unauthorized("Not poster of acknowledgement.");
             }
 
             try
             {
-                db.Acknowledgements!.Remove(acknowledgement);
-                int completed = await db.SaveChangesAsync();
+                this.db.Acknowledgements!.Remove(acknowledgement);
+                int completed = await this.db.SaveChangesAsync();
 
                 if (completed == 1)
                 {
-                    return NoContent();
+                    return this.NoContent();
                 }
                 else
                 {
-                    return BadRequest("Failed to delete acknowledgement.");
+                    return this.BadRequest("Failed to delete acknowledgement.");
                 }
             }
             catch (Exception)
             {
                 // Log this exception
-                return BadRequest("Error when deleting acknowledgement.");
+                return this.BadRequest("Error when deleting acknowledgement.");
             }
         }
     }

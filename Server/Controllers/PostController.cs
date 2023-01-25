@@ -1,14 +1,20 @@
-﻿using Microsoft.EntityFrameworkCore.ChangeTracking; // EntityEntry<T>
-using Microsoft.EntityFrameworkCore; // ToListAsync, FirstOrDefaultAsync
+﻿// <copyright file="PostController.cs" company="Stephan Santos">
+// Copyright (c) Stephan Santos. All rights reserved.
+// </copyright>
+
+using HearYe.Server.Helpers;
+using HearYe.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore; // ToListAsync, FirstOrDefaultAsync
+using Microsoft.EntityFrameworkCore.ChangeTracking; // EntityEntry<T>
 using Microsoft.Identity.Web.Resource;
-using System.Security.Claims;
-using HearYe.Shared;
-using HearYe.Server.Helpers;
 
 namespace HearYe.Server.Controllers
 {
+    /// <summary>
+    /// Handles requests related to posts.
+    /// </summary>
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
@@ -17,37 +23,53 @@ namespace HearYe.Server.Controllers
     {
         private readonly HearYeContext db;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PostController"/> class.
+        /// </summary>
+        /// <param name="db">HearYeContext instance.</param>
         public PostController(HearYeContext db)
         {
             this.db = db;
         }
 
-        // GET: api/post/[id]
+        /// <summary>
+        /// GET: api/post/[id]; <br />
+        /// Get the specified post.
+        /// </summary>
+        /// <param name="id">Id of the specified post.</param>
+        /// <returns>200 (with a post object), 401, or 400.</returns>
         [HttpGet("{id:int}", Name = nameof(GetPost))]
         [ProducesResponseType(200, Type = typeof(Post))]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> GetPost(int id)
         {
-            Post? post = await db.Posts!.Where(p => p.Id == id).FirstOrDefaultAsync();
+            Post? post = await this.db.Posts!.Where(p => p.Id == id).FirstOrDefaultAsync();
 
             if (post == null)
             {
-                return NotFound();
+                return this.NotFound();
             }
 
-            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
-            int roleId = await AuthCheck.UserGroupAuthCheck(db, claimId, id);
+            int claimId = AuthCheck.UserClaimCheck(this.HttpContext.User.Claims);
+            int roleId = await AuthCheck.UserGroupAuthCheck(this.db, claimId, id);
 
             if (roleId == 0)
             {
-                return Unauthorized();
+                return this.Unauthorized();
             }
 
-            return Ok(post);
+            return this.Ok(post);
         }
 
-        // GET: api/post/new?messageGroupId=[messageGroupId]&count=[count]&skip=[skip]
+        /// <summary>
+        /// GET: api/post/new?messageGroupId=[messageGroupId]&amp;count=[count]&amp;skip=[skip]; <br />
+        /// Get posts that have not gone stale and that the requesting user has not acknowledged.
+        /// </summary>
+        /// <param name="messageGroupId">Id of a message group.</param>
+        /// <param name="count">Number of posts to return.</param>
+        /// <param name="skip">Number of posts to skip. Posts are ordered by creation date.</param>
+        /// <returns>200 (with a list of post objects), 400, or 401.</returns>
         [HttpGet("new")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Post>))]
         [ProducesResponseType(400)]
@@ -56,34 +78,39 @@ namespace HearYe.Server.Controllers
         {
             if (messageGroupId == null || messageGroupId == 0)
             {
-                return BadRequest();
+                return this.BadRequest();
             }
 
-            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
-            int roleId = await AuthCheck.UserGroupAuthCheck(db, claimId, (int)messageGroupId);
+            int claimId = AuthCheck.UserClaimCheck(this.HttpContext.User.Claims);
+            int roleId = await AuthCheck.UserGroupAuthCheck(this.db, claimId, (int)messageGroupId);
 
             if (roleId == 0)
             {
-                return Unauthorized();
+                return this.Unauthorized();
             }
 
-            IEnumerable<Post?> posts = await db.Posts!
+            IEnumerable<Post?> posts = await this.db.Posts!
                 .Include("Acknowledgements")
-                .Where
-                (
+                .Where(
                     p => p.MessageGroupId == messageGroupId
                     && (p.StaleDate == null || p.StaleDate > DateTime.Now)
-                    && (p.Acknowledgements!.All(a => a.UserId != claimId))
-                )
+                    && p.Acknowledgements!.All(a => a.UserId != claimId))
                 .OrderByDescending(p => p.CreatedDate)
                 .Skip(skip)
                 .Take(count)
                 .ToListAsync();
 
-            return Ok(posts);
+            return this.Ok(posts);
         }
 
-        // GET: api/post/acknowledged?messageGroupId=[messageGroupId]&count=[count]&skip=[skip]
+        /// <summary>
+        /// GET: api/post/acknowledged?messageGroupId=[messageGroupId]&amp;count=[count]&amp;skip=[skip]; <br />
+        /// Get posts that have not gone stale and that the requesting user has acknowledged.
+        /// </summary>
+        /// <param name="messageGroupId">Id of a message group.</param>
+        /// <param name="count">Number of posts to return.</param>
+        /// <param name="skip">Number of posts to skip. Posts are ordered by creation date.</param>
+        /// <returns>200 (with a list of post objects), 400, or 401.</returns>
         [HttpGet("acknowledged")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Post>))]
         [ProducesResponseType(400)]
@@ -92,34 +119,39 @@ namespace HearYe.Server.Controllers
         {
             if (messageGroupId == null || messageGroupId == 0)
             {
-                return BadRequest();
+                return this.BadRequest();
             }
 
-            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
-            int roleId = await AuthCheck.UserGroupAuthCheck(db, claimId, (int)messageGroupId);
+            int claimId = AuthCheck.UserClaimCheck(this.HttpContext.User.Claims);
+            int roleId = await AuthCheck.UserGroupAuthCheck(this.db, claimId, (int)messageGroupId);
 
             if (roleId == 0)
             {
-                return Unauthorized();
+                return this.Unauthorized();
             }
 
-            IEnumerable<Post?> posts = await db.Posts!
+            IEnumerable<Post?> posts = await this.db.Posts!
                 .Include("Acknowledgements")
-                .Where
-                (
+                .Where(
                     p => p.MessageGroupId == messageGroupId
                     && (p.StaleDate == null || p.StaleDate > DateTime.Now)
-                    && (p.Acknowledgements!.Any(a => a.UserId == claimId))
-                )
+                    && p.Acknowledgements!.Any(a => a.UserId == claimId))
                 .OrderByDescending(p => p.CreatedDate)
                 .Skip(skip)
                 .Take(count)
                 .ToListAsync();
 
-            return Ok(posts);
+            return this.Ok(posts);
         }
 
-        // GET: api/post/stale?messageGroupId=[messageGroupId]&count=[count]&skip=[skip]
+        /// <summary>
+        /// GET: api/post/stale?messageGroupId=[messageGroupId]&amp;count=[count]&amp;skip=[skip]; <br />
+        /// Get posts that have have gone stale.
+        /// </summary>
+        /// <param name="messageGroupId">Id of a message group.</param>
+        /// <param name="count">Number of posts to return.</param>
+        /// <param name="skip">Number of posts to skip. Posts are ordered by creation date.</param>
+        /// <returns>200 (with a list of post objects), 400, or 401.</returns>
         [HttpGet("stale")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Post>))]
         [ProducesResponseType(400)]
@@ -128,18 +160,18 @@ namespace HearYe.Server.Controllers
         {
             if (messageGroupId == null || messageGroupId == 0)
             {
-                return BadRequest();
+                return this.BadRequest();
             }
 
-            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
-            int roleId = await AuthCheck.UserGroupAuthCheck(db, claimId, (int)messageGroupId);
+            int claimId = AuthCheck.UserClaimCheck(this.HttpContext.User.Claims);
+            int roleId = await AuthCheck.UserGroupAuthCheck(this.db, claimId, (int)messageGroupId);
 
             if (roleId == 0)
             {
-                return Unauthorized();
+                return this.Unauthorized();
             }
 
-            IEnumerable<Post?> posts = await db.Posts!
+            IEnumerable<Post?> posts = await this.db.Posts!
                 .Include("Acknowledgements")
                 .Where(p => p.MessageGroupId == messageGroupId && p.StaleDate <= DateTime.Now)
                 .OrderByDescending(p => p.CreatedDate)
@@ -147,45 +179,54 @@ namespace HearYe.Server.Controllers
                 .Take(count)
                 .ToListAsync();
 
-            return Ok(posts);
+            return this.Ok(posts);
         }
 
-        // POST: api/post
-        // BODY: Post (JSON)
+        /// <summary>
+        /// POST: api/post; <br />
+        /// Create a new post.
+        /// </summary>
+        /// <param name="post">Post object included in request body in JSON format.</param>
+        /// <returns>201, 400, or 404.</returns>
         [HttpPost]
         [ProducesResponseType(201, Type = typeof(User))]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         public async Task<IActionResult> NewPost([FromBody] Post post)
         {
-            if (post == null || post.MessageGroupId == null || !ModelState.IsValid)
+            if (post == null || post.MessageGroupId == null || !this.ModelState.IsValid)
             {
-                return BadRequest("Complete post object required.");
+                return this.BadRequest("Complete post object required.");
             }
 
-            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
-            int roleId = await AuthCheck.UserGroupAuthCheck(db, claimId, (int)post.MessageGroupId!);
+            int claimId = AuthCheck.UserClaimCheck(this.HttpContext.User.Claims);
+            int roleId = await AuthCheck.UserGroupAuthCheck(this.db, claimId, (int)post.MessageGroupId!);
 
             if (roleId == 0)
             {
-                return Unauthorized();
+                return this.Unauthorized();
             }
 
-            EntityEntry<Post> newPost = await db.Posts!.AddAsync(post);
-            int completed = await db.SaveChangesAsync();
+            EntityEntry<Post> newPost = await this.db.Posts!.AddAsync(post);
+            int completed = await this.db.SaveChangesAsync();
 
             if (completed != 1)
             {
-                return BadRequest("Failed to create new post.");
+                return this.BadRequest("Failed to create new post.");
             }
 
-            return CreatedAtRoute(
-                routeName: nameof(GetPost),
+            return this.CreatedAtRoute(
+                routeName: nameof(this.GetPost),
                 routeValues: new { id = newPost.Entity.Id },
                 value: newPost.Entity);
         }
 
-        // DELETE: api/post/[id]
+        /// <summary>
+        /// DELETE: api/post/[id]; <br />
+        /// Delete the specified post.
+        /// </summary>
+        /// <param name="id">Id of the specified post.</param>
+        /// <returns>204, 400, 401, or 404.</returns>
         [HttpDelete("{id:int}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
@@ -193,34 +234,34 @@ namespace HearYe.Server.Controllers
         [ProducesResponseType(404)]
         public async Task<IActionResult> DeletePost(int id)
         {
-            Post? post = await db.Posts!.Where(p => p.Id == id).FirstOrDefaultAsync();
+            Post? post = await this.db.Posts!.Where(p => p.Id == id).FirstOrDefaultAsync();
 
             if (post == null || post.MessageGroupId == null)
             {
-                return NotFound();
+                return this.NotFound();
             }
 
-            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
-            int roleId = await AuthCheck.UserGroupAuthCheck(db, claimId, (int)post.MessageGroupId!);
+            int claimId = AuthCheck.UserClaimCheck(this.HttpContext.User.Claims);
+            int roleId = await AuthCheck.UserGroupAuthCheck(this.db, claimId, (int)post.MessageGroupId!);
 
             if (roleId == 0 || claimId != post.UserId)
             {
-                return Unauthorized();
+                return this.Unauthorized();
             }
 
             post.IsDeleted = true;
             post.DeletedDate = DateTime.Now;
-            db.Posts!.Update(post);
+            this.db.Posts!.Update(post);
 
-            int completed = await db.SaveChangesAsync();
+            int completed = await this.db.SaveChangesAsync();
 
             if (completed == 1)
             {
-                return NoContent();
+                return this.NoContent();
             }
             else
             {
-                return BadRequest("Post found but failed to delete.");
+                return this.BadRequest("Post found but failed to delete.");
             }
         }
     }

@@ -1,14 +1,20 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿// <copyright file="MessageGroupInvitationController.cs" company="Stephan Santos">
+// Copyright (c) Stephan Santos. All rights reserved.
+// </copyright>
+
+using HearYe.Server.Helpers;
+using HearYe.Shared;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Identity.Web.Resource;
-using System.Security.Claims;
-using HearYe.Shared;
-using HearYe.Server.Helpers;
 
 namespace HearYe.Server.Controllers
 {
+    /// <summary>
+    /// Handles requests related to message group invitations.
+    /// </summary>
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
@@ -17,119 +23,144 @@ namespace HearYe.Server.Controllers
     {
         private readonly HearYeContext db;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MessageGroupInvitationController"/> class.
+        /// </summary>
+        /// <param name="db">HearYeContext instance.</param>
         public MessageGroupInvitationController(HearYeContext db)
         {
             this.db = db;
         }
 
-        // GET: api/messagegroupinvitation/[id]
+        /// <summary>
+        /// GET: api/messagegroupinvitation/[id]; <br />
+        /// Returns the specified message group invitation.
+        /// Requester must either be the invitee or inviter.
+        /// </summary>
+        /// <param name="id">Id of the requested message group invitation.</param>
+        /// <returns>200 (with a message group invitation object), 401, or 404.</returns>
         [HttpGet("{id:int}", Name = nameof(GetMessageGroupInvitation))]
         [ProducesResponseType(200, Type = typeof(MessageGroupInvitation))]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> GetMessageGroupInvitation(int id)
         {
-            MessageGroupInvitation? messageGroupInvitation = await db.MessageGroupInvitations!.Where(mgi => mgi.Id == id).FirstOrDefaultAsync();
+            MessageGroupInvitation? messageGroupInvitation = await this.db.MessageGroupInvitations!
+                .Where(mgi => mgi.Id == id).FirstOrDefaultAsync();
 
             if (messageGroupInvitation == null)
             {
-                return NotFound();
+                return this.NotFound();
             }
 
-            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
-            int roleId = await AuthCheck.UserInviteAuthCheck(db, claimId, id);
+            int claimId = AuthCheck.UserClaimCheck(this.HttpContext.User.Claims);
+            int roleId = await AuthCheck.UserInviteAuthCheck(this.db, claimId, id);
 
             if (roleId == 0)
             {
-                return Unauthorized();
+                return this.Unauthorized();
             }
 
-            return Ok(messageGroupInvitation);
+            return this.Ok(messageGroupInvitation);
         }
 
-        // GET: api/messagegroupinvitation/user/[id]
+        /// <summary>
+        /// GET: api/messagegroupinvitation/user/[id]; <br />
+        /// Get all message group invitations that a user has sent or received.
+        /// </summary>
+        /// <param name="userId">Id of the specified user.</param>
+        /// <returns>200 (with a list of member group invitations), or 401.</returns>
         [HttpGet("user/{id:int}", Name = nameof(GetMessageGroupInvitations))]
         [ProducesResponseType(200, Type = typeof(IEnumerable<MessageGroupInvitation>))]
         [ProducesResponseType(401)]
         public async Task<IActionResult> GetMessageGroupInvitations(int userId)
         {
-            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
+            int claimId = AuthCheck.UserClaimCheck(this.HttpContext.User.Claims);
             if (claimId == 0 || userId != claimId)
             {
-                return Unauthorized();
+                return this.Unauthorized();
             }
 
-            IEnumerable<MessageGroupInvitation> messageGroupInvitations = await db.MessageGroupInvitations!
-                .Where(mgi => (mgi.InvitationActive == true) 
-                    && (mgi.InvitingUserId == userId) 
-                    || (mgi.InvitedUserId == userId))
+            IEnumerable<MessageGroupInvitation> messageGroupInvitations = await this.db.MessageGroupInvitations!
+                .Where(mgi => (mgi.InvitationActive == true)
+                    && ((mgi.InvitingUserId == userId)
+                    || (mgi.InvitedUserId == userId)))
                 .ToListAsync();
 
-            return Ok(messageGroupInvitations);
+            return this.Ok(messageGroupInvitations);
         }
 
-        // POST: api/messagegroupinvitations/new
-        // BODY: string
+        /// <summary>
+        /// POST: api/messagegroupinvitations/new; <br />
+        /// Create new message group invitation.
+        /// </summary>
+        /// <param name="invite">MessageGroupInvitation object included in request body in JSON format.</param>
+        /// <returns>201, 400, or 401.</returns>
         [HttpPost("new")]
         [ProducesResponseType(201, Type = typeof(MessageGroupInvitation))]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         public async Task<IActionResult> NewMessageGroupInvitation([FromBody] MessageGroupInvitation invite)
         {
-            if (invite == null || !ModelState.IsValid || invite.InvitationAccepted == true || invite.InvitationActive == false)
+            if (invite == null || !this.ModelState.IsValid || invite.InvitationAccepted == true || invite.InvitationActive == false)
             {
-                return BadRequest();
+                return this.BadRequest();
             }
 
-            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
-            int roleId = await AuthCheck.UserGroupAuthCheck(db, claimId, invite.MessageGroupId);
+            int claimId = AuthCheck.UserClaimCheck(this.HttpContext.User.Claims);
+            int roleId = await AuthCheck.UserGroupAuthCheck(this.db, claimId, invite.MessageGroupId);
 
             if (roleId == 0)
             {
-                return Unauthorized();
+                return this.Unauthorized();
             }
 
-            MessageGroupMember? invitee = await db.MessageGroupMembers!
+            MessageGroupMember? invitee = await this.db.MessageGroupMembers!
                 .Where(members => (members.MessageGroupId == invite.MessageGroupId) && (members.UserId == invite.InvitedUserId))
                 .FirstOrDefaultAsync();
 
             if (invitee != null)
             {
-                return BadRequest("Invited user is already a group member.");
+                return this.BadRequest("Invited user is already a group member.");
             }
 
-            User? user = await db.Users!.Where(u => u.Id == invite.InvitedUserId).FirstOrDefaultAsync();
+            User? user = await this.db.Users!.Where(u => u.Id == invite.InvitedUserId).FirstOrDefaultAsync();
             if (user == null)
             {
-                return BadRequest("Invited user does not exist.");
+                return this.BadRequest("Invited user does not exist.");
             }
-            if (user.AcceptGroupInvitations == false)
+            else if (user.AcceptGroupInvitations == false)
             {
-                return BadRequest("User not accepting invitations");
+                return this.BadRequest("User not accepting invitations");
             }
 
             try
             {
-                EntityEntry<MessageGroupInvitation> newInvitation = await db.MessageGroupInvitations!.AddAsync(invite);
-                int completed = await db.SaveChangesAsync();
+                EntityEntry<MessageGroupInvitation> newInvitation = await this.db.MessageGroupInvitations!.AddAsync(invite);
+                int completed = await this.db.SaveChangesAsync();
                 if (completed != 1)
                 {
-                    return BadRequest("Failed to create invitation.");
+                    return this.BadRequest("Failed to create invitation.");
                 }
 
-                return CreatedAtRoute(
-                routeName: nameof(GetMessageGroupInvitation),
+                return this.CreatedAtRoute(
+                routeName: nameof(this.GetMessageGroupInvitation),
                 routeValues: new { id = newInvitation.Entity.Id },
                 value: newInvitation.Entity);
             }
             catch (Exception)
             {
                 // Log this exception
-                return BadRequest("Error when creating invitation.");
+                return this.BadRequest("Error when creating invitation.");
             }
         }
 
-        // PATCH: api/messagegroupinvitation/decline/[id]
+        /// <summary>
+        /// PATCH: api/messagegroupinvitation/decline/[id]; <br />
+        /// Decline specified message group invitation. Must be the invitee.
+        /// </summary>
+        /// <param name="inviteId">Id of the specified message group invitation.</param>
+        /// <returns>204, 400, 401, or 404.</returns>
         [HttpPatch("decline/{id:int}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
@@ -139,30 +170,30 @@ namespace HearYe.Server.Controllers
         {
             if (inviteId < 1)
             {
-                return BadRequest("Invalid invite id.");
+                return this.BadRequest("Invalid invite id.");
             }
 
-            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
+            int claimId = AuthCheck.UserClaimCheck(this.HttpContext.User.Claims);
             if (claimId == 0)
             {
-                return Unauthorized();
+                return this.Unauthorized();
             }
 
-            MessageGroupInvitation? mgi = await db.MessageGroupInvitations!
+            MessageGroupInvitation? mgi = await this.db.MessageGroupInvitations!
                 .Where(inv => inv.Id == inviteId)
                 .FirstOrDefaultAsync();
 
             if (mgi == null)
             {
-                return NotFound();
+                return this.NotFound();
             }
             else if (mgi.InvitationActive == false)
             {
-                return BadRequest("Invitation already used.");
+                return this.BadRequest("Invitation already used.");
             }
             else if (claimId != mgi.InvitedUserId)
             {
-                return Unauthorized("Not invite recipient.");
+                return this.Unauthorized("Not invite recipient.");
             }
 
             try
@@ -171,26 +202,31 @@ namespace HearYe.Server.Controllers
                 mgi.InvitationAccepted = false;
                 mgi.ActionDate = DateTime.Now;
 
-                db.MessageGroupInvitations!.Update(mgi);
-                int completed = await db.SaveChangesAsync();
+                this.db.MessageGroupInvitations!.Update(mgi);
+                int completed = await this.db.SaveChangesAsync();
 
                 if (completed == 1)
                 {
-                    return NoContent();
+                    return this.NoContent();
                 }
                 else
                 {
-                    return BadRequest("Failed to decline invitation.");
+                    return this.BadRequest("Failed to decline invitation.");
                 }
             }
             catch (Exception)
             {
                 // Log this exception
-                return BadRequest("Error when declining invitation.");
+                return this.BadRequest("Error when declining invitation.");
             }
         }
 
-        // PATCH: api/messagegroupinvitation/accept/[id]
+        /// <summary>
+        /// PATCH: api/messagegroupinvitation/accept/[id]; <br />
+        /// Accept specified message group invitation. Must be the invitee.
+        /// </summary>
+        /// <param name="inviteId">Id of the specified message group invitation.</param>
+        /// <returns>204, 400, 401, or 404.</returns>
         [HttpPatch("accept/{id:int}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
@@ -200,74 +236,79 @@ namespace HearYe.Server.Controllers
         {
             if (inviteId < 1)
             {
-                return BadRequest("Invalid invite id.");
+                return this.BadRequest("Invalid invite id.");
             }
 
-            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
+            int claimId = AuthCheck.UserClaimCheck(this.HttpContext.User.Claims);
             if (claimId == 0)
             {
-                return Unauthorized();
+                return this.Unauthorized();
             }
 
-            MessageGroupInvitation? mgi = await db.MessageGroupInvitations!
+            MessageGroupInvitation? mgi = await this.db.MessageGroupInvitations!
                 .Where(inv => inv.Id == inviteId)
                 .FirstOrDefaultAsync();
 
             if (mgi == null)
             {
-                return NotFound();
+                return this.NotFound();
             }
             else if (mgi.InvitationActive == false)
             {
-                return BadRequest("Invitation already used.");
+                return this.BadRequest("Invitation already used.");
             }
             else if (claimId != mgi.InvitedUserId)
             {
-                return Unauthorized("Not invite recipient.");
+                return this.Unauthorized("Not invite recipient.");
             }
 
-            using var transaction = db.Database.BeginTransaction();
+            using var transaction = this.db.Database.BeginTransaction();
             try
             {
                 mgi.InvitationActive = false;
                 mgi.InvitationAccepted = true;
                 mgi.ActionDate = DateTime.Now;
 
-                db.MessageGroupInvitations!.Update(mgi);
+                this.db.MessageGroupInvitations!.Update(mgi);
 
-                int completed1 = await db.SaveChangesAsync();
+                int completed1 = await this.db.SaveChangesAsync();
 
-                MessageGroupMember mgm = new()
+                MessageGroupMember mgm = new ()
                 {
                     MessageGroupId = mgi.MessageGroupId,
                     MessageGroupRoleId = 2,
-                    UserId = mgi.InvitedUserId
+                    UserId = mgi.InvitedUserId,
                 };
 
-                EntityEntry<MessageGroupMember> newMGM = await db.MessageGroupMembers!.AddAsync(mgm);
+                EntityEntry<MessageGroupMember> newMGM = await this.db.MessageGroupMembers!.AddAsync(mgm);
 
-                int completed2 = await db.SaveChangesAsync();
+                int completed2 = await this.db.SaveChangesAsync();
 
                 if (completed1 == 1 && completed2 == 1)
                 {
                     transaction.Commit();
-                    return NoContent();
+                    return this.NoContent();
                 }
                 else
                 {
                     transaction.Rollback();
-                    return BadRequest("Failed to accept invitation.");
+                    return this.BadRequest("Failed to accept invitation.");
                 }
             }
             catch (Exception)
             {
                 // Log this exception
                 transaction.Rollback();
-                return BadRequest("Error when accepting invitation.");
+                return this.BadRequest("Error when accepting invitation.");
             }
         }
 
-        // DELETE: api/messagegroupinvitation/delete/[id]
+        /// <summary>
+        /// DELETE: api/messagegroupinvitation/delete/[id]; <br />
+        /// Delete the specified message group invitation. Must be the requester of the invite.
+        /// </summary>
+        /// <param name="inviteId">Id of the specified message group invite.</param>
+        /// <returns>204, 400, 401, or 404.</returns>
         [HttpDelete("delete/{id:int}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
@@ -277,46 +318,46 @@ namespace HearYe.Server.Controllers
         {
             if (inviteId < 1)
             {
-                return BadRequest("Invalid invite id.");
+                return this.BadRequest("Invalid invite id.");
             }
 
-            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
+            int claimId = AuthCheck.UserClaimCheck(this.HttpContext.User.Claims);
             if (claimId == 0)
             {
-                return Unauthorized();
+                return this.Unauthorized();
             }
 
-            MessageGroupInvitation? mgi = await db.MessageGroupInvitations!
+            MessageGroupInvitation? mgi = await this.db.MessageGroupInvitations!
                 .Where(inv => inv.Id == inviteId)
                 .FirstOrDefaultAsync();
 
             if (mgi == null)
             {
-                return NotFound();
+                return this.NotFound();
             }
             else if (claimId != mgi.InvitingUserId)
             {
-                return Unauthorized("Not invite sender.");
+                return this.Unauthorized("Not invite sender.");
             }
 
             try
             {
-                db.MessageGroupInvitations!.Remove(mgi);
-                int completed = await db.SaveChangesAsync();
+                this.db.MessageGroupInvitations!.Remove(mgi);
+                int completed = await this.db.SaveChangesAsync();
 
                 if (completed == 1)
                 {
-                    return NoContent();
+                    return this.NoContent();
                 }
                 else
                 {
-                    return BadRequest("Failed to delete invitation.");
+                    return this.BadRequest("Failed to delete invitation.");
                 }
             }
             catch (Exception)
             {
                 // Log this exception
-                return BadRequest("Error when deleting invitation.");
+                return this.BadRequest("Error when deleting invitation.");
             }
         }
     }

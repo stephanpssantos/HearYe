@@ -1,15 +1,22 @@
-﻿using Microsoft.EntityFrameworkCore.ChangeTracking; // EntityEntry<T>
-using Microsoft.EntityFrameworkCore; // ToListAsync, FirstOrDefaultAsync
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.Identity.Web.Resource;
-using Microsoft.Graph;
-using HearYe.Shared;
+﻿// <copyright file="UserController.cs" company="Stephan Santos">
+// Copyright (c) Stephan Santos. All rights reserved.
+// </copyright>
+
 using HearYe.Server.Helpers;
+using HearYe.Shared;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore; // ToListAsync, FirstOrDefaultAsync
+using Microsoft.EntityFrameworkCore.ChangeTracking; // EntityEntry<T>
+using Microsoft.Graph;
+using Microsoft.Identity.Web.Resource;
 using User = HearYe.Shared.User;
 
 namespace HearYe.Server.Controllers
 {
+    /// <summary>
+    /// Handles requests related to users.
+    /// </summary>
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
@@ -19,37 +26,53 @@ namespace HearYe.Server.Controllers
         private readonly HearYeContext db;
         private readonly GraphServiceClient graph;
 
-        public UserController(HearYeContext db, GraphServiceClient graph) 
-        { 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UserController"/> class.
+        /// </summary>
+        /// <param name="db">HearYeContext instance.</param>
+        /// <param name="graph">GraphServiceClient instance.</param>
+        public UserController(HearYeContext db, GraphServiceClient graph)
+        {
             this.db = db;
             this.graph = graph;
         }
 
-        // GET: api/user/[id]
+        /// <summary>
+        /// GET: api/user/[id]; <br />
+        /// Get the specified user by id.
+        /// </summary>
+        /// <param name="id">Id of specified user.</param>
+        /// <returns>200 (with user object in body), 401, or 404.</returns>
         [HttpGet("{id:int}", Name = nameof(GetUser))]
         [ProducesResponseType(200, Type = typeof(User))]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> GetUser(int id)
         {
-            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
+            int claimId = AuthCheck.UserClaimCheck(this.HttpContext.User.Claims);
 
-            if (claimId == 0 || id != claimId) 
+            if (claimId == 0 || id != claimId)
             {
-                return Unauthorized();
+                return this.Unauthorized();
             }
 
-            User? user = await db.Users!.FirstOrDefaultAsync(user => user.Id == id);
-            
+            User? user = await this.db.Users!.FirstOrDefaultAsync(user => user.Id == id);
+
             if (user == null)
             {
-                return NotFound();
+                return this.NotFound();
             }
 
-            return Ok(user);
+            return this.Ok(user);
         }
 
-        // GET: api/user/?aadOid=[aadOid]
+        /// <summary>
+        /// GET: api/user/?aadOid=[aadOid]; <br />
+        /// Get user by Azure AD Object Id.
+        /// Used for verifying new user claims (before the user's database ID is saved in their claims.)
+        /// </summary>
+        /// <param name="aadOid">User's Azure AD OID.</param>
+        /// <returns>200 (with user object in body), 400, 401, or 404.</returns>
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(User))]
         [ProducesResponseType(400)]
@@ -57,107 +80,118 @@ namespace HearYe.Server.Controllers
         [ProducesResponseType(404)]
         public async Task<IActionResult> GetUserByOid(string aadOid)
         {
-            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
+            int claimId = AuthCheck.UserClaimCheck(this.HttpContext.User.Claims);
 
             if (claimId == 0)
             {
-                return Unauthorized();
+                return this.Unauthorized();
             }
 
             bool validGuid = Guid.TryParse(aadOid, out Guid input);
             if (!validGuid)
             {
-                return BadRequest();
+                return this.BadRequest();
             }
 
-            User? user = await db.Users!
+            User? user = await this.db.Users!
                 .Where(u => u.AadOid == input)
                 .FirstOrDefaultAsync();
 
             if (user == null)
             {
-                return NotFound();
+                return this.NotFound();
             }
-            else if (user.Id != claimId) // && user.role != Admin
+            else if (user.Id != claimId)
             {
-                return Unauthorized();
+                return this.Unauthorized();
             }
-            return Ok(user);
+
+            return this.Ok(user);
         }
 
-        // GET: api/user/groups/[id]
+        /// <summary>
+        /// GET: api/user/groups/[id]; <br />
+        /// Get a list of message groups that a user is a member of.
+        /// </summary>
+        /// <param name="id">Id of the specified user.</param>
+        /// <returns>200 (with a list of message group objects in body), or 401.</returns>
         [HttpGet("groups/{id:int}")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<MessageGroup>))]
         [ProducesResponseType(401)]
         public async Task<IActionResult> GetUserMessageGroups(int id)
         {
-            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
+            int claimId = AuthCheck.UserClaimCheck(this.HttpContext.User.Claims);
 
             if (claimId == 0 || id != claimId)
             {
-                return Unauthorized();
+                return this.Unauthorized();
             }
 
-            IEnumerable<MessageGroup?> mg = await db.MessageGroupMembers!
+            IEnumerable<MessageGroup?> mg = await this.db.MessageGroupMembers!
                 .Where(mgm => mgm.UserId == id)
                 .Select(mgm => mgm.MessageGroup)
                 .ToListAsync();
 
-            return Ok(mg);
+            return this.Ok(mg);
         }
 
-        // POST: api/user
-        // BODY: User (JSON)
+        /// <summary>
+        /// POST: api/user; <br />
+        /// Create new user then register new user id in Azure AD graph.
+        /// The custom attribute 'extension_database' will be added to the user graph object.
+        /// </summary>
+        /// <param name="user">User object included in request body in JSON format.</param>
+        /// <returns>201, 400, or 404.</returns>
         [HttpPost]
         [ProducesResponseType(201, Type = typeof(User))]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         public async Task<IActionResult> NewUser([FromBody] User user)
         {
-            if (user == null || !ModelState.IsValid)
+            if (user == null || !this.ModelState.IsValid)
             {
-                return BadRequest("Valid user object required.");
+                return this.BadRequest("Valid user object required.");
             }
 
-            string? aadOid = HttpContext.User.Claims.FirstOrDefault(x => 
+            string? aadOid = this.HttpContext.User.Claims.FirstOrDefault(x =>
                 x.Type.Equals("http://schemas.microsoft.com/identity/claims/objectidentifier"))?.Value;
 
             if (aadOid == null)
             {
-                return Unauthorized();
+                return this.Unauthorized();
             }
 
             if (aadOid != user.AadOid.ToString())
             {
-                return BadRequest("Azure AD object ID (AadOid) missing or mismatched.");
+                return this.BadRequest("Azure AD object ID (AadOid) missing or mismatched.");
             }
 
-            using var transaction = db.Database.BeginTransaction();
+            using var transaction = this.db.Database.BeginTransaction();
 
             try
             {
-                EntityEntry<User> newUser = await db.Users!.AddAsync(user);
-                int completed = await db.SaveChangesAsync();
+                EntityEntry<User> newUser = await this.db.Users!.AddAsync(user);
+                int completed = await this.db.SaveChangesAsync();
 
                 if (completed != 1)
                 {
-                    return BadRequest("Failed to create new user.");
+                    return this.BadRequest("Failed to create new user.");
                 }
 
-                Microsoft.Graph.User newGraphUser = new()
+                Microsoft.Graph.User newGraphUser = new ()
                 {
                     AdditionalData = new Dictionary<string, object>()
                     {
-                        { "extension_9ad29a8ab7fc468aa9c975e45b6eb34e_DatabaseId", newUser.Entity.Id.ToString() }
-                    }
+                        { "extension_9ad29a8ab7fc468aa9c975e45b6eb34e_DatabaseId", newUser.Entity.Id.ToString() },
+                    },
                 };
 
-                await graph.Users[aadOid].Request().UpdateAsync(newGraphUser);
+                await this.graph.Users[aadOid].Request().UpdateAsync(newGraphUser);
 
                 transaction.Commit();
 
-                return CreatedAtRoute(
-                    routeName: nameof(GetUser),
+                return this.CreatedAtRoute(
+                    routeName: nameof(this.GetUser),
                     routeValues: new { id = newUser.Entity.Id },
                     value: newUser.Entity);
             }
@@ -165,12 +199,17 @@ namespace HearYe.Server.Controllers
             {
                 // Log this exception.
                 transaction.Rollback();
-                return BadRequest("Failed to register graph record for new user.");
+                return this.BadRequest("Failed to register graph record for new user.");
             }
         }
 
-        // PUT: api/user/[id]
-        // BODY: User (JSON)
+        /// <summary>
+        /// PUT: api/user/[id]; <br />
+        /// Update user properties.
+        /// </summary>
+        /// <param name="id">Id of the user to update.</param>
+        /// <param name="user">User object included in request body in JSON format.</param>
+        /// <returns>204, 400, 401, or 404.</returns>
         [HttpPut("{id:int}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
@@ -180,37 +219,42 @@ namespace HearYe.Server.Controllers
         {
             if (user == null || user.Id != id)
             {
-                return BadRequest("User ID mismatch.");
+                return this.BadRequest("User ID mismatch.");
             }
 
-            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
+            int claimId = AuthCheck.UserClaimCheck(this.HttpContext.User.Claims);
 
             if (claimId == 0 || id != claimId)
             {
-                return Unauthorized();
+                return this.Unauthorized();
             }
 
-            User? existing = await db.Users!.Where(u => u.Id == id).FirstOrDefaultAsync();
+            User? existing = await this.db.Users!.Where(u => u.Id == id).FirstOrDefaultAsync();
             if (existing == null)
             {
-                return NotFound();
+                return this.NotFound();
             }
 
-            db.Users!.Update(user);
-            int completed = await db.SaveChangesAsync();
+            this.db.Users!.Update(user);
+            int completed = await this.db.SaveChangesAsync();
 
             if (completed == 1)
             {
-                return NoContent();
+                return this.NoContent();
             }
             else
             {
-                return BadRequest("Failed to update user.");
+                return this.BadRequest("Failed to update user.");
             }
         }
 
-        // DELETE: api/user/[id]
-        // Deletes from app db only. B2C account remains.
+        /// <summary>
+        /// DELETE: api/user/[id]; <br />
+        /// Deletes user account. Deletes only from application database.
+        /// Azure AD user object is not deleted.
+        /// </summary>
+        /// <param name="id">Id of the user to delete.</param>
+        /// <returns>204, 400, 401, or 404.</returns>
         [HttpDelete("{id:int}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
@@ -218,29 +262,29 @@ namespace HearYe.Server.Controllers
         [ProducesResponseType(404)]
         public async Task<IActionResult> DeleteUser(int id)
         {
-            int claimId = AuthCheck.UserClaimCheck(HttpContext.User.Claims);
+            int claimId = AuthCheck.UserClaimCheck(this.HttpContext.User.Claims);
 
             if (claimId == 0 || id != claimId)
             {
-                return Unauthorized();
+                return this.Unauthorized();
             }
 
-            User? existing = await db.Users!.Where(u => u.Id == id).FirstOrDefaultAsync();
+            User? existing = await this.db.Users!.Where(u => u.Id == id).FirstOrDefaultAsync();
             if (existing == null)
             {
-                return NotFound();
+                return this.NotFound();
             }
 
-            db.Users!.Remove(existing);
-            int completed = await db.SaveChangesAsync();
+            this.db.Users!.Remove(existing);
+            int completed = await this.db.SaveChangesAsync();
 
             if (completed == 1)
             {
-                return NoContent();
+                return this.NoContent();
             }
             else
             {
-                return BadRequest("User found but failed to delete.");
+                return this.BadRequest("User found but failed to delete.");
             }
         }
     }
