@@ -2,12 +2,14 @@
 // Copyright (c) Stephan Santos. All rights reserved.
 // </copyright>
 
+using System.Text.Json;
 using HearYe.Server.Helpers;
 using HearYe.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore; // ToListAsync, FirstOrDefaultAsync
 using Microsoft.EntityFrameworkCore.ChangeTracking; // EntityEntry<T>
+using Microsoft.Extensions.Hosting;
 using Microsoft.Graph;
 using Microsoft.Identity.Web.Resource;
 using User = HearYe.Shared.User;
@@ -178,6 +180,8 @@ namespace HearYe.Server.Controllers
 
                 if (completed != 1)
                 {
+                    this.logger.LogError("New user transaction failed.");
+                    this.logger.LogError(JsonSerializer.Serialize(user), CustomJsonOptions.IgnoreCycles());
                     return this.BadRequest("Failed to create new user.");
                 }
 
@@ -198,10 +202,12 @@ namespace HearYe.Server.Controllers
                     routeValues: new { id = newUser.Entity.Id },
                     value: newUser.Entity);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // Log this exception.
                 transaction.Rollback();
+                this.logger.LogError("Error when creating new user.");
+                this.logger.LogError(ex.Message);
+                this.logger.LogError(JsonSerializer.Serialize(user), CustomJsonOptions.IgnoreCycles());
                 return this.BadRequest("Failed to register graph record for new user.");
             }
         }
@@ -247,6 +253,8 @@ namespace HearYe.Server.Controllers
             }
             else
             {
+                this.logger.LogError("Error when updating user.");
+                this.logger.LogError(JsonSerializer.Serialize(user), CustomJsonOptions.IgnoreCycles());
                 return this.BadRequest("Failed to update user.");
             }
         }
@@ -287,6 +295,8 @@ namespace HearYe.Server.Controllers
             }
             else
             {
+                this.logger.LogError("Error when deleting user.");
+                this.logger.LogError(JsonSerializer.Serialize(existing), CustomJsonOptions.IgnoreCycles());
                 return this.BadRequest("User found but failed to delete.");
             }
         }

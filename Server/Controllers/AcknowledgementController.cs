@@ -2,6 +2,8 @@
 // Copyright (c) Stephan Santos. All rights reserved.
 // </copyright>
 
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using HearYe.Server.Helpers;
 using HearYe.Shared;
 using Microsoft.AspNetCore.Authorization;
@@ -81,14 +83,18 @@ namespace HearYe.Server.Controllers
 
                 if (completed != 1)
                 {
+                    this.logger.LogError("New acknowledgement not saved.");
+                    this.logger.LogError(JsonSerializer.Serialize(acknowledgement, CustomJsonOptions.IgnoreCycles()));
                     return this.BadRequest("Failed to create new acknowledgement.");
                 }
 
                 return this.NoContent();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // Log this exception
+                this.logger.LogError("Error when creating new acknowledgement.");
+                this.logger.LogError(ex.Message);
+                this.logger.LogError(JsonSerializer.Serialize(acknowledgement, CustomJsonOptions.IgnoreCycles()));
                 return this.BadRequest("Error when creating new acknowledgement.");
             }
         }
@@ -142,12 +148,16 @@ namespace HearYe.Server.Controllers
                 }
                 else
                 {
+                    this.logger.LogError("Error when deleting acknowledgement.");
+                    this.logger.LogError(JsonSerializer.Serialize(acknowledgement, CustomJsonOptions.IgnoreCycles()));
                     return this.BadRequest("Failed to delete acknowledgement.");
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // Log this exception
+                this.logger.LogError("Error when deleting acknowledgement.");
+                this.logger.LogError(ex.Message);
+                this.logger.LogError(JsonSerializer.Serialize(acknowledgement, CustomJsonOptions.IgnoreCycles()));
                 return this.BadRequest("Error when deleting acknowledgement.");
             }
         }

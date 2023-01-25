@@ -2,6 +2,7 @@
 // Copyright (c) Stephan Santos. All rights reserved.
 // </copyright>
 
+using System.Text.Json;
 using HearYe.Server.Helpers;
 using HearYe.Shared;
 using Microsoft.AspNetCore.Authorization;
@@ -215,6 +216,8 @@ namespace HearYe.Server.Controllers
 
             if (completed != 1)
             {
+                this.logger.LogError("New post transaction failed.");
+                this.logger.LogError(JsonSerializer.Serialize(post), CustomJsonOptions.IgnoreCycles());
                 return this.BadRequest("Failed to create new post.");
             }
 
@@ -264,6 +267,8 @@ namespace HearYe.Server.Controllers
             }
             else
             {
+                this.logger.LogError("Delete post transaction failed.");
+                this.logger.LogError(JsonSerializer.Serialize(post), CustomJsonOptions.IgnoreCycles());
                 return this.BadRequest("Post found but failed to delete.");
             }
         }

@@ -2,6 +2,7 @@
 // Copyright (c) Stephan Santos. All rights reserved.
 // </copyright>
 
+using System.Text.Json;
 using HearYe.Server.Helpers;
 using HearYe.Shared;
 using Microsoft.AspNetCore.Authorization;
@@ -143,6 +144,8 @@ namespace HearYe.Server.Controllers
                 int completed = await this.db.SaveChangesAsync();
                 if (completed != 1)
                 {
+                    this.logger.LogError("New message group invitation transaction rolled back.");
+                    this.logger.LogError(JsonSerializer.Serialize(invite, CustomJsonOptions.IgnoreCycles()));
                     return this.BadRequest("Failed to create invitation.");
                 }
 
@@ -151,9 +154,11 @@ namespace HearYe.Server.Controllers
                 routeValues: new { id = newInvitation.Entity.Id },
                 value: newInvitation.Entity);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // Log this exception
+                this.logger.LogError("Error when creating new message group invitation.");
+                this.logger.LogError(ex.Message);
+                this.logger.LogError(JsonSerializer.Serialize(invite, CustomJsonOptions.IgnoreCycles()));
                 return this.BadRequest("Error when creating invitation.");
             }
         }
@@ -214,12 +219,16 @@ namespace HearYe.Server.Controllers
                 }
                 else
                 {
+                    this.logger.LogError("Failed to decline message group invitation.");
+                    this.logger.LogError(JsonSerializer.Serialize(mgi, CustomJsonOptions.IgnoreCycles()));
                     return this.BadRequest("Failed to decline invitation.");
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // Log this exception
+                this.logger.LogError("Error when declining message group invitation.");
+                this.logger.LogError(ex.Message);
+                this.logger.LogError(JsonSerializer.Serialize(mgi, CustomJsonOptions.IgnoreCycles()));
                 return this.BadRequest("Error when declining invitation.");
             }
         }
@@ -295,13 +304,18 @@ namespace HearYe.Server.Controllers
                 else
                 {
                     transaction.Rollback();
+                    this.logger.LogError("Failed to accept message group invitation.");
+                    this.logger.LogError(JsonSerializer.Serialize(mgi, CustomJsonOptions.IgnoreCycles()));
+                    this.logger.LogError(JsonSerializer.Serialize(mgm, CustomJsonOptions.IgnoreCycles()));
                     return this.BadRequest("Failed to accept invitation.");
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // Log this exception
                 transaction.Rollback();
+                this.logger.LogError("Error when accepting message group invitation.");
+                this.logger.LogError(ex.Message);
+                this.logger.LogError(JsonSerializer.Serialize(mgi, CustomJsonOptions.IgnoreCycles()));
                 return this.BadRequest("Error when accepting invitation.");
             }
         }
@@ -354,12 +368,16 @@ namespace HearYe.Server.Controllers
                 }
                 else
                 {
+                    this.logger.LogError("Failed to delete message group invitation.");
+                    this.logger.LogError(JsonSerializer.Serialize(mgi, CustomJsonOptions.IgnoreCycles()));
                     return this.BadRequest("Failed to delete invitation.");
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // Log this exception
+                this.logger.LogError("Error when deleting message group invitation.");
+                this.logger.LogError(ex.Message);
+                this.logger.LogError(JsonSerializer.Serialize(mgi, CustomJsonOptions.IgnoreCycles()));
                 return this.BadRequest("Error when deleting invitation.");
             }
         }

@@ -2,6 +2,7 @@
 // Copyright (c) Stephan Santos. All rights reserved.
 // </copyright>
 
+using System.Text.Json;
 using HearYe.Server.Helpers;
 using HearYe.Shared;
 using Microsoft.AspNetCore.Authorization;
@@ -145,6 +146,8 @@ namespace HearYe.Server.Controllers
                 if (completedGroup != 1)
                 {
                     transaction.Rollback();
+                    this.logger.LogError("New message group transaction rolled back.");
+                    this.logger.LogError(JsonSerializer.Serialize(newGroup, CustomJsonOptions.IgnoreCycles()));
                     return this.BadRequest("Failed to create new message group.");
                 }
 
@@ -161,6 +164,8 @@ namespace HearYe.Server.Controllers
                 if (completedAdmin != 1)
                 {
                     transaction.Rollback();
+                    this.logger.LogError("New message group transaction rolled back. Could not add admin.");
+                    this.logger.LogError(JsonSerializer.Serialize(newGroupAdmin, CustomJsonOptions.IgnoreCycles()));
                     return this.BadRequest("Failed to add users to group.");
                 }
 
@@ -171,10 +176,12 @@ namespace HearYe.Server.Controllers
                     routeValues: new { id = newGroupEntry.Entity.Id },
                     value: newGroupEntry.Entity);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 // Log this exception.
                 transaction.Rollback();
+                this.logger.LogError("Error when creating new message group.");
+                this.logger.LogError(ex.Message);
                 return this.BadRequest("Failed to create new message group.");
             }
         }
@@ -222,16 +229,20 @@ namespace HearYe.Server.Controllers
                 if (completed != 1)
                 {
                     transaction.Rollback();
+                    this.logger.LogError("Set mg role transaction rolled back.");
+                    this.logger.LogError(JsonSerializer.Serialize(mgm), CustomJsonOptions.IgnoreCycles());
                     return this.BadRequest("Failed to set message group member role.");
                 }
 
                 transaction.Commit();
                 return new NoContentResult();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // Log this exception.
                 transaction.Rollback();
+                this.logger.LogError("Error when setting message group role.");
+                this.logger.LogError(ex.Message);
+                this.logger.LogError(JsonSerializer.Serialize(mgm), CustomJsonOptions.IgnoreCycles());
                 return this.BadRequest("Error when setting message group member role.");
             }
         }
@@ -277,6 +288,8 @@ namespace HearYe.Server.Controllers
             }
             else
             {
+                this.logger.LogError("Error when deleting message group.");
+                this.logger.LogError(JsonSerializer.Serialize(mg), CustomJsonOptions.IgnoreCycles());
                 return this.BadRequest("Message group found but failed to delete.");
             }
         }
