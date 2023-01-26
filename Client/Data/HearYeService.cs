@@ -40,6 +40,10 @@ namespace HearYe.Client.Data
                 }
                 else
                 {
+                    // Check if response message is: user already exists.
+                    // If so, try to check graph?
+                    // if graph is valid, log user out
+                    // if no graph, try register graph then log user out.
                     // Do something here.
                     return null;
                 }

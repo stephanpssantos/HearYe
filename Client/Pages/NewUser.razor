@@ -59,24 +59,7 @@
         }
         else
         {
-            //InteractiveRequestOptions requestOptions = new ()
-            //{
-            //    Interaction = InteractionType.SignOut,
-            //    ReturnUrl = "/authentication/login",
-            //};
-            //requestOptions.TryAddAdditionalParameter("prompt", "select_account");
-            //requestOptions.TryAddAdditionalParameter("prompt", "none");
-            //requestOptions.TryAddAdditionalParameter("login_hint", aadOidString);
-
             NavigationManager.NavigateToLogout("authentication/logout", "/authentication/login");
-
-            //NavigationOptions options = new()
-            //{
-            //    ForceLoad = true,
-            //    ReplaceHistoryEntry = true,
-            //};
-
-            //NavigationManager.NavigateTo(NavigationManager.BaseUri + "authentication/login", options);
         }
     }
 }
