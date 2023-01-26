@@ -1,4 +1,5 @@
 ﻿using HearYe.Shared;
+using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using System.Net.Http.Json; // GetFromJsonAsync, ReadFromJsonAsync
 
 namespace HearYe.Client.Data
@@ -29,9 +30,31 @@ namespace HearYe.Client.Data
 
         public async Task<User?> NewUserAsync(User user)
         {
-            HttpResponseMessage response = await http.PostAsJsonAsync("api/user", user);
+            try
+            {
+                HttpResponseMessage response = await http.PostAsJsonAsync("api/user", user);
 
-            return await response.Content.ReadFromJsonAsync<User>();
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadFromJsonAsync<User>();
+                }
+                else
+                {
+                    // Do something here.
+                    return null;
+                }
+            }
+            catch (AccessTokenNotAvailableException ex)
+            {
+                //Navigation.NavigateToLogin("authentication/login"); in case ex.redirect causes issues
+                ex.Redirect();
+                return null;
+            }
+            catch (Exception ex)
+            {
+                // Do something here
+                return null;
+            }
         }
 
         public Task<List<Post>?> GetNewPostsAsync(string messageGroupId, int count = 15, int skip = 0)

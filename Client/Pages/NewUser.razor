@@ -1,0 +1,82 @@
+﻿@page "/newuser"
+@using HearYe.Client.Data
+@using HearYe.Shared
+@using Microsoft.Identity.Client
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@inject IHearYeService service
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<div>
+    Finalizing new user account...
+</div>
+
+@code {
+    protected async override Task OnParametersSetAsync()
+    {
+        var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authenticationState.User;
+
+        if (user.Identity is null)
+        {
+            // do something
+            return;
+        }
+
+        string? claimId = user.Claims.FirstOrDefault(x => x.Type.Equals("extension_DatabaseId"))?.Value;
+        if (claimId is not null)
+        {
+            // do something
+            return;
+        }
+
+        string? aadOidString = user.Claims.FirstOrDefault(x => x.Type.Equals("oid"))?.Value;
+        string? displayName = user.Identity.Name ?? String.Empty;
+        bool aadOidParsed = Guid.TryParse(aadOidString, out Guid aadOid);
+
+        if (aadOidString == null || !aadOidParsed)
+        {
+            // log out? redirect?
+            //NavigationManager.NavigateToLogin("authentication/login");
+            return;
+        }
+
+        User newUser = new()
+            {
+                AadOid = aadOid,
+                DisplayName = displayName,
+                AcceptGroupInvitations = true,
+                IsDeleted = false,
+                CreatedDate = DateTime.Now
+            };
+
+        User? response = await service.NewUserAsync(newUser);
+
+        if (response is null)
+        {
+            // log out? redirect?
+            //NavigationManager.NavigateToLogin("authentication/login");
+        }
+        else
+        {
+            //InteractiveRequestOptions requestOptions = new ()
+            //{
+            //    Interaction = InteractionType.SignOut,
+            //    ReturnUrl = "/authentication/login",
+            //};
+            //requestOptions.TryAddAdditionalParameter("prompt", "select_account");
+            //requestOptions.TryAddAdditionalParameter("prompt", "none");
+            //requestOptions.TryAddAdditionalParameter("login_hint", aadOidString);
+
+            NavigationManager.NavigateToLogout("authentication/logout", "/authentication/login");
+
+            //NavigationOptions options = new()
+            //{
+            //    ForceLoad = true,
+            //    ReplaceHistoryEntry = true,
+            //};
+
+            //NavigationManager.NavigateTo(NavigationManager.BaseUri + "authentication/login", options);
+        }
+    }
+}

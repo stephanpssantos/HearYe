@@ -171,8 +171,8 @@ namespace HearYe.Server.Controllers
                 return this.BadRequest("Azure AD object ID (AadOid) missing or mismatched.");
             }
 
-            using var transaction = this.db.Database.BeginTransaction();
-
+            // using var transaction = this.db.Database.BeginTransaction();
+            // Undo this later.
             try
             {
                 EntityEntry<User> newUser = await this.db.Users!.AddAsync(user);
@@ -195,8 +195,8 @@ namespace HearYe.Server.Controllers
 
                 await this.graph.Users[aadOid].Request().UpdateAsync(newGraphUser);
 
-                transaction.Commit();
-
+                // transaction.Commit();
+                // Undo this later.
                 return this.CreatedAtRoute(
                     routeName: nameof(this.GetUser),
                     routeValues: new { id = newUser.Entity.Id },
@@ -204,7 +204,7 @@ namespace HearYe.Server.Controllers
             }
             catch (Exception ex)
             {
-                transaction.Rollback();
+                //transaction.Rollback();
                 this.logger.LogError("Error when creating new user.");
                 this.logger.LogError(ex.Message);
                 this.logger.LogError(JsonSerializer.Serialize(user), CustomJsonOptions.IgnoreCycles());
