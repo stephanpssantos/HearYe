@@ -2,11 +2,13 @@
 @layout NoNavLayout
 @using HearYe.Client.Data
 @using HearYe.Shared
-@using Microsoft.Identity.Client
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Microsoft.Identity.Client
 @inject IHearYeService service
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@attribute [Authorize]
 
 <div>
     Finalizing new user account...
@@ -20,14 +22,16 @@
 
         if (user.Identity is null)
         {
-            // do something
+            // Clear leftover credentials before trying again.
+            NavigationManager.NavigateToLogout("authentication/logout");
             return;
         }
 
         string? claimId = user.Claims.FirstOrDefault(x => x.Type.Equals("extension_DatabaseId"))?.Value;
         if (claimId is not null)
         {
-            // do something
+            // User already registered.
+            NavigationManager.NavigateTo("/");
             return;
         }
 
@@ -37,8 +41,8 @@
 
         if (aadOidString == null || !aadOidParsed)
         {
-            // log out? redirect?
-            //NavigationManager.NavigateToLogin("authentication/login");
+            // Abormal access token.
+            NavigationManager.NavigateToLogout("authentication/logout");
             return;
         }
 
@@ -55,12 +59,15 @@
 
         if (response is null)
         {
-            // log out? redirect?
-            //NavigationManager.NavigateToLogin("authentication/login");
+            // TODO:
+            // Banner saying "Error with your account. Please try logging in again.
+            NavigationManager.NavigateToLogout("authentication/logout", "/landing");
         }
         else
         {
-            NavigationManager.NavigateToLogout("authentication/logout", "/authentication/login");
+            // TODO:
+            // Banner saying "Account registration complete. You may now login to your account.
+            NavigationManager.NavigateToLogout("authentication/logout", "/landing");
         }
     }
 }

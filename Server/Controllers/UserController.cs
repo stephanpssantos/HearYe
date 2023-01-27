@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore; // ToListAsync, FirstOrDefaultAsync
 using Microsoft.EntityFrameworkCore.ChangeTracking; // EntityEntry<T>
-using Microsoft.Extensions.Hosting;
 using Microsoft.Graph;
 using Microsoft.Identity.Web.Resource;
 using User = HearYe.Shared.User;
@@ -146,7 +145,7 @@ namespace HearYe.Server.Controllers
         /// The custom attribute 'extension_database' will be added to the user graph object.
         /// </summary>
         /// <param name="user">User object included in request body in JSON format.</param>
-        /// <returns>201, 400, or 404.</returns>
+        /// <returns>201, 400, or 401.</returns>
         [HttpPost]
         [ProducesResponseType(201, Type = typeof(User))]
         [ProducesResponseType(400)]
@@ -171,18 +170,24 @@ namespace HearYe.Server.Controllers
                 return this.BadRequest("Azure AD object ID (AadOid) missing or mismatched.");
             }
 
-            // using var transaction = this.db.Database.BeginTransaction();
-            // Undo this later.
+            using var transaction = this.db.Database.BeginTransaction();
             try
             {
                 EntityEntry<User> newUser = await this.db.Users!.AddAsync(user);
-                int completed = await this.db.SaveChangesAsync();
 
-                if (completed != 1)
+                try
                 {
-                    this.logger.LogError("New user transaction failed.");
-                    this.logger.LogError(JsonSerializer.Serialize(user), CustomJsonOptions.IgnoreCycles());
-                    return this.BadRequest("Failed to create new user.");
+                    int completed = await this.db.SaveChangesAsync();
+                    if (completed != 1)
+                    {
+                        throw new Exception("Could not save new user.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    this.logger.LogError(ex.Message);
+                    this.logger.LogError(ex.InnerException?.Message);
+                    throw new Exception("Error when creating new user.");
                 }
 
                 Microsoft.Graph.User newGraphUser = new ()
@@ -193,10 +198,26 @@ namespace HearYe.Server.Controllers
                     },
                 };
 
-                await this.graph.Users[aadOid].Request().UpdateAsync(newGraphUser);
+                try
+                {
+                    await this.graph.Users[aadOid].Request().UpdateAsync(newGraphUser);
+                }
+                catch (Exception ex)
+                {
+                    this.logger.LogError(ex.Message);
+                    throw new Exception("Failed to register graph record for new user.");
+                }
 
-                // transaction.Commit();
-                // Undo this later.
+                try
+                {
+                    transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    this.logger.LogError(ex.Message);
+                    throw new Exception("Error committing changes to database.");
+                }
+
                 return this.CreatedAtRoute(
                     routeName: nameof(this.GetUser),
                     routeValues: new { id = newUser.Entity.Id },
@@ -204,11 +225,10 @@ namespace HearYe.Server.Controllers
             }
             catch (Exception ex)
             {
-                //transaction.Rollback();
                 this.logger.LogError("Error when creating new user.");
                 this.logger.LogError(ex.Message);
                 this.logger.LogError(JsonSerializer.Serialize(user), CustomJsonOptions.IgnoreCycles());
-                return this.BadRequest("Failed to register graph record for new user.");
+                return this.BadRequest(ex.Message);
             }
         }
 

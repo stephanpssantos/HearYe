@@ -330,7 +330,7 @@ namespace HearYe.Server.Tests
         }
 
         [Fact]
-        public async void NewUser_FailedUserCreationIsRolledBack()
+        public async void NewUser_WhenGraphFailsUserCreationIsRolledBack()
         {
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
@@ -338,14 +338,15 @@ namespace HearYe.Server.Tests
                 Shared.User newUser = new()
                 {
                     AadOid = new Guid("f09cc0b1-f05d-40e0-9684-c4a945d4e7f9"),
-                    DisplayName = "TestUser_1",
+                    DisplayName = "TestUser_fail_1",
                     AcceptGroupInvitations = true,
                     IsDeleted = false,
                     CreatedDate = DateTime.Now,
                     LastModifiedDate = DateTime.Now
                 };
 
-                var controller = new UserController(context, _graphServiceClient, _logger).WithAuthenticatedIdentity("1", "f09cc0b1-f05d-40e0-9684-c4a945d4e7f9");
+                var controller = new UserController(context, _graphServiceClient, _logger)
+                    .WithAuthenticatedIdentity("1", "f09cc0b1-f05d-40e0-9684-c4a945d4e7f9");
 
                 // Act
                 var result = await controller.NewUser(newUser);
@@ -353,8 +354,8 @@ namespace HearYe.Server.Tests
 
                 // Assert
                 Assert.IsType<BadRequestObjectResult>(result);
-                Assert.Equal(resultBody!.Value, "Failed to register graph record for new user.");
-                Assert.DoesNotContain(context.Users!, users => users.DisplayName == "TestUser_1");
+                Assert.Equal("Failed to register graph record for new user.", resultBody!.Value);
+                Assert.DoesNotContain(context.Users!, users => users.DisplayName == "TestUser_fail_1");
             }
         }
 
@@ -366,7 +367,7 @@ namespace HearYe.Server.Tests
             {
                 Shared.User newUser = new()
                 {
-                    AadOid = new Guid("f09cc0b1-f05d-40e0-9684-c4a945d4e7f9"),
+                    AadOid = new Guid("f09cc0b1-f05d-40e0-9684-c4a945d4a7f9"),
                     DisplayName = "TestUser_1",
                     AcceptGroupInvitations = true,
                     IsDeleted = false,
@@ -378,7 +379,7 @@ namespace HearYe.Server.Tests
                 {
                     AdditionalData = new Dictionary<string, object>()
                     {
-                        { "extension_9ad29a8ab7fc468aa9c975e45b6eb34e_DatabaseId", "3" }
+                        { "extension_9ad29a8ab7fc468aa9c975e45b6eb34e_DatabaseId", "8" }
                     }
                 };
 
@@ -389,7 +390,7 @@ namespace HearYe.Server.Tests
                     .ReturnsAsync(() => null);
 
                 var controller = new UserController(context, customMockGraphClient.Object, _logger)
-                    .WithAuthenticatedIdentity("1", "f09cc0b1-f05d-40e0-9684-c4a945d4e7f9");
+                    .WithAuthenticatedIdentity("8", "f09cc0b1-f05d-40e0-9684-c4a945d4a7f9");
 
                 // Act
                 var result = await controller.NewUser(newUser);
@@ -577,14 +578,14 @@ namespace HearYe.Server.Tests
             // Arrange
             using (HearYeContext context = Fixture.CreateContext())
             {
-                var controller = new UserController(context, _graphServiceClient, _logger).WithAuthenticatedIdentity("3");
+                var controller = new UserController(context, _graphServiceClient, _logger).WithAuthenticatedIdentity("7");
 
                 // Act
-                var result = await controller.DeleteUser(3);
+                var result = await controller.DeleteUser(7);
 
                 // Assert
                 Assert.IsType<NoContentResult>(result);
-                Assert.Null(context.Users!.Where(x => x.Id == 3).FirstOrDefault());
+                Assert.Null(context.Users!.Where(x => x.Id == 7).FirstOrDefault());
             }
         }
     }
