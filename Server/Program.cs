@@ -14,9 +14,20 @@ using Swashbuckle.AspNetCore.SwaggerUI; // SubmitMethod
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAdB2C"));
+
+/* It's possible to use this code to check claims. Use with the Authorize attribute
+ * e.g. [Authorize(Policy = "RequireDbIdClaim")]. I'm not doing this because I often
+ * need to use the claim value within the method, and I'd rather not repeat this
+ * check.
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("RequireDbIdClaim", policy =>
+        policy.RequireAssertion(context => context.User.HasClaim(c =>
+            c.Type.Equals("extension_DatabaseId"))));
+});*/
 
 builder.Services.Configure<JwtBearerOptions>(
     JwtBearerDefaults.AuthenticationScheme, options =>

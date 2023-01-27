@@ -225,6 +225,7 @@ namespace HearYe.Server.Controllers
             }
             catch (Exception ex)
             {
+                transaction.Rollback();
                 this.logger.LogError("Error when creating new user.");
                 this.logger.LogError(ex.Message);
                 this.logger.LogError(JsonSerializer.Serialize(user), CustomJsonOptions.IgnoreCycles());
