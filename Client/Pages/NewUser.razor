@@ -4,6 +4,7 @@
 @using HearYe.Shared
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Microsoft.AspNetCore.WebUtilities
 @using Microsoft.Identity.Client
 @inject IHearYeService service
 @inject NavigationManager NavigationManager
@@ -59,15 +60,15 @@
 
         if (response is null)
         {
-            // TODO:
-            // Banner saying "Error with your account. Please try logging in again.
-            NavigationManager.NavigateToLogout("authentication/logout", "/landing");
+            UriBuilder builder = new(NavigationManager.ToAbsoluteUri("landing"));
+            string newPath = QueryHelpers.AddQueryString(builder.ToString(), "registrationSuceeded", "false");
+            NavigationManager.NavigateToLogout("authentication/logout", newPath);
         }
         else
         {
-            // TODO:
-            // Banner saying "Account registration complete. You may now login to your account.
-            NavigationManager.NavigateToLogout("authentication/logout", "/landing");
+            UriBuilder builder = new(NavigationManager.ToAbsoluteUri("landing"));
+            string newPath = QueryHelpers.AddQueryString(builder.ToString(), "registrationSuceeded", "true");
+            NavigationManager.NavigateToLogout("authentication/logout", newPath);
         }
     }
 }

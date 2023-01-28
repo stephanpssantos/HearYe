@@ -1,5 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Microsoft.AspNetCore.WebUtilities
 @inject NavigationManager Navigation
 
 <div>
@@ -29,7 +30,9 @@
 
     public void BeginLogOut()
     {
-        Navigation.NavigateToLogout("authentication/logout");
+        UriBuilder builder = new(Navigation.ToAbsoluteUri("landing"));
+        string newPath = QueryHelpers.AddQueryString(builder.ToString(), "logoutSuceeded", "true");
+        Navigation.NavigateToLogout("authentication/logout", newPath);
     }
 
     private void ToggleAccountDD()
