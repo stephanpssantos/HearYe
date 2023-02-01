@@ -1,89 +1,76 @@
-﻿@page "/landing"
-@layout NoNavLayout
+﻿@page "/"
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using HearYe.Client.Data
+@using HearYe.Shared
 @inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IHearYeService service
+@attribute [Authorize]
 
-<AuthorizeView>
-    <Authorized>
-        <RedirectToHome />
-    </Authorized>
-    <NotAuthorized>
-        <PageTitle>Okay</PageTitle>
-        <div class="min-vh-100 p-3 container d-flex flex-column justify-content-between align-items-center text-center">
-            <div class="row">
-                @if (showBanner)
-                {
-                    <div class="alert @bannerType" role="alert">
-                        @bannerMessage
-                    </div>
-                }
+<PageTitle>Hear Ye</PageTitle>
+
+<h1>New Messages</h1>
+<div>
+    <textarea placeholder="Write a new message" />
+    <label for="OldDate">Old on:</label>
+    <input type="date" id="OldDate" />
+    <button>Post</button>
+</div>
+
+<div>
+    <span>PostDate</span>
+    <div>
+        <div>
+            <div>
+                <span>UserImage</span>
+                <span>User.DisplayName says:</span>
             </div>
-            <div class="row">
-                <div class="card p-5">
-                    <div class="d-flex flex-column gap-0 mt-3 mb-3 align-items-center">
-                        <div class="fs-1">
-                            <img src="OKHand1.svg" class="OkSvg2 align-top" />
-                        </div>
-                        <h1>
-                            <strong>Okay</strong>
-                        </h1>
-                    </div>
-                    <h4 class="text-muted">
-                        <small>An Announcement Board</small>
-                    </h4>
-                    <hr />
-                    <button type="button" class="btn btn-primary" onclick="@(() => Navigation.NavigateToLogin("authentication/login"))">
-                        Continue
-                    </button>
-                </div>
-            </div>
-            <div class="row">
-                © 2023 Stephan Santos<br />
-                All rights reserved
-            </div>
+            <p>
+                Post.Message
+            </p>
+            <p>
+                Old news on: Post.StaleDate
+            </p>
         </div>
-    </NotAuthorized>
-</AuthorizeView>
+        <div>
+            <button @onclick="ClickAThing">AcknowledgeButton</button>
+            <span>Acknowledged by Acknowledgements.Where(acknowledgement => acknowledgement.postid == post.id).Count() person/people.</span>
+        </div>
+    </div>
+</div>
 
 @code
 {
-    private bool showBanner = false;
-    private string? bannerType;
-    private string? bannerMessage;
+    [CascadingParameter]
+    protected StateContainer? State { get; set; }
 
-    [Parameter]
-    [SupplyParameterFromQuery]
-    public bool? LogoutSuceeded { get; set; }
-
-    [Parameter]
-    [SupplyParameterFromQuery]
-    public bool? RegistrationSuceeded { get; set; }
-
-
-    protected override void OnParametersSet()
+    protected async override Task OnParametersSetAsync()
     {
-        if (LogoutSuceeded == true)
+        if (State is not null && State.UserDbId is null)
         {
-            showBanner = true;
-            bannerType = "alert-success";
-            bannerMessage = "You've successfully logged out.";
+            var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authenticationState.User;
+            if (user.Identity is not null && user.Identity.IsAuthenticated)
+            {
+                string? userDbId = user.Claims.FirstOrDefault(x => x.Type.Equals("extension_DatabaseId"))?.Value;
+
+                // The code below checks that the newUser token claim exists - but it might cause problems.
+                // if (user.Claims.FirstOrDefault(x => x.Type.Equals("newUser"))?.Value is not null && userDbId is null)
+                if (userDbId is null)
+                {
+                    Navigation.NavigateTo("/newuser");
+                }
+                else
+                {
+                    State.UserDbId = userDbId;
+                }
+            }
         }
-        else if (RegistrationSuceeded == true)
-        {
-            showBanner = true;
-            bannerType = "alert-success";
-            bannerMessage = "You've successfully registered. Please try logging in now.";
-        }
-        else if (RegistrationSuceeded == false)
-        {
-            showBanner = true;
-            bannerType = "alert-danger";
-            bannerMessage = "Error registering your account. " +
-                "Please try logging in again or contact support if the error persists.";
-        }
-        else
-        {
-            showBanner = false;
-        }
+    }
+
+    private async void ClickAThing()
+    {
+        await service.GetUserAsync("1");
     }
 }
