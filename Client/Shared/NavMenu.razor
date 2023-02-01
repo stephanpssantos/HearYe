@@ -1,11 +1,4 @@
-﻿@using HearYe.Client.Data
-@using HearYe.Shared
-@using Microsoft.AspNetCore.WebUtilities
-@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
-@inject IHearYeService Service
-@inject StateContainer State
-@inject AuthenticationStateProvider AuthenticationStateProvider
-@inject NavigationManager Navigation
+﻿@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 
 <AuthorizeView>
     <Authorized>
@@ -19,51 +12,10 @@
                         </span>
                         <GroupDropDown />
                     </div>
-                    <div class="d-flex gap-2 me-lg-5">
-                        <ul class="nav">
-                            <li class="nav-item">
-                                <a class="nav-link active" aria-current="page" role="button">New</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" role="button">Acknowledged</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" role="button">Old</a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="dropdown ms-lg-5">
-                        <button class="btn btn-outline-secondary dropdown-toggle border-white" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            @context.User.Identity?.Name
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item disabled" role="button">Account Settings</a></li>
-                            <li><a class="dropdown-item" role="button" @onclick="BeginLogOut">Log Out</a></li>
-                        </ul>
-                    </div>
+                    <PostTypeSelector />
+                    <AccountDropDown UserName="@context.User.Identity?.Name" />
                 </div>
             </div>
         </nav>
     </Authorized>
 </AuthorizeView>
-
-@code
-{
-    protected override void OnInitialized()
-    {
-        State.OnChange += StateHasChanged;
-    }
-
-    public void Dispose()
-    {
-        State.OnChange -= StateHasChanged;
-    }
-
-    public void BeginLogOut()
-    {
-        UriBuilder builder = new(Navigation.ToAbsoluteUri("landing"));
-        string newPath = QueryHelpers.AddQueryString(builder.ToString(), "logoutSuceeded", "true");
-        Navigation.NavigateToLogout("authentication/logout", newPath);
-    }
-}
-

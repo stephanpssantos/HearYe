@@ -53,7 +53,7 @@
         State.OnChange -= StateHasChanged;
     }
 
-    protected async override Task OnParametersSetAsync()
+    protected override void OnParametersSet()
     {
         if (State.UserDbId is null)
         {

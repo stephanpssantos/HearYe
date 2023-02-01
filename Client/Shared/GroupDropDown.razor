@@ -1,6 +1,6 @@
 ﻿@using HearYe.Client.Data
 @using HearYe.Shared
-@inject IHearYeService service
+@inject IHearYeService Service
 @inject StateContainer State
 
 <div class="dropdown">
@@ -58,8 +58,22 @@
             State.ActiveGroupId = group.Id;
             State.ActiveGroupName = group.MessageGroupName;
 
-            var activeGroupPosts = await service.GetNewPostsAsync(group.Id.ToString());
-            State.PostCollection = activeGroupPosts;
+            IEnumerable<Post>? postCollection;
+            switch (State.ActivePostType)
+            {
+                case PostTypes.Acknowledged:
+                    postCollection = await Service.GetAcknowledgedPostsAsync(group.Id.ToString());
+                    break;
+                case PostTypes.Stale:
+                    postCollection = await Service.GetStalePostsAsync(group.Id.ToString());
+                    break;
+                case PostTypes.New:
+                default:
+                    postCollection = await Service.GetNewPostsAsync(group.Id.ToString());
+                    break;
+            }
+
+            State.PostCollection = postCollection;
         }
     }
 }

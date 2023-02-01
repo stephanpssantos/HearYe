@@ -61,5 +61,15 @@ namespace HearYe.Client.Data
         {
             return http.GetFromJsonAsync<List<Post>?>($"api/post/new?messageGroupId={messageGroupId}&count={count}&skip={skip}");
         }
+
+        public Task<List<Post>?> GetAcknowledgedPostsAsync(string messageGroupId, int count = 15, int skip = 0)
+        {
+            return http.GetFromJsonAsync<List<Post>?>($"api/post/acknowledged?messageGroupId={messageGroupId}&count={count}&skip={skip}");
+        }
+
+        public Task<List<Post>?> GetStalePostsAsync(string messageGroupId, int count = 15, int skip = 0)
+        {
+            return http.GetFromJsonAsync<List<Post>?>($"api/post/stale?messageGroupId={messageGroupId}&count={count}&skip={skip}");
+        }
     }
 }

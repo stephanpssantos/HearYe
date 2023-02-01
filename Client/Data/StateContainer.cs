@@ -9,6 +9,7 @@ namespace HearYe.Client.Data
         private int activeGroupId;
         private string? activeGroupName;
         private IEnumerable<Post>? postCollection;
+        private PostTypes activePostType = PostTypes.New;
 
         public string? UserDbId { 
             get => userDbId; 
@@ -59,8 +60,20 @@ namespace HearYe.Client.Data
             }
         }
 
+        public PostTypes ActivePostType
+        {
+            get => activePostType;
+            set
+            {
+                activePostType = value;
+                NotifyStateChanged();
+            }
+        }
+
         public event Action? OnChange;
 
         private void NotifyStateChanged() => OnChange?.Invoke();
     }
+
+    public enum PostTypes { New, Acknowledged, Stale }
 }
