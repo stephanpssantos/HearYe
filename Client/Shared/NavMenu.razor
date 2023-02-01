@@ -2,7 +2,8 @@
 @using HearYe.Shared
 @using Microsoft.AspNetCore.WebUtilities
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
-@inject IHearYeService service
+@inject IHearYeService Service
+@inject StateContainer State
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager Navigation
 
@@ -13,41 +14,10 @@
                 <div class="d-flex justify-content-between align-items-center w-100">
                     <div class="d-flex gap-2 align-items-center">
                         <img src="OKHand1.svg" class="fs-3 OkSvg1" />
-                        <span class="fs-3">
+                        <span class="fs-3 me-3">
                             <strong>Okay</strong>
                         </span>
-                        <div class="dropdown ms-3">
-                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                @if (State is not null)
-                                {
-                                    @(State.ActiveGroupName ?? "No groups");
-                                }
-                            </button>
-                            <ul class="dropdown-menu">
-                                @if (State is not null && State.UserGroups is not null)
-                                {
-                                    @foreach (MessageGroup group in State.UserGroups.Take(5))
-                                    {
-                                        if (group.Id == State.ActiveGroupId)
-                                        {
-                                            <li><a class="dropdown-item active" aria-current="true" role="button">@group.MessageGroupName</a></li>
-                                        }
-                                        else
-                                        {
-                                            <li>
-                                                <a class="dropdown-item" role="button" @onclick="(() => SetActiveGroup(group))">
-                                                    @group.MessageGroupName
-                                                </a>
-                                            </li>
-                                        }
-                                    }
-                                }
-                                <li><a class="dropdown-item" role="button">See all groups</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" role="button">Manage groups </a></li>
-                                <li><a class="dropdown-item" role="button">Create new group</a></li>
-                            </ul>
-                        </div>
+                        <GroupDropDown />
                     </div>
                     <div class="d-flex gap-2 me-lg-5">
                         <ul class="nav">
@@ -79,14 +49,23 @@
 
 @code
 {
-    [CascadingParameter]
-    protected StateContainer? State { get; set; }
-
-    protected async override Task OnParametersSetAsync()
+    protected override void OnInitialized()
     {
-        if (State is not null && State.UserDbId is not null && State.UserGroups is null)
+        State.OnChange += StateHasChanged;
+        State.OnChange += InitializeState;
+    }
+
+    public void Dispose()
+    {
+        State.OnChange -= StateHasChanged;
+        State.OnChange -= InitializeState;
+    }
+
+    private async void InitializeState()
+    {
+        if (State is not null && State.UserGroups is null && State.UserDbId is not null)
         {
-            var userGroups = await service.GetUserMessageGroupsAsync(State.UserDbId);
+            var userGroups = await Service.GetUserMessageGroupsAsync(State.UserDbId);
             State.UserGroups = userGroups;
 
             var firstGroup = userGroups?.FirstOrDefault();
@@ -95,21 +74,9 @@
                 State.ActiveGroupId = firstGroup.Id;
                 State.ActiveGroupName = firstGroup.MessageGroupName;
 
-                var activeGroupPosts = await service.GetNewPostsAsync(firstGroup.Id.ToString());
+                var activeGroupPosts = await Service.GetNewPostsAsync(firstGroup.Id.ToString());
                 State.PostCollection = activeGroupPosts;
             }
-        }
-    }
-
-    public async void SetActiveGroup(MessageGroup group)
-    {
-        if (State is not null)
-        {
-            State.ActiveGroupId = group.Id;
-            State.ActiveGroupName = group.MessageGroupName;
-
-            var activeGroupPosts = await service.GetNewPostsAsync(group.Id.ToString());
-            State.PostCollection = activeGroupPosts;
         }
     }
 

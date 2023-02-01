@@ -18,6 +18,7 @@ builder.Services.AddHttpClient("HearYe.ServerAPI", client => client.BaseAddress 
 // Transient means you get a new instance of the service every time its requested.
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("HearYe.ServerAPI"));
 builder.Services.AddTransient<IHearYeService, HearYeService>();
+builder.Services.AddSingleton<StateContainer>();
 
 builder.Services.AddMsalAuthentication(options =>
 {

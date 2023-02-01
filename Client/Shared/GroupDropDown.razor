@@ -1,0 +1,65 @@
+﻿@using HearYe.Client.Data
+@using HearYe.Shared
+@inject IHearYeService service
+@inject StateContainer State
+
+<div class="dropdown">
+    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        @if (State is not null && State.UserGroups is not null)
+        {
+            @(State.ActiveGroupName ?? "No groups")
+        }
+        else
+        {
+            <span>Loading groups</span>
+        }
+    </button>
+    <ul class="dropdown-menu">
+        @if (State is not null && State.UserGroups is not null)
+        {
+            @foreach (MessageGroup group in State.UserGroups.Take(5))
+            {
+                if (group.Id == State.ActiveGroupId)
+                {
+                    <li><a class="dropdown-item active" aria-current="true" role="button">@group.MessageGroupName</a></li>
+                }
+                else
+                {
+                    <li>
+                        <a class="dropdown-item" role="button" @onclick="(() => SetActiveGroup(group))">
+                            @group.MessageGroupName
+                        </a>
+                    </li>
+                }
+            }
+        }
+        <li><a class="dropdown-item" role="button">See all groups</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item" role="button">Manage groups </a></li>
+        <li><a class="dropdown-item" role="button">Create new group</a></li>
+    </ul>
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        State.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        State.OnChange -= StateHasChanged;
+    }
+
+    public async void SetActiveGroup(MessageGroup group)
+    {
+        if (State is not null)
+        {
+            State.ActiveGroupId = group.Id;
+            State.ActiveGroupName = group.MessageGroupName;
+
+            var activeGroupPosts = await service.GetNewPostsAsync(group.Id.ToString());
+            State.PostCollection = activeGroupPosts;
+        }
+    }
+}

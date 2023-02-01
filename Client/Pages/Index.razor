@@ -5,7 +5,8 @@
 @using HearYe.Shared
 @inject NavigationManager Navigation
 @inject AuthenticationStateProvider AuthenticationStateProvider
-@inject IHearYeService service
+@inject IHearYeService Service
+@inject StateContainer State
 @attribute [Authorize]
 
 <PageTitle>Hear Ye</PageTitle>
@@ -42,8 +43,15 @@
 
 @code
 {
-    [CascadingParameter]
-    protected StateContainer? State { get; set; }
+    protected override void OnInitialized()
+    {
+        State.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        State.OnChange -= StateHasChanged;
+    }
 
     protected async override Task OnParametersSetAsync()
     {
@@ -71,6 +79,6 @@
 
     private async void ClickAThing()
     {
-        await service.GetUserAsync("1");
+        await Service.GetUserAsync("1");
     }
 }

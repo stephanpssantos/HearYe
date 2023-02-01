@@ -4,14 +4,63 @@ namespace HearYe.Client.Data
 {
     public class StateContainer
     {
-        public string? UserDbId { get; set; }
+        private string? userDbId;
+        private IEnumerable<MessageGroup>? userGroups;
+        private int activeGroupId;
+        private string? activeGroupName;
+        private IEnumerable<Post>? postCollection;
 
-        public IEnumerable<MessageGroup>? UserGroups { get; set; }
+        public string? UserDbId { 
+            get => userDbId; 
+            set
+            {
+                userDbId = value;
+                NotifyStateChanged();
+            }
+        }
 
-        public int ActiveGroupId { get; set; }
+        public IEnumerable<MessageGroup>? UserGroups 
+        { 
+            get => userGroups;
+            set 
+            {
+                userGroups = value;
+                NotifyStateChanged();
+            } 
+        }
 
-        public string? ActiveGroupName { get; set; }
+        public int ActiveGroupId
+        {
+            get => activeGroupId;
+            set
+            {
+                activeGroupId = value;
+                NotifyStateChanged();
+            }
+        }
 
-        public IEnumerable<Post>? PostCollection { get; set; }
+        public string? ActiveGroupName
+        {
+            get => activeGroupName;
+            set
+            {
+                activeGroupName = value;
+                NotifyStateChanged();
+            }
+        }
+
+        public IEnumerable<Post>? PostCollection
+        {
+            get => postCollection;
+            set
+            {
+                postCollection = value;
+                NotifyStateChanged();
+            }
+        }
+
+        public event Action? OnChange;
+
+        private void NotifyStateChanged() => OnChange?.Invoke();
     }
 }
