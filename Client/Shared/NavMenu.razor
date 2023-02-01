@@ -1,20 +1,96 @@
-﻿<AuthorizeView>
+﻿@using HearYe.Client.Data
+@using HearYe.Shared
+@using Microsoft.AspNetCore.WebUtilities
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@inject IHearYeService service
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager Navigation
+
+<AuthorizeView>
     <Authorized>
-        <div>
-            Hear Ye
-        </div>
-        <div>
-            <NavLink href="/" Match="NavLinkMatch.All">
-                New
-            </NavLink>
-            <NavLink href="/">
-                Acknowledged
-            </NavLink>
-            <NavLink href="/">
-                Expired
-            </NavLink>
-        </div>
-        <AccountDropDown UserName="@context.User.Identity?.Name" />
+        <nav class="navbar bg-white p-2 border-bottom border-2">
+            <div class="container-lg">
+                <div class="d-flex justify-content-between align-items-center w-100">
+                    <div class="d-flex gap-2 align-items-center">
+                        <img src="OKHand1.svg" class="fs-3 OkSvg1" />
+                        <span class="fs-3">
+                            <strong>Okay</strong>
+                        </span>
+                        <div class="dropdown ms-3">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Group 1
+                            </button>
+                            <ul class="dropdown-menu">
+                                @*<li><a class="dropdown-item active" aria-current="true" href="#">Group 1</a></li>*@
+                                @if (userGroups is not null)
+                                {
+                                    @foreach (MessageGroup group in userGroups)
+                                    {
+                                        <li><a class="dropdown-item" href="#">@group.MessageGroupName</a></li>
+                                    }
+                                }
+                                <li><a class="dropdown-item" href="#">See all groups</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#">Manage groups </a></li>
+                                <li><a class="dropdown-item" href="#">Create new group</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2 me-lg-5">
+                        <ul class="nav">
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="#">New</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Acknowledged</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Old</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="dropdown ms-lg-5">
+                        <button class="btn btn-outline-secondary dropdown-toggle border-white" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            @context.User.Identity?.Name
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item disabled" href="#">Account Settings</a></li>
+                            <li><a class="dropdown-item" href="#" @onclick="BeginLogOut">Log Out</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
     </Authorized>
 </AuthorizeView>
+
+@code
+{
+    private string? id;
+    private IEnumerable<MessageGroup>? userGroups;
+
+    protected async override Task OnParametersSetAsync()
+    {
+        var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authenticationState.User;
+
+        if (id is null)
+        {
+            id = user.Claims.FirstOrDefault(x => x.Type.Equals("extension_DatabaseId"))?.Value;
+            if (String.IsNullOrEmpty(id))
+            {
+                return;
+            }
+        }
+
+        userGroups = await service.GetUserMessageGroupsAsync(id);
+    }
+
+    public void BeginLogOut()
+    {
+        UriBuilder builder = new(Navigation.ToAbsoluteUri("landing"));
+        string newPath = QueryHelpers.AddQueryString(builder.ToString(), "logoutSuceeded", "true");
+        Navigation.NavigateToLogout("authentication/logout", newPath);
+    }
+}
 
