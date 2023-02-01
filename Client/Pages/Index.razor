@@ -55,24 +55,41 @@
 
     protected async override Task OnParametersSetAsync()
     {
-        if (State is not null && State.UserDbId is null)
+        if (State.UserDbId is null)
         {
-            var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-            var user = authenticationState.User;
-            if (user.Identity is not null && user.Identity.IsAuthenticated)
-            {
-                string? userDbId = user.Claims.FirstOrDefault(x => x.Type.Equals("extension_DatabaseId"))?.Value;
+            InitializeState();
+        }
+    }
 
-                // The code below checks that the newUser token claim exists - but it might cause problems.
-                // if (user.Claims.FirstOrDefault(x => x.Type.Equals("newUser"))?.Value is not null && userDbId is null)
-                if (userDbId is null)
-                {
-                    Navigation.NavigateTo("/newuser");
-                }
-                else
-                {
-                    State.UserDbId = userDbId;
-                }
+    private async void InitializeState()
+    {
+        var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authenticationState.User;
+        if (user.Identity is not null && user.Identity.IsAuthenticated)
+        {
+            string? userDbId = user.Claims.FirstOrDefault(x => x.Type.Equals("extension_DatabaseId"))?.Value;
+
+            // The code below checks that the newUser token claim exists - but it might cause problems.
+            // if (user.Claims.FirstOrDefault(x => x.Type.Equals("newUser"))?.Value is not null && userDbId is null)
+            if (userDbId is null)
+            {
+                Navigation.NavigateTo("/newuser");
+                return;
+            }
+            
+            State.UserDbId = userDbId;
+            
+            var userGroups = await Service.GetUserMessageGroupsAsync(userDbId);
+            State.UserGroups = userGroups;
+
+            var firstGroup = userGroups?.FirstOrDefault();
+            if (firstGroup is not null)
+            {
+                State.ActiveGroupId = firstGroup.Id;
+                State.ActiveGroupName = firstGroup.MessageGroupName;
+
+                var activeGroupPosts = await Service.GetNewPostsAsync(firstGroup.Id.ToString());
+                State.PostCollection = activeGroupPosts;
             }
         }
     }

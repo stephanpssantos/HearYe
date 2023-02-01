@@ -52,32 +52,11 @@
     protected override void OnInitialized()
     {
         State.OnChange += StateHasChanged;
-        State.OnChange += InitializeState;
     }
 
     public void Dispose()
     {
         State.OnChange -= StateHasChanged;
-        State.OnChange -= InitializeState;
-    }
-
-    private async void InitializeState()
-    {
-        if (State is not null && State.UserGroups is null && State.UserDbId is not null)
-        {
-            var userGroups = await Service.GetUserMessageGroupsAsync(State.UserDbId);
-            State.UserGroups = userGroups;
-
-            var firstGroup = userGroups?.FirstOrDefault();
-            if (firstGroup is not null)
-            {
-                State.ActiveGroupId = firstGroup.Id;
-                State.ActiveGroupName = firstGroup.MessageGroupName;
-
-                var activeGroupPosts = await Service.GetNewPostsAsync(firstGroup.Id.ToString());
-                State.PostCollection = activeGroupPosts;
-            }
-        }
     }
 
     public void BeginLogOut()
