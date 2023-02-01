@@ -18,34 +18,47 @@
                         </span>
                         <div class="dropdown ms-3">
                             <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Group 1
+                                @if (State is not null)
+                                {
+                                    @(State.ActiveGroupName ?? "No groups");
+                                }
                             </button>
                             <ul class="dropdown-menu">
-                                @*<li><a class="dropdown-item active" aria-current="true" href="#">Group 1</a></li>*@
                                 @if (State is not null && State.UserGroups is not null)
                                 {
-                                    @foreach (MessageGroup group in State.UserGroups)
+                                    @foreach (MessageGroup group in State.UserGroups.Take(5))
                                     {
-                                        <li><a class="dropdown-item" href="#">@group.MessageGroupName</a></li>
+                                        if (group.Id == State.ActiveGroupId)
+                                        {
+                                            <li><a class="dropdown-item active" aria-current="true" role="button">@group.MessageGroupName</a></li>
+                                        }
+                                        else
+                                        {
+                                            <li>
+                                                <a class="dropdown-item" role="button" @onclick="(() => SetActiveGroup(group))">
+                                                    @group.MessageGroupName
+                                                </a>
+                                            </li>
+                                        }
                                     }
                                 }
-                                <li><a class="dropdown-item" href="#">See all groups</a></li>
+                                <li><a class="dropdown-item" role="button">See all groups</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="#">Manage groups </a></li>
-                                <li><a class="dropdown-item" href="#">Create new group</a></li>
+                                <li><a class="dropdown-item" role="button">Manage groups </a></li>
+                                <li><a class="dropdown-item" role="button">Create new group</a></li>
                             </ul>
                         </div>
                     </div>
                     <div class="d-flex gap-2 me-lg-5">
                         <ul class="nav">
                             <li class="nav-item">
-                                <a class="nav-link active" aria-current="page" href="#">New</a>
+                                <a class="nav-link active" aria-current="page" role="button">New</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="#">Acknowledged</a>
+                                <a class="nav-link" role="button">Acknowledged</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="#">Old</a>
+                                <a class="nav-link" role="button">Old</a>
                             </li>
                         </ul>
                     </div>
@@ -54,8 +67,8 @@
                             @context.User.Identity?.Name
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item disabled" href="#">Account Settings</a></li>
-                            <li><a class="dropdown-item" href="#" @onclick="BeginLogOut">Log Out</a></li>
+                            <li><a class="dropdown-item disabled" role="button">Account Settings</a></li>
+                            <li><a class="dropdown-item" role="button" @onclick="BeginLogOut">Log Out</a></li>
                         </ul>
                     </div>
                 </div>
@@ -71,10 +84,32 @@
 
     protected async override Task OnParametersSetAsync()
     {
-        if (State is not null && State.UserDbId is not null)
+        if (State is not null && State.UserDbId is not null && State.UserGroups is null)
         {
             var userGroups = await service.GetUserMessageGroupsAsync(State.UserDbId);
             State.UserGroups = userGroups;
+
+            var firstGroup = userGroups?.FirstOrDefault();
+            if (firstGroup is not null)
+            {
+                State.ActiveGroupId = firstGroup.Id;
+                State.ActiveGroupName = firstGroup.MessageGroupName;
+
+                var activeGroupPosts = await service.GetNewPostsAsync(firstGroup.Id.ToString());
+                State.PostCollection = activeGroupPosts;
+            }
+        }
+    }
+
+    public async void SetActiveGroup(MessageGroup group)
+    {
+        if (State is not null)
+        {
+            State.ActiveGroupId = group.Id;
+            State.ActiveGroupName = group.MessageGroupName;
+
+            var activeGroupPosts = await service.GetNewPostsAsync(group.Id.ToString());
+            State.PostCollection = activeGroupPosts;
         }
     }
 
