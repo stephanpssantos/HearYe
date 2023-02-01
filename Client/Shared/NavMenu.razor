@@ -22,9 +22,9 @@
                             </button>
                             <ul class="dropdown-menu">
                                 @*<li><a class="dropdown-item active" aria-current="true" href="#">Group 1</a></li>*@
-                                @if (userGroups is not null)
+                                @if (State is not null && State.UserGroups is not null)
                                 {
-                                    @foreach (MessageGroup group in userGroups)
+                                    @foreach (MessageGroup group in State.UserGroups)
                                     {
                                         <li><a class="dropdown-item" href="#">@group.MessageGroupName</a></li>
                                     }
@@ -66,24 +66,16 @@
 
 @code
 {
-    private string? id;
-    private IEnumerable<MessageGroup>? userGroups;
+    [CascadingParameter]
+    protected StateContainer? State { get; set; }
 
     protected async override Task OnParametersSetAsync()
     {
-        var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authenticationState.User;
-
-        if (id is null)
+        if (State is not null && State.UserDbId is not null)
         {
-            id = user.Claims.FirstOrDefault(x => x.Type.Equals("extension_DatabaseId"))?.Value;
-            if (String.IsNullOrEmpty(id))
-            {
-                return;
-            }
+            var userGroups = await service.GetUserMessageGroupsAsync(State.UserDbId);
+            State.UserGroups = userGroups;
         }
-
-        userGroups = await service.GetUserMessageGroupsAsync(id);
     }
 
     public void BeginLogOut()

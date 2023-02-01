@@ -1,11 +1,18 @@
 ﻿@inherits LayoutComponentBase
+@using HearYe.Client.Data
 
 <div class="page">
-    <NavMenu />
-
-    <main>
-        <article>
-            @Body
-        </article>
-    </main>
+    <CascadingValue Value="@state">
+        <NavMenu />
+        <main>
+            <article>
+                @Body
+            </article>
+        </main>
+    </CascadingValue>
 </div>
+
+@code
+{
+    private StateContainer state = new ();
+}

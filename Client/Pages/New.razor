@@ -42,16 +42,29 @@
 
 @code
 {
+    [CascadingParameter]
+    protected StateContainer? State { get; set; }
+
     protected async override Task OnParametersSetAsync()
     {
-        var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authenticationState.User;
-        if (user.Identity is not null && user.Identity.IsAuthenticated)
+        if (State is not null && State.UserDbId is null)
         {
-            if (user.Claims.FirstOrDefault(x => x.Type.Equals("newUser"))?.Value is not null
-                && user.Claims.FirstOrDefault(x => x.Type.Equals("extension_DatabaseId"))?.Value is null)
+            var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authenticationState.User;
+            if (user.Identity is not null && user.Identity.IsAuthenticated)
             {
-                Navigation.NavigateTo("/newuser");
+                string? userDbId = user.Claims.FirstOrDefault(x => x.Type.Equals("extension_DatabaseId"))?.Value;
+
+                // The code below checks that the newUser token claim exists - but it might cause problems.
+                // if (user.Claims.FirstOrDefault(x => x.Type.Equals("newUser"))?.Value is not null && userDbId is null)
+                if (userDbId is null)
+                {
+                    Navigation.NavigateTo("/newuser");
+                }
+                else
+                {
+                    State.UserDbId = userDbId;
+                }
             }
         }
     }
