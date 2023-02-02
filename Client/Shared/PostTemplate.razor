@@ -2,31 +2,31 @@
 @using HearYe.Shared;
 @inject StateContainer State
 
-<div class="card flex-row mb-3">
-    <div class="col-9">
-        <div class="card-header d-flex justify-content-between">
-            <div>
-                @GetDisplayName()
-            </div>
-            <div>
-                @if(Post is not null && Post.Post is not null)
-                {
-                    @GetPostTime(Post.Post.CreatedDate)
-                }
-            </div>
+<div class="card mb-3">
+    <div class="card-header d-flex justify-content-between">
+        <div>
+            @GetDisplayName()
         </div>
-        <div class="card-body">
-            <p class="card-text">@Post?.Post?.Message</p>
-            <div class="text-end align-bottom mt-3">
-                <span>Old news on: @(Post?.Post?.StaleDate is null ? "Never" : Post?.Post?.StaleDate.ToString())</span>
-            </div>
+        <div>
+            @if(Post is not null && Post.Post is not null)
+            {
+                @GetPostTime(Post.Post.CreatedDate)
+            }
         </div>
     </div>
-    <div class="col-3 p-3 d-flex flex-column justify-content-center align-items-center text-center rounded-end border-start">
-        <button type="button" class="mb-2 fs-5 fw-bold btn @(isAcknowledged ? "btn-outline-success" : "btn-outline-dark")">
-            @(isAcknowledged ? "✓" : "Okay")
-        </button>
-        <span>@acknowledgementMessage</span>
+    <div class="card-body">
+        <p class="card-text">@Post?.Post?.Message</p>
+        <div class="d-flex justify-content-between align-items-end mt-3">
+            <div class="btn-group" role="group" aria-label="@acknowledgementCount acknowledgements">
+                <button type="button" class="btn @(isAcknowledged ? "btn-primary" : "btn-outline-dark")">
+                    OK
+                </button>
+                <button type="button" class="btn @(isAcknowledged ? "btn-outline-primary" : "btn-outline-dark")">
+                    @acknowledgementCount
+                </button>
+            </div>
+            <span>Old news on: @(Post?.Post?.StaleDate is null ? "Never" : Post?.Post?.StaleDate.ToString())</span>
+        </div>
     </div>
 </div>
 
@@ -48,38 +48,6 @@
         acknowledgementCount = Post.Post.Acknowledgements.Count();
         isAcknowledged = Post.Post.Acknowledgements
             .Where(a => a.UserId.ToString() == State.UserDbId).FirstOrDefault() is not null;
-
-        SetAcknowledgementMessage();
-    }
-
-    private void SetAcknowledgementMessage()
-    {
-        if (!isAcknowledged && acknowledgementCount == 0)
-        {
-            acknowledgementMessage = "Nobody has acknowleged this yet.";
-        }
-        else if (!isAcknowledged &&  acknowledgementCount == 1)
-        {
-            acknowledgementMessage = "1 person has acknowledged this message.";
-        }
-        else if (!isAcknowledged && acknowledgementCount > 1)
-        {
-            acknowledgementMessage = acknowledgementCount.ToString() + " people have acknowledged this message.";
-        }
-        else if (isAcknowledged && acknowledgementCount == 1)
-        {
-            acknowledgementMessage = "You have acknowledged this message.";
-        }
-        else if (isAcknowledged && acknowledgementCount == 2)
-        {
-            acknowledgementMessage = "You and 1 other person have acknowledged this message.";
-        }
-        else if (isAcknowledged && acknowledgementCount > 2)
-        {
-            acknowledgementMessage = $"You and {acknowledgementCount - 1} other people have acknowledged this message.";
-        }
-
-        StateHasChanged();
     }
 
     private string GetDisplayName()
