@@ -11,5 +11,6 @@ namespace HearYe.Client.Data
         Task<List<Post>?> GetNewPostsAsync(string messageGroupId, int count = 15, int skip = 0);
         Task<List<Post>?> GetAcknowledgedPostsAsync(string messageGroupId, int count = 15, int skip = 0);
         Task<List<Post>?> GetStalePostsAsync(string messageGroupId, int count = 15, int skip = 0);
+        Task<Post?> NewPostAsync(Post post);
     }
 }

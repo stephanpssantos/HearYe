@@ -24,7 +24,7 @@ namespace HearYe.Shared
         public int? MessageGroupId { get; set; }
 
         [Required]
-        [StringLength(255)]
+        [StringLength(255, ErrorMessage = "Message must be less than 256 characters.")]
         public string Message { get; set; } = String.Empty;
 
         [Required]

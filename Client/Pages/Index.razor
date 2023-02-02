@@ -9,37 +9,36 @@
 @inject StateContainer State
 @attribute [Authorize]
 
-<PageTitle>Hear Ye</PageTitle>
+<PageTitle>Okay</PageTitle>
 
-<h1>New Messages</h1>
-<div>
-    <textarea placeholder="Write a new message" />
-    <label for="OldDate">Old on:</label>
-    <input type="date" id="OldDate" />
-    <button>Post</button>
-</div>
+<div class="container-lg">
+    <NewMessage />
+    
+    <h1>New Messages</h1>
 
-<div>
-    <span>PostDate</span>
     <div>
+        <span>PostDate</span>
         <div>
             <div>
-                <span>UserImage</span>
-                <span>User.DisplayName says:</span>
+                <div>
+                    <span>UserImage</span>
+                    <span>User.DisplayName says:</span>
+                </div>
+                <p>
+                    Post.Message
+                </p>
+                <p>
+                    Old news on: Post.StaleDate
+                </p>
             </div>
-            <p>
-                Post.Message
-            </p>
-            <p>
-                Old news on: Post.StaleDate
-            </p>
-        </div>
-        <div>
-            <button @onclick="ClickAThing">AcknowledgeButton</button>
-            <span>Acknowledged by Acknowledgements.Where(acknowledgement => acknowledgement.postid == post.id).Count() person/people.</span>
+            <div>
+                <button @onclick="ClickAThing">AcknowledgeButton</button>
+                <span>Acknowledged by Acknowledgements.Where(acknowledgement => acknowledgement.postid == post.id).Count() person/people.</span>
+            </div>
         </div>
     </div>
 </div>
+
 
 @code
 {

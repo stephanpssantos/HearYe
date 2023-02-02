@@ -193,7 +193,7 @@ namespace HearYe.Server.Controllers
         /// <param name="post">Post object included in request body in JSON format.</param>
         /// <returns>201, 400, or 404.</returns>
         [HttpPost]
-        [ProducesResponseType(201, Type = typeof(User))]
+        [ProducesResponseType(201, Type = typeof(Post))]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         public async Task<IActionResult> NewPost([FromBody] Post post)

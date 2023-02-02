@@ -57,6 +57,34 @@ namespace HearYe.Client.Data
             }
         }
 
+        public async Task<Post?> NewPostAsync(Post post)
+        {
+            try
+            {
+                HttpResponseMessage response = await http.PostAsJsonAsync("api/post", post);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadFromJsonAsync<Post>();
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (AccessTokenNotAvailableException ex)
+            {
+                //Navigation.NavigateToLogin("authentication/login"); in case ex.redirect causes issues
+                ex.Redirect();
+                return null;
+            }
+            catch (Exception ex)
+            {
+                // Do something here
+                return null;
+            }
+        }
+
         public Task<List<Post>?> GetNewPostsAsync(string messageGroupId, int count = 15, int skip = 0)
         {
             return http.GetFromJsonAsync<List<Post>?>($"api/post/new?messageGroupId={messageGroupId}&count={count}&skip={skip}");
