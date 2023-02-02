@@ -1,0 +1,149 @@
+﻿@using HearYe.Client.Data
+@using HearYe.Shared;
+@inject StateContainer State
+
+<div class="card flex-row mb-3">
+    <div class="col-9">
+        <div class="card-header d-flex justify-content-between">
+            <div>
+                @GetDisplayName()
+            </div>
+            <div>
+                @if(Post is not null && Post.Post is not null)
+                {
+                    @GetPostTime(Post.Post.CreatedDate)
+                }
+            </div>
+        </div>
+        <div class="card-body">
+            <p class="card-text">@Post?.Post?.Message</p>
+            <div class="text-end align-bottom mt-3">
+                <span>Old news on: @(Post?.Post?.StaleDate is null ? "Never" : Post?.Post?.StaleDate.ToString())</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-3 p-3 d-flex flex-column justify-content-center align-items-center text-center rounded-end border-start">
+        <button type="button" class="mb-2 fs-5 fw-bold btn @(isAcknowledged ? "btn-outline-success" : "btn-outline-dark")">
+            @(isAcknowledged ? "✓" : "Okay")
+        </button>
+        <span>@acknowledgementMessage</span>
+    </div>
+</div>
+
+@code {
+    private bool isAcknowledged = false;
+    private int acknowledgementCount = 0;
+    private string acknowledgementMessage = String.Empty;
+
+    [Parameter]
+    public PostWithUserName? Post { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        if (Post is null || Post.Post is null || Post.Post.Acknowledgements is null)
+        {
+            return;
+        }
+
+        acknowledgementCount = Post.Post.Acknowledgements.Count();
+        isAcknowledged = Post.Post.Acknowledgements
+            .Where(a => a.UserId.ToString() == State.UserDbId).FirstOrDefault() is not null;
+
+        SetAcknowledgementMessage();
+    }
+
+    private void SetAcknowledgementMessage()
+    {
+        if (!isAcknowledged && acknowledgementCount == 0)
+        {
+            acknowledgementMessage = "Nobody has acknowleged this yet.";
+        }
+        else if (!isAcknowledged &&  acknowledgementCount == 1)
+        {
+            acknowledgementMessage = "1 person has acknowledged this message.";
+        }
+        else if (!isAcknowledged && acknowledgementCount > 1)
+        {
+            acknowledgementMessage = acknowledgementCount.ToString() + " people have acknowledged this message.";
+        }
+        else if (isAcknowledged && acknowledgementCount == 1)
+        {
+            acknowledgementMessage = "You have acknowledged this message.";
+        }
+        else if (isAcknowledged && acknowledgementCount == 2)
+        {
+            acknowledgementMessage = "You and 1 other person have acknowledged this message.";
+        }
+        else if (isAcknowledged && acknowledgementCount > 2)
+        {
+            acknowledgementMessage = $"You and {acknowledgementCount - 1} other people have acknowledged this message.";
+        }
+
+        StateHasChanged();
+    }
+
+    private string GetDisplayName()
+    {
+        if (Post is null || Post.Post is null)
+        {
+            return String.Empty;
+        }
+
+        if (Post.Post.UserId is null || Post.DisplayName is null)
+        {
+            return "Unknown says:";
+        }
+
+        if (Post.Post.UserId.ToString() == State.UserDbId)
+        {
+            return "You said:";
+        }
+
+        return Post.DisplayName + " says:";
+    }
+
+    // https://stackoverflow.com/questions/11/calculate-relative-time-in-c-sharp
+    private string GetPostTime(DateTime postTime)
+    {
+        const int SECOND = 1;
+        const int MINUTE = 60 * SECOND;
+        const int HOUR = 60 * MINUTE;
+        const int DAY = 24 * HOUR;
+        const int MONTH = 30 * DAY;
+
+        var ts = new TimeSpan(DateTime.Now.Ticks - postTime.Ticks);
+        double delta = Math.Abs(ts.TotalSeconds);
+
+        if (delta < 1 * MINUTE)
+            return "just now";
+
+        if (delta < 2 * MINUTE)
+            return "a minute ago";
+
+        if (delta < 45 * MINUTE)
+            return ts.Minutes + " minutes ago";
+
+        if (delta < 90 * MINUTE)
+            return "an hour ago";
+
+        if (delta < 24 * HOUR)
+            return ts.Hours + " hours ago";
+
+        if (delta < 48 * HOUR)
+            return "yesterday";
+
+        if (delta < 30 * DAY)
+            return ts.Days + " days ago";
+
+        if (delta < 12 * MONTH)
+        {
+            int months = Convert.ToInt32(Math.Floor((double)ts.Days / 30));
+            return months <= 1 ? "one month ago" : months + " months ago";
+        }
+        else
+        {
+            int years = Convert.ToInt32(Math.Floor((double)ts.Days / 365));
+            return years <= 1 ? "one year ago" : years + " years ago";
+        }
+    }
+}

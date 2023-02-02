@@ -8,7 +8,7 @@ namespace HearYe.Client.Data
         private IEnumerable<MessageGroup>? userGroups;
         private int activeGroupId;
         private string? activeGroupName;
-        private IEnumerable<Post>? postCollection;
+        private IEnumerable<PostWithUserName>? postCollection;
         private PostTypes activePostType = PostTypes.New;
 
         public string? UserDbId { 
@@ -50,7 +50,7 @@ namespace HearYe.Client.Data
             }
         }
 
-        public IEnumerable<Post>? PostCollection
+        public IEnumerable<PostWithUserName>? PostCollection
         {
             get => postCollection;
             set

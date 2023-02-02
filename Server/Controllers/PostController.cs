@@ -75,7 +75,7 @@ namespace HearYe.Server.Controllers
         /// <param name="skip">Number of posts to skip. Posts are ordered by creation date.</param>
         /// <returns>200 (with a list of post objects), 400, or 401.</returns>
         [HttpGet("new")]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<Post>))]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<PostWithUserName>))]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         public async Task<IActionResult> GetNewPosts(int? messageGroupId, int count = 15, int skip = 0)
@@ -93,7 +93,7 @@ namespace HearYe.Server.Controllers
                 return this.Unauthorized();
             }
 
-            IEnumerable<Post?> posts = await this.db.Posts!
+            IEnumerable<PostWithUserName?> posts = await this.db.Posts!
                 .Include("Acknowledgements")
                 .Where(
                     p => p.MessageGroupId == messageGroupId
@@ -102,6 +102,7 @@ namespace HearYe.Server.Controllers
                 .OrderByDescending(p => p.CreatedDate)
                 .Skip(skip)
                 .Take(count)
+                .Select(p => new PostWithUserName { Post = p, DisplayName = p.User == null ? "Unknown" : p.User.DisplayName })
                 .ToListAsync();
 
             return this.Ok(posts);
@@ -116,7 +117,7 @@ namespace HearYe.Server.Controllers
         /// <param name="skip">Number of posts to skip. Posts are ordered by creation date.</param>
         /// <returns>200 (with a list of post objects), 400, or 401.</returns>
         [HttpGet("acknowledged")]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<Post>))]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<PostWithUserName>))]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         public async Task<IActionResult> GetAcknowledgedPosts(int? messageGroupId, int count = 15, int skip = 0)
@@ -134,7 +135,7 @@ namespace HearYe.Server.Controllers
                 return this.Unauthorized();
             }
 
-            IEnumerable<Post?> posts = await this.db.Posts!
+            IEnumerable<PostWithUserName?> posts = await this.db.Posts!
                 .Include("Acknowledgements")
                 .Where(
                     p => p.MessageGroupId == messageGroupId
@@ -143,6 +144,7 @@ namespace HearYe.Server.Controllers
                 .OrderByDescending(p => p.CreatedDate)
                 .Skip(skip)
                 .Take(count)
+                .Select(p => new PostWithUserName { Post = p, DisplayName = p.User == null ? "Unknown" : p.User.DisplayName })
                 .ToListAsync();
 
             return this.Ok(posts);
@@ -157,7 +159,7 @@ namespace HearYe.Server.Controllers
         /// <param name="skip">Number of posts to skip. Posts are ordered by creation date.</param>
         /// <returns>200 (with a list of post objects), 400, or 401.</returns>
         [HttpGet("stale")]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<Post>))]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<PostWithUserName>))]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         public async Task<IActionResult> GetStalePosts(int? messageGroupId, int count = 15, int skip = 0)
@@ -175,12 +177,13 @@ namespace HearYe.Server.Controllers
                 return this.Unauthorized();
             }
 
-            IEnumerable<Post?> posts = await this.db.Posts!
+            IEnumerable<PostWithUserName?> posts = await this.db.Posts!
                 .Include("Acknowledgements")
                 .Where(p => p.MessageGroupId == messageGroupId && p.StaleDate <= DateTime.Now)
                 .OrderByDescending(p => p.CreatedDate)
                 .Skip(skip)
                 .Take(count)
+                .Select(p => new PostWithUserName { Post = p, DisplayName = p.User == null ? "Unknown" : p.User.DisplayName })
                 .ToListAsync();
 
             return this.Ok(posts);

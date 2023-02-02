@@ -55,7 +55,7 @@
         if (!validDbId || State.ActiveGroupId == 0)
         {
             bannerType = "alert-warning";
-            bannerMessage = "Message posting failed. Please try again later.";
+            bannerMessage = "⚠ Message posting failed. Please try again later.";
             StateHasChanged();
             return;
         }
@@ -71,7 +71,7 @@
             if (postSuccessful is null)
             {
                 bannerType = "alert-warning";
-                bannerMessage = "Message posting failed. Please try again later.";
+                bannerMessage = "⚠ Message posting failed. Please try again later.";
                 StateHasChanged();
                 return;
             }
@@ -80,25 +80,26 @@
                 // Success message: Successfully posted
                 newPost = new();
                 editContext = new(newPost);
-                List<Post> newPostCollection = new();
+                List<PostWithUserName> newPostCollection = new();
 
                 // I could just prepend the post to State.PostCollection, but
                 // that wouldn't trigger StateHasChanged on StateContainer.
                 if (State.ActivePostType == PostTypes.New)
                 {
-                    newPostCollection.Add(postSuccessful);
+                    PostWithUserName postWithUserName = new() { Post = postSuccessful, DisplayName = "You" };
+                    newPostCollection.Add(postWithUserName);
                 }
 
                 if (State.PostCollection is not null)
                 {
-                    foreach (Post oldPost in State.PostCollection)
+                    foreach (PostWithUserName oldPost in State.PostCollection)
                     {
                         newPostCollection.Add(oldPost);
                     }
                 }
 
                 bannerType = "alert-success";
-                bannerMessage = "Message posted!";
+                bannerMessage = "👌 Message posted!";
                 State.PostCollection = newPostCollection;
                 return;
             }

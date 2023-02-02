@@ -58,7 +58,7 @@
             State.ActiveGroupId = group.Id;
             State.ActiveGroupName = group.MessageGroupName;
 
-            IEnumerable<Post>? postCollection;
+            IEnumerable<PostWithUserName>? postCollection;
             switch (State.ActivePostType)
             {
                 case PostTypes.Acknowledged:

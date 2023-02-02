@@ -43,4 +43,10 @@ namespace HearYe.Shared
 
         public virtual ICollection<Acknowledgement>? Acknowledgements { get; set; }
     }
+
+    public class PostWithUserName
+    {
+        public Post? Post { get; set; }
+        public string? DisplayName { get; set; }
+    }
 }

@@ -13,30 +13,14 @@
 
 <div class="container-lg">
     <NewMessage />
-    
     <h1>New Messages</h1>
-
-    <div>
-        <span>PostDate</span>
-        <div>
-            <div>
-                <div>
-                    <span>UserImage</span>
-                    <span>User.DisplayName says:</span>
-                </div>
-                <p>
-                    Post.Message
-                </p>
-                <p>
-                    Old news on: Post.StaleDate
-                </p>
-            </div>
-            <div>
-                <button @onclick="ClickAThing">AcknowledgeButton</button>
-                <span>Acknowledged by Acknowledgements.Where(acknowledgement => acknowledgement.postid == post.id).Count() person/people.</span>
-            </div>
-        </div>
-    </div>
+    @if(State.PostCollection is not null)
+    {
+        @foreach (PostWithUserName post in State.PostCollection)
+        {
+            <PostTemplate Post="@post" />
+        }
+    }
 </div>
 
 
@@ -75,9 +59,9 @@
                 Navigation.NavigateTo("/newuser");
                 return;
             }
-            
+
             State.UserDbId = userDbId;
-            
+
             var userGroups = await Service.GetUserMessageGroupsAsync(userDbId);
             State.UserGroups = userGroups;
 
