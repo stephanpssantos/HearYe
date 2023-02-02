@@ -116,8 +116,8 @@ namespace HearYe.Server.Tests
                 // Assert
                 Assert.IsType<OkObjectResult>(result);
                 Assert.Equal(2, resultBody!.Count());
-                Assert.Contains(resultBody!, post => post.Post!.Id == 3);
-                Assert.Contains(resultBody!, post => post.Post!.Id == 4);
+                Assert.Contains(resultBody!, post => post.Id == 3);
+                Assert.Contains(resultBody!, post => post.Id == 4);
             }
         }
 
@@ -133,13 +133,13 @@ namespace HearYe.Server.Tests
                 var result = await controller.GetNewPosts(1);
                 var okResult = result as OkObjectResult;
                 var resultBody = okResult!.Value as IEnumerable<Shared.PostWithUserName>;
-                var post1 = resultBody!.Where(p => p.Post!.Id == 4).FirstOrDefault();
+                var post1 = resultBody!.Where(p => p.Id == 4).FirstOrDefault();
 
                 // Assert
                 Assert.IsType<OkObjectResult>(result);
-                Assert.Single(post1!.Post!.Acknowledgements!);
-                Assert.Equal(4, post1.Post!.Acknowledgements!.FirstOrDefault()!.PostId);
-                Assert.Equal(4, post1.Post!.Acknowledgements!.FirstOrDefault()!.UserId);
+                Assert.Single(post1!.Acknowledgements!);
+                Assert.Equal(4, post1!.Acknowledgements!.FirstOrDefault()!.PostId);
+                Assert.Equal(4, post1!.Acknowledgements!.FirstOrDefault()!.UserId);
             }
         }
 
@@ -175,7 +175,7 @@ namespace HearYe.Server.Tests
                 // Assert
                 Assert.IsType<OkObjectResult>(result);
                 Assert.Single(resultBody!);
-                Assert.Contains(resultBody!, post => post.Post!.Id == 1);
+                Assert.Contains(resultBody!, post => post.Id == 1);
             }
         }
 
@@ -191,13 +191,13 @@ namespace HearYe.Server.Tests
                 var result = await controller.GetAcknowledgedPosts(1);
                 var okResult = result as OkObjectResult;
                 var resultBody = okResult!.Value as IEnumerable<Shared.PostWithUserName>;
-                var post1 = resultBody!.Where(p => p.Post!.Id == 1).FirstOrDefault();
+                var post1 = resultBody!.Where(p => p.Id == 1).FirstOrDefault();
 
                 // Assert
                 Assert.IsType<OkObjectResult>(result);
-                Assert.Single(post1!.Post!.Acknowledgements!);
-                Assert.Equal(1, post1.Post!.Acknowledgements!.FirstOrDefault()!.PostId);
-                Assert.Equal(1, post1.Post!.Acknowledgements!.FirstOrDefault()!.UserId);
+                Assert.Single(post1!.Acknowledgements!);
+                Assert.Equal(1, post1.Acknowledgements!.FirstOrDefault()!.PostId);
+                Assert.Equal(1, post1.Acknowledgements!.FirstOrDefault()!.UserId);
             }
         }
 
@@ -233,7 +233,7 @@ namespace HearYe.Server.Tests
                 // Assert
                 Assert.IsType<OkObjectResult>(result);
                 Assert.Single(resultBody!);
-                Assert.Contains(resultBody!, post => post.Post!.Id == 5);
+                Assert.Contains(resultBody!, post => post.Id == 5);
             }
         }
 
@@ -249,13 +249,13 @@ namespace HearYe.Server.Tests
                 var result = await controller.GetStalePosts(1);
                 var okResult = result as OkObjectResult;
                 var resultBody = okResult!.Value as IEnumerable<Shared.PostWithUserName>;
-                var post1 = resultBody!.Where(p => p.Post!.Id == 5).FirstOrDefault();
+                var post1 = resultBody!.Where(p => p.Id == 5).FirstOrDefault();
 
                 // Assert
                 Assert.IsType<OkObjectResult>(result);
-                Assert.Single(post1!.Post!.Acknowledgements!);
-                Assert.Equal(5, post1.Post!.Acknowledgements!.FirstOrDefault()!.PostId);
-                Assert.Equal(4, post1.Post!.Acknowledgements!.FirstOrDefault()!.UserId);
+                Assert.Single(post1!.Acknowledgements!);
+                Assert.Equal(5, post1.Acknowledgements!.FirstOrDefault()!.PostId);
+                Assert.Equal(4, post1.Acknowledgements!.FirstOrDefault()!.UserId);
             }
         }
 

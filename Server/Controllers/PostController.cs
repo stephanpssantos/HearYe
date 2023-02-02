@@ -102,7 +102,19 @@ namespace HearYe.Server.Controllers
                 .OrderByDescending(p => p.CreatedDate)
                 .Skip(skip)
                 .Take(count)
-                .Select(p => new PostWithUserName { Post = p, DisplayName = p.User == null ? "Unknown" : p.User.DisplayName })
+                .Select(p => new PostWithUserName
+                {
+                    Id = p.Id,
+                    UserId = p.UserId,
+                    MessageGroupId = p.MessageGroupId,
+                    Message = p.Message,
+                    IsDeleted = p.IsDeleted,
+                    CreatedDate = p.CreatedDate,
+                    StaleDate = p.StaleDate,
+                    DeletedDate = p.DeletedDate,
+                    Acknowledgements = p.Acknowledgements,
+                    DisplayName = p.User == null ? "Unknown" : p.User.DisplayName,
+                })
                 .ToListAsync();
 
             return this.Ok(posts);
@@ -144,7 +156,19 @@ namespace HearYe.Server.Controllers
                 .OrderByDescending(p => p.CreatedDate)
                 .Skip(skip)
                 .Take(count)
-                .Select(p => new PostWithUserName { Post = p, DisplayName = p.User == null ? "Unknown" : p.User.DisplayName })
+                .Select(p => new PostWithUserName
+                {
+                    Id = p.Id,
+                    UserId = p.UserId,
+                    MessageGroupId = p.MessageGroupId,
+                    Message = p.Message,
+                    IsDeleted = p.IsDeleted,
+                    CreatedDate = p.CreatedDate,
+                    StaleDate = p.StaleDate,
+                    DeletedDate = p.DeletedDate,
+                    Acknowledgements = p.Acknowledgements,
+                    DisplayName = p.User == null ? "Unknown" : p.User.DisplayName,
+                })
                 .ToListAsync();
 
             return this.Ok(posts);
@@ -183,7 +207,19 @@ namespace HearYe.Server.Controllers
                 .OrderByDescending(p => p.CreatedDate)
                 .Skip(skip)
                 .Take(count)
-                .Select(p => new PostWithUserName { Post = p, DisplayName = p.User == null ? "Unknown" : p.User.DisplayName })
+                .Select(p => new PostWithUserName
+                {
+                    Id = p.Id,
+                    UserId = p.UserId,
+                    MessageGroupId = p.MessageGroupId,
+                    Message = p.Message,
+                    IsDeleted = p.IsDeleted,
+                    CreatedDate = p.CreatedDate,
+                    StaleDate = p.StaleDate,
+                    DeletedDate = p.DeletedDate,
+                    Acknowledgements = p.Acknowledgements,
+                    DisplayName = p.User == null ? "Unknown" : p.User.DisplayName,
+                })
                 .ToListAsync();
 
             return this.Ok(posts);

@@ -8,14 +8,14 @@
             @GetDisplayName()
         </div>
         <div>
-            @if(Post is not null && Post.Post is not null)
+            @if(Post is not null)
             {
-                @GetPostTime(Post.Post.CreatedDate)
+                @GetPostTime(Post.CreatedDate)
             }
         </div>
     </div>
     <div class="card-body">
-        <p class="card-text">@Post?.Post?.Message</p>
+        <p class="card-text">@Post?.Message</p>
         <div class="d-flex justify-content-between align-items-end mt-3">
             <div class="btn-group" role="group" aria-label="@acknowledgementCount acknowledgements">
                 <button type="button" class="btn @(isAcknowledged ? "btn-primary" : "btn-outline-dark")">
@@ -25,7 +25,7 @@
                     @acknowledgementCount
                 </button>
             </div>
-            <span>Old news on: @(Post?.Post?.StaleDate is null ? "Never" : Post?.Post?.StaleDate.ToString())</span>
+            <span>Old news on: @(Post?.StaleDate is null ? "Never" : Post?.StaleDate.ToString())</span>
         </div>
     </div>
 </div>
@@ -40,29 +40,29 @@
 
     protected override void OnParametersSet()
     {
-        if (Post is null || Post.Post is null || Post.Post.Acknowledgements is null)
+        if (Post is null || Post.Acknowledgements is null)
         {
             return;
         }
 
-        acknowledgementCount = Post.Post.Acknowledgements.Count();
-        isAcknowledged = Post.Post.Acknowledgements
+        acknowledgementCount = Post.Acknowledgements.Count();
+        isAcknowledged = Post.Acknowledgements
             .Where(a => a.UserId.ToString() == State.UserDbId).FirstOrDefault() is not null;
     }
 
     private string GetDisplayName()
     {
-        if (Post is null || Post.Post is null)
+        if (Post is null)
         {
             return String.Empty;
         }
 
-        if (Post.Post.UserId is null || Post.DisplayName is null)
+        if (Post.UserId is null || Post.DisplayName is null)
         {
             return "Unknown says:";
         }
 
-        if (Post.Post.UserId.ToString() == State.UserDbId)
+        if (Post.UserId.ToString() == State.UserDbId)
         {
             return "You said:";
         }

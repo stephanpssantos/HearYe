@@ -1,5 +1,6 @@
 ﻿@using HearYe.Client.Data
 @using HearYe.Shared
+@using System.Text.Json
 @inject IHearYeService Service
 @inject StateContainer State
 
@@ -86,7 +87,9 @@
                 // that wouldn't trigger StateHasChanged on StateContainer.
                 if (State.ActivePostType == PostTypes.New)
                 {
-                    PostWithUserName postWithUserName = new() { Post = postSuccessful, DisplayName = "You" };
+                    string postSuccessfulSerialized = JsonSerializer.Serialize<Post>(postSuccessful);
+                    PostWithUserName postWithUserName = JsonSerializer.Deserialize<PostWithUserName>(postSuccessfulSerialized)!;
+                    postWithUserName.DisplayName = "You";
                     newPostCollection.Add(postWithUserName);
                 }
 
