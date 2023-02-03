@@ -52,4 +52,10 @@ namespace HearYe.Shared
 
         public virtual ICollection<MessageGroupInvitation>? MessageGroupInvitationsSent { get; set; }
     }
+
+    public class UserPublicInfo
+    {
+        public int Id { get; set; }
+        public string DisplayName { get; set; } = String.Empty;
+    }
 }

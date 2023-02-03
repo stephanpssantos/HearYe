@@ -99,19 +99,20 @@ namespace HearYe.Server.Controllers
         }
 
         /// <summary>
-        /// DELETE: api/acknowledgement/[id]; <br />
+        /// DELETE: api/acknowledgement/delete?postId=[postId]&amp;userId=[userId]; <br />
         /// Delete specified post acknowledgement.
         /// </summary>
-        /// <param name="acknowledgementId">ID of acknowledgement to delete.</param>
+        /// <param name="postId">Post ID of acknowledgement to delete.</param>
+        /// <param name="userId">User ID of acknowledgement to delete.</param>
         /// <returns>204, 400, 401, or 404.</returns>
-        [HttpDelete("{id:int}")]
+        [HttpDelete("delete")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
-        public async Task<IActionResult> DeleteAcknowledgement(int acknowledgementId)
+        public async Task<IActionResult> DeleteAcknowledgement(int postId, int userId)
         {
-            if (acknowledgementId < 1)
+            if (postId < 1 || userId < 1)
             {
                 return this.BadRequest();
             }
@@ -123,7 +124,7 @@ namespace HearYe.Server.Controllers
             }
 
             Acknowledgement? acknowledgement = await this.db.Acknowledgements!
-                .Where(a => a.Id == acknowledgementId)
+                .Where(a => a.PostId == postId && a.UserId == userId)
                 .FirstOrDefaultAsync();
 
             if (acknowledgement == null)

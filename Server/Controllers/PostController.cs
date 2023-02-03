@@ -50,13 +50,13 @@ namespace HearYe.Server.Controllers
         {
             Post? post = await this.db.Posts!.Where(p => p.Id == id).FirstOrDefaultAsync();
 
-            if (post == null)
+            if (post == null || post.MessageGroupId == null)
             {
                 return this.NotFound();
             }
 
             int claimId = AuthCheck.UserClaimCheck(this.HttpContext.User.Claims);
-            int roleId = await AuthCheck.UserGroupAuthCheck(this.db, claimId, id);
+            int roleId = await AuthCheck.UserGroupAuthCheck(this.db, claimId, (int)post.MessageGroupId);
 
             if (roleId == 0)
             {
@@ -64,6 +64,46 @@ namespace HearYe.Server.Controllers
             }
 
             return this.Ok(post);
+        }
+
+        /// <summary>
+        /// GET: api/post/acknowledged/[id]; <br />
+        /// Get a list of users who have acknowledged a post.
+        /// </summary>
+        /// <param name="id">Id of the specified post.</param>
+        /// <returns>200 (with a post object), 401, or 400.</returns>
+        [HttpGet("acknowledged/{id:int}")]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<UserPublicInfo>))]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> GetPostAcknowledgedUsers(int id)
+        {
+            Post? post = await this.db.Posts!.Where(p => p.Id == id).FirstOrDefaultAsync();
+
+            if (post == null || post.MessageGroupId == null)
+            {
+                return this.NotFound();
+            }
+
+            int claimId = AuthCheck.UserClaimCheck(this.HttpContext.User.Claims);
+            int roleId = await AuthCheck.UserGroupAuthCheck(this.db, claimId, (int)post.MessageGroupId);
+
+            if (roleId == 0)
+            {
+                return this.Unauthorized();
+            }
+
+            IEnumerable<UserPublicInfo> users = await this.db.Acknowledgements!
+                .Include(a => a.User)
+                .Where(a => a.PostId == id)
+                .Select(a => new UserPublicInfo
+                {
+                    DisplayName = a.User == null ? "Unknown" : a.User.DisplayName,
+                    Id = a.UserId,
+                })
+                .ToListAsync();
+
+            return this.Ok(users);
         }
 
         /// <summary>

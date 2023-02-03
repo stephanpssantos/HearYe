@@ -99,5 +99,15 @@ namespace HearYe.Client.Data
         {
             return http.GetFromJsonAsync<List<PostWithUserName>?>($"api/post/stale?messageGroupId={messageGroupId}&count={count}&skip={skip}");
         }
+
+        public async Task<HttpResponseMessage> NewAcknowledgementAsync(Acknowledgement acknowledgement)
+        {
+            return await http.PostAsJsonAsync("api/acknowledgement", acknowledgement);
+        }
+
+        public async Task<HttpResponseMessage> DeleteAcknowledgementAsync(int postId, int userId)
+        {
+            return await http.DeleteAsync($"api/acknowledgement/delete?postId={postId}&userId={userId}");
+        }
     }
 }
