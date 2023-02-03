@@ -12,9 +12,21 @@
 <PageTitle>Okay</PageTitle>
 
 <div class="container-lg">
-    <NewMessage />
-    <h1>New Messages</h1>
-    @if(State.PostCollection is not null)
+    @if (State.ActivePostType == PostTypes.New)
+    {
+        <NewMessage />
+        <h1>New Messages</h1>
+    }
+    else if (State.ActivePostType == PostTypes.Acknowledged)
+    {
+        <h1 class="mt-2">Acknowledged Messages</h1>
+    }
+    else if (State.ActivePostType == PostTypes.Stale)
+    {
+        <h1 class="mt-2">Old Messages</h1>
+    }
+
+    @if (State.PostCollection is not null)
     {
         @foreach (PostWithUserName post in State.PostCollection)
         {
