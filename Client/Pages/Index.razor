@@ -17,31 +17,58 @@
         {
             <div class="w-md-75">
                 <NewMessage />
-                <h1 class="mt-2">New Messages</h1>
+                <h1 class="mt-2 mb-3">New Messages</h1>
             </div>
         }
         else if (State.ActivePostType == PostTypes.Acknowledged)
         {
             <div class="w-md-75">
-                <h1 class="mt-2">Acknowledged Messages</h1>
+                <h1 class="mt-2 mb-3">Acknowledged Messages</h1>
             </div>
         }
         else if (State.ActivePostType == PostTypes.Stale)
         {
             <div class="w-md-75">
-                <h1 class="mt-2">Old Messages</h1>
+                <h1 class="mt-2 mb-3">Old Messages</h1>
             </div>
         }
 
-        @if (State.PostCollection is not null)
-        {
-            <div class="w-md-75">
+        <div class="w-md-75">
+            @if (State.PostCollection is not null && State.PostCollection.Any())
+            {
                 @foreach (PostWithUserName post in State.PostCollection)
                 {
                     <PostTemplate Post="@post" />
                 }
-            </div>
-        }
+            }
+            else if (State.PostCollection is not null && !State.PostCollection.Any())
+            {
+                <h3 class="text-muted">No posts found.</h3>
+            }
+            else
+            {
+                <div class="card">
+                    <div class="card-header">
+                        <div class="placeholder-glow d-flex pt-2 pb-2">
+                            <span class="placeholder col-3" />
+                            <span class="placeholder col-6" style="visibility: hidden" />
+                            <span class="placeholder col-3" />
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-text placeholder-glow">
+                            <span class="placeholder col-12"></span>
+                            <br />
+                            <div class="d-flex mt-2">
+                                <span class="placeholder col-2"></span>
+                                <span class="placeholder col-6" style="visibility: hidden"></span>
+                                <span class="placeholder col-4"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
     </div>
 </div>
 
