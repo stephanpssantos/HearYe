@@ -12,6 +12,17 @@
 <PageTitle>Okay</PageTitle>
 
 <div class="container-lg">
+    <div class="modal fade" id="indexModal">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            @if (State.ModalIsOpen)
+            {
+                @if (State.AcknowledgedModalId > 0)
+                {
+                    <AcknowledgedModal />
+                }
+            }
+        </div>
+    </div>
     <div class="d-flex flex-column align-items-center">
         @if (State.ActivePostType == PostTypes.New)
         {

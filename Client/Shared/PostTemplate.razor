@@ -23,7 +23,7 @@
                     class="btn @(isAcknowledged ? "btn-primary" : "btn-outline-dark")" @onclick="AcknowledgePost">
                     OK
                 </button>
-                <button type="button" class="btn @(isAcknowledged ? "btn-outline-primary" : "btn-outline-dark")">
+                <button type="button" class="btn @(isAcknowledged ? "btn-outline-primary" : "btn-outline-dark")" @onclick="OpenAcknowledgedList" data-bs-toggle="modal" data-bs-target="#indexModal">
                     @acknowledgementCount
                 </button>
             </div>
@@ -37,17 +37,19 @@
     private bool isAcknowledged = false;
     private int acknowledgementCount = 0;
     private string acknowledgementMessage = String.Empty;
+    private int postId = 0;
 
     [Parameter]
     public PostWithUserName? Post { get; set; }
 
     protected override void OnParametersSet()
     {
-        if (Post is null || Post.Acknowledgements is null)
+        if (Post is null || Post.Acknowledgements is null || Post.Id == postId)
         {
             return;
         }
 
+        postId = Post.Id; // Prevents rerenders from resetting these values (unless it's a whole new post)
         acknowledgementCount = Post.Acknowledgements.Count();
         isAcknowledged = Post.Acknowledgements
             .Where(a => a.UserId.ToString() == State.UserDbId).FirstOrDefault() is not null;
@@ -69,7 +71,7 @@
         }
 
         acknowledgeDisabled = true;
-        
+
         Acknowledgement newAcknowledgement = new()
         {
             PostId = Post.Id,
@@ -108,6 +110,17 @@
 
         acknowledgeDisabled = false;
         StateHasChanged();
+    }
+
+    private void OpenAcknowledgedList()
+    {
+        if (Post is null)
+        {
+            return;
+        }
+
+        State.AcknowledgedModalId = Post.Id;
+        State.ModalIsOpen = true;
     }
 
     private string GetDisplayName()

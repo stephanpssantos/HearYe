@@ -14,5 +14,6 @@ namespace HearYe.Client.Data
         Task<Post?> NewPostAsync(Post post);
         Task<HttpResponseMessage> NewAcknowledgementAsync(Acknowledgement acknowledgement);
         Task<HttpResponseMessage> DeleteAcknowledgementAsync(int postId, int userId);
+        Task<List<UserPublicInfo>?> GetPostAcknowledgedUsersAsync(int userId);
     }
 }

@@ -10,6 +10,8 @@ namespace HearYe.Client.Data
         private string? activeGroupName;
         private IEnumerable<PostWithUserName>? postCollection;
         private PostTypes activePostType = PostTypes.New;
+        private bool modalIsOpen = false;
+        private int acknowledgedModalId;
 
         public string? UserDbId { 
             get => userDbId; 
@@ -66,6 +68,26 @@ namespace HearYe.Client.Data
             set
             {
                 activePostType = value;
+                NotifyStateChanged();
+            }
+        }
+
+        public bool ModalIsOpen
+        {
+            get => modalIsOpen;
+            set
+            {
+                modalIsOpen = value;
+                NotifyStateChanged();
+            }
+        }
+
+        public int AcknowledgedModalId
+        {
+            get => acknowledgedModalId;
+            set
+            {
+                acknowledgedModalId = value;
                 NotifyStateChanged();
             }
         }

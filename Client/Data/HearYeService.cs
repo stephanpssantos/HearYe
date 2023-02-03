@@ -109,5 +109,10 @@ namespace HearYe.Client.Data
         {
             return await http.DeleteAsync($"api/acknowledgement/delete?postId={postId}&userId={userId}");
         }
+
+        public Task<List<UserPublicInfo>?> GetPostAcknowledgedUsersAsync(int userId)
+        {
+            return http.GetFromJsonAsync<List<UserPublicInfo>?>($"api/post/acknowledged/{userId}");
+        }
     }
 }
