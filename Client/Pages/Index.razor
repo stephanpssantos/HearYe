@@ -12,27 +12,37 @@
 <PageTitle>Okay</PageTitle>
 
 <div class="container-lg">
-    @if (State.ActivePostType == PostTypes.New)
-    {
-        <NewMessage />
-        <h1>New Messages</h1>
-    }
-    else if (State.ActivePostType == PostTypes.Acknowledged)
-    {
-        <h1 class="mt-2">Acknowledged Messages</h1>
-    }
-    else if (State.ActivePostType == PostTypes.Stale)
-    {
-        <h1 class="mt-2">Old Messages</h1>
-    }
-
-    @if (State.PostCollection is not null)
-    {
-        @foreach (PostWithUserName post in State.PostCollection)
+    <div class="d-flex flex-column align-items-center">
+        @if (State.ActivePostType == PostTypes.New)
         {
-            <PostTemplate Post="@post" />
+            <div class="w-md-75">
+                <NewMessage />
+                <h1 class="mt-2">New Messages</h1>
+            </div>
         }
-    }
+        else if (State.ActivePostType == PostTypes.Acknowledged)
+        {
+            <div class="w-md-75">
+                <h1 class="mt-2">Acknowledged Messages</h1>
+            </div>
+        }
+        else if (State.ActivePostType == PostTypes.Stale)
+        {
+            <div class="w-md-75">
+                <h1 class="mt-2">Old Messages</h1>
+            </div>
+        }
+
+        @if (State.PostCollection is not null)
+        {
+            <div class="w-md-75">
+                @foreach (PostWithUserName post in State.PostCollection)
+                {
+                    <PostTemplate Post="@post" />
+                }
+            </div>
+        }
+    </div>
 </div>
 
 
