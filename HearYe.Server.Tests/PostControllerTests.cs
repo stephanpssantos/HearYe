@@ -85,6 +85,76 @@ namespace HearYe.Server.Tests
         }
 
         [Fact]
+        public async void GetPostAcknowledgedUsers_ReturnsUnauthorizedWhenUnauthorized()
+        {
+            // Arrange
+            using (HearYeContext context = Fixture.CreateContext())
+            {
+                var controller = new PostController(context, this.logger).WithAnonymousIdentity();
+
+                // Act
+                var result = await controller.GetPostAcknowledgedUsers(1);
+
+                // Assert
+                Assert.IsType<UnauthorizedResult>(result);
+            }
+        }
+
+        [Fact]
+        public async void GetPostAcknowledgedUsers_ReturnsNotFoundWhenNonExistent()
+        {
+            // Arrange
+            using (HearYeContext context = Fixture.CreateContext())
+            {
+                var controller = new PostController(context, this.logger).WithAuthenticatedIdentity("1");
+
+                // Act
+                var result = await controller.GetPostAcknowledgedUsers(9999);
+
+                // Assert
+                Assert.IsType<NotFoundResult>(result);
+            }
+        }
+
+        [Fact]
+        public async void GetPostAcknowledgedUsers_ReturnsUnauthorizedWhenNotGroupMember()
+        {
+            // Arrange
+            using (HearYeContext context = Fixture.CreateContext())
+            {
+                var controller = new PostController(context, this.logger).WithAuthenticatedIdentity("2");
+
+                // Act
+                var result = await controller.GetPostAcknowledgedUsers(1);
+
+                // Assert
+                Assert.IsType<UnauthorizedResult>(result);
+            }
+        }
+
+        [Fact]
+        public async void GetPostAcknowledgedUsers_ReturnsPublicUserInfoWithValidRequest()
+        {
+            // Arrange
+            using (HearYeContext context = Fixture.CreateContext())
+            {
+                var controller = new PostController(context, this.logger).WithAuthenticatedIdentity("1");
+
+                // Act
+                var result = await controller.GetPostAcknowledgedUsers(1);
+                var okResult = result as OkObjectResult;
+                var resultBody = okResult!.Value as IEnumerable<UserPublicInfo>;
+                var resultSample = resultBody!.First();
+
+                // Assert
+                Assert.IsType<OkObjectResult>(result);
+                Assert.Single(resultBody!);
+                Assert.IsType<UserPublicInfo>(resultSample);
+                Assert.NotNull(resultSample.DisplayName);
+            }
+        }
+
+        [Fact]
         public async void GetNewPosts_ReturnsUnauthorizedIfNotInGroup()
         {
             // Arrange
@@ -140,6 +210,27 @@ namespace HearYe.Server.Tests
                 Assert.Single(post1!.Acknowledgements!);
                 Assert.Equal(4, post1!.Acknowledgements!.FirstOrDefault()!.PostId);
                 Assert.Equal(4, post1!.Acknowledgements!.FirstOrDefault()!.UserId);
+            }
+        }
+
+        [Fact]
+        public async void GetNewPosts_IncludesThePostersUserName()
+        {
+            // Arrange
+            using (HearYeContext context = Fixture.CreateContext())
+            {
+                var controller = new PostController(context, this.logger).WithAuthenticatedIdentity("1");
+
+                // Act
+                var result = await controller.GetNewPosts(1);
+                var okResult = result as OkObjectResult;
+                var resultBody = okResult!.Value as IEnumerable<Shared.PostWithUserName>;
+                var samplePost = resultBody!.Where(p => p.Id == 3).FirstOrDefault();
+
+                // Assert
+                Assert.IsType<OkObjectResult>(result);
+                Assert.NotNull(samplePost);
+                Assert.Equal("TestUser", samplePost.DisplayName);
             }
         }
 
