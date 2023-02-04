@@ -157,7 +157,7 @@ namespace HearYe.Server.Tests
                 var controller = new AcknowledgementController(context, this.logger).WithAnonymousIdentity();
 
                 // Act
-                var result = await controller.DeleteAcknowledgement(1);
+                var result = await controller.DeleteAcknowledgement(1, 1);
 
                 // Assert
                 Assert.IsType<UnauthorizedResult>(result);
@@ -173,7 +173,7 @@ namespace HearYe.Server.Tests
                 var controller = new AcknowledgementController(context, this.logger).WithAuthenticatedIdentity("1");
 
                 // Act
-                var result = await controller.DeleteAcknowledgement(0);
+                var result = await controller.DeleteAcknowledgement(0, 0);
 
                 // Assert
                 Assert.IsType<BadRequestResult>(result);
@@ -189,7 +189,7 @@ namespace HearYe.Server.Tests
                 var controller = new AcknowledgementController(context, this.logger).WithAuthenticatedIdentity("1");
 
                 // Act
-                var result = await controller.DeleteAcknowledgement(9999);
+                var result = await controller.DeleteAcknowledgement(9999, 9999);
 
                 // Assert
                 Assert.IsType<NotFoundResult>(result);
@@ -205,7 +205,7 @@ namespace HearYe.Server.Tests
                 var controller = new AcknowledgementController(context, this.logger).WithAuthenticatedIdentity("4");
 
                 // Act
-                var result = await controller.DeleteAcknowledgement(1);
+                var result = await controller.DeleteAcknowledgement(1, 1);
                 var resultObject = result as UnauthorizedObjectResult;
 
                 // Assert
@@ -223,7 +223,7 @@ namespace HearYe.Server.Tests
                 var controller = new AcknowledgementController(context, this.logger).WithAuthenticatedIdentity("2");
 
                 // Act
-                var result = await controller.DeleteAcknowledgement(5);
+                var result = await controller.DeleteAcknowledgement(2, 2);
                 var verify = context.Acknowledgements!.Where(a => a.Id == 5).FirstOrDefault();
 
                 // Assert
