@@ -17,12 +17,12 @@
     [Parameter]
     public string? UserName { get; set; }
 
-    public void BeginEditProfile()
+    private void BeginEditProfile()
     {
         Navigation.NavigateToLogout("authentication/profile");
     }
 
-    public void BeginLogOut()
+    private void BeginLogOut()
     {
         UriBuilder builder = new(Navigation.ToAbsoluteUri("landing"));
         string newPath = QueryHelpers.AddQueryString(builder.ToString(), "logoutSuceeded", "true");
