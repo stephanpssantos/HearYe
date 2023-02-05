@@ -3,7 +3,7 @@
 @inject IHearYeService Service
 @inject StateContainer State
 
-<ul class="nav nav-pills col-lg-4">
+<ul class="nav nav-pills">
     <li class="nav-item">
         <a class="nav-link @checkClass(PostTypes.New)" aria-current="@checkAria(PostTypes.New)" 
             onclick="@(() => setPostType(PostTypes.New))" role="button">New</a>

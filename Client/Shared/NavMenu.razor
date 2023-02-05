@@ -5,15 +5,24 @@
         <nav class="navbar bg-white p-2 border-bottom border-2">
             <div class="container-lg justify-content-center">
                 <div class="d-flex justify-content-between align-items-center w-md-75">
-                    <div class="d-flex gap-2 align-items-center col-lg-4">
+                    <div class="d-flex gap-2 align-items-center col-md-4">
                         <img src="OKHand1.svg" class="fs-3 OkSvg1" />
                         <span class="fs-3 me-3">
                             <strong>Okay</strong>
                         </span>
-                        <GroupDropDown />
+                        <div class="d-none d-xl-block">
+                            <GroupDropDown />
+                        </div>
                     </div>
-                    <PostTypeSelector />
+                    
+                    <div class="d-none d-xl-block col-xl-4">
+                        <PostTypeSelector />
+                    </div>
                     <AccountDropDown UserName="@context.User.Identity?.Name" />
+                </div>
+                <div class="d-flex d-xl-none flex-column align-items-end w-md-75 gap-2 mt-1">
+                    <GroupDropDown />
+                    <PostTypeSelector />
                 </div>
             </div>
         </nav>

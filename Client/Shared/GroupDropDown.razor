@@ -3,8 +3,8 @@
 @inject IHearYeService Service
 @inject StateContainer State
 
-<div class="dropdown">
-    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+<div class="dropdown w-100">
+    <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
         @if (State is not null && State.UserGroups is not null)
         {
             @(State.ActiveGroupName ?? "No groups")
@@ -14,7 +14,7 @@
             <span>Loading groups</span>
         }
     </button>
-    <ul class="dropdown-menu">
+    <ul class="dropdown-menu w-100">
         @if (State is not null && State.UserGroups is not null)
         {
             @foreach (MessageGroup group in State.UserGroups.Take(5))
