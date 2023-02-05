@@ -43,7 +43,7 @@ namespace HearYe.Server.Tests
                 {
                     PostId = 1,
                     UserId = 2,
-                    CreatedDate = DateTime.UtcNow
+                    CreatedDate = DateTimeOffset.Now
                 };
 
                 // Act
@@ -65,7 +65,7 @@ namespace HearYe.Server.Tests
                 {
                     PostId = 9999,
                     UserId = 2,
-                    CreatedDate = DateTime.UtcNow
+                    CreatedDate = DateTimeOffset.Now
                 };
 
                 // Act
@@ -87,7 +87,7 @@ namespace HearYe.Server.Tests
                 {
                     PostId = 1,
                     UserId = 2,
-                    CreatedDate = DateTime.UtcNow
+                    CreatedDate = DateTimeOffset.Now
                 };
 
                 // Act
@@ -109,7 +109,7 @@ namespace HearYe.Server.Tests
                 {
                     PostId = 3,
                     UserId = 4,
-                    CreatedDate = DateTime.UtcNow
+                    CreatedDate = DateTimeOffset.Now
                 };
 
                 // Act
@@ -135,7 +135,7 @@ namespace HearYe.Server.Tests
                 {
                     PostId = 4,
                     UserId = 4,
-                    CreatedDate = DateTime.UtcNow
+                    CreatedDate = DateTimeOffset.Now
                 };
 
                 // Act

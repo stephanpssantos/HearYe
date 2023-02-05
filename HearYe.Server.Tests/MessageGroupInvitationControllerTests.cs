@@ -226,7 +226,7 @@ namespace HearYe.Server.Tests
                     InvitingUserId = 2,
                     InvitationActive = true,
                     InvitationAccepted = false,
-                    CreatedDate = DateTime.Now
+                    CreatedDate = DateTimeOffset.Now
                 };
 
                 // Act
@@ -251,7 +251,7 @@ namespace HearYe.Server.Tests
                     InvitingUserId = 1,
                     InvitationActive = true,
                     InvitationAccepted = false,
-                    CreatedDate = DateTime.Now
+                    CreatedDate = DateTimeOffset.Now
                 };
 
                 // Act
@@ -278,7 +278,7 @@ namespace HearYe.Server.Tests
                     InvitingUserId = 1,
                     InvitationActive = false,
                     InvitationAccepted = true,
-                    CreatedDate = DateTime.Now
+                    CreatedDate = DateTimeOffset.Now
                 };
 
                 // Act
@@ -303,7 +303,7 @@ namespace HearYe.Server.Tests
                     InvitingUserId = 1,
                     InvitationActive = true,
                     InvitationAccepted = false,
-                    CreatedDate = DateTime.Now
+                    CreatedDate = DateTimeOffset.Now
                 };
 
                 // Act
@@ -330,7 +330,7 @@ namespace HearYe.Server.Tests
                     InvitingUserId = 1,
                     InvitationActive = true,
                     InvitationAccepted = false,
-                    CreatedDate = DateTime.Now
+                    CreatedDate = DateTimeOffset.Now
                 };
 
                 // Act
@@ -357,7 +357,7 @@ namespace HearYe.Server.Tests
                     InvitingUserId = 1,
                     InvitationActive = true,
                     InvitationAccepted = false,
-                    CreatedDate = DateTime.Now
+                    CreatedDate = DateTimeOffset.Now
                 };
 
                 // Act

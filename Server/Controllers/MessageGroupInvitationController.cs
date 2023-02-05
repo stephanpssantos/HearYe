@@ -208,7 +208,7 @@ namespace HearYe.Server.Controllers
             {
                 mgi.InvitationActive = false;
                 mgi.InvitationAccepted = false;
-                mgi.ActionDate = DateTime.Now;
+                mgi.ActionDate = DateTimeOffset.Now;
 
                 this.db.MessageGroupInvitations!.Update(mgi);
                 int completed = await this.db.SaveChangesAsync();
@@ -279,7 +279,7 @@ namespace HearYe.Server.Controllers
             {
                 mgi.InvitationActive = false;
                 mgi.InvitationAccepted = true;
-                mgi.ActionDate = DateTime.Now;
+                mgi.ActionDate = DateTimeOffset.Now;
 
                 this.db.MessageGroupInvitations!.Update(mgi);
 

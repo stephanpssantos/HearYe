@@ -137,7 +137,7 @@ namespace HearYe.Server.Controllers
                 .Include("Acknowledgements")
                 .Where(
                     p => p.MessageGroupId == messageGroupId
-                    && (p.StaleDate == null || p.StaleDate > DateTime.Now)
+                    && (p.StaleDate == null || p.StaleDate > DateTimeOffset.Now)
                     && p.Acknowledgements!.All(a => a.UserId != claimId))
                 .OrderByDescending(p => p.CreatedDate)
                 .Skip(skip)
@@ -191,7 +191,7 @@ namespace HearYe.Server.Controllers
                 .Include("Acknowledgements")
                 .Where(
                     p => p.MessageGroupId == messageGroupId
-                    && (p.StaleDate == null || p.StaleDate > DateTime.Now)
+                    && (p.StaleDate == null || p.StaleDate > DateTimeOffset.Now)
                     && p.Acknowledgements!.Any(a => a.UserId == claimId))
                 .OrderByDescending(p => p.CreatedDate)
                 .Skip(skip)
@@ -243,7 +243,7 @@ namespace HearYe.Server.Controllers
 
             IEnumerable<PostWithUserName?> posts = await this.db.Posts!
                 .Include("Acknowledgements")
-                .Where(p => p.MessageGroupId == messageGroupId && p.StaleDate <= DateTime.Now)
+                .Where(p => p.MessageGroupId == messageGroupId && p.StaleDate <= DateTimeOffset.Now)
                 .OrderByDescending(p => p.CreatedDate)
                 .Skip(skip)
                 .Take(count)

@@ -19,8 +19,8 @@
                 DisplayName = "TestUser",
                 AcceptGroupInvitations = true,
                 IsDeleted = false,
-                CreatedDate = DateTime.Now,
-                LastModifiedDate = DateTime.Now
+                CreatedDate = DateTimeOffset.Now,
+                LastModifiedDate = DateTimeOffset.Now
             };
 
             User demoUser2 = new()
@@ -30,8 +30,8 @@
                 DisplayName = "TestUser2",
                 AcceptGroupInvitations = true,
                 IsDeleted = false,
-                CreatedDate = DateTime.Now,
-                LastModifiedDate = DateTime.Now
+                CreatedDate = DateTimeOffset.Now,
+                LastModifiedDate = DateTimeOffset.Now
             };
 
             User demoUser3 = new()
@@ -41,8 +41,8 @@
                 DisplayName = "TestUser3",
                 AcceptGroupInvitations = false,
                 IsDeleted = false,
-                CreatedDate = DateTime.Now,
-                LastModifiedDate = DateTime.Now
+                CreatedDate = DateTimeOffset.Now,
+                LastModifiedDate = DateTimeOffset.Now
             };
 
             User demoUser4 = new()
@@ -52,8 +52,8 @@
                 DisplayName = "TestUser4",
                 AcceptGroupInvitations = true,
                 IsDeleted = false,
-                CreatedDate = DateTime.Now,
-                LastModifiedDate = DateTime.Now
+                CreatedDate = DateTimeOffset.Now,
+                LastModifiedDate = DateTimeOffset.Now
             };
 
             User demoUser5 = new()
@@ -63,8 +63,8 @@
                 DisplayName = "TestUser5",
                 AcceptGroupInvitations = true,
                 IsDeleted = false,
-                CreatedDate = DateTime.Now,
-                LastModifiedDate = DateTime.Now
+                CreatedDate = DateTimeOffset.Now,
+                LastModifiedDate = DateTimeOffset.Now
             };
 
             User demoUser6 = new()
@@ -74,8 +74,8 @@
                 DisplayName = "TestUser6",
                 AcceptGroupInvitations = true,
                 IsDeleted = false,
-                CreatedDate = DateTime.Now,
-                LastModifiedDate = DateTime.Now
+                CreatedDate = DateTimeOffset.Now,
+                LastModifiedDate = DateTimeOffset.Now
             };
 
             User demoUser7 = new()
@@ -85,8 +85,8 @@
                 DisplayName = "TestUser7",
                 AcceptGroupInvitations = true,
                 IsDeleted = false,
-                CreatedDate = DateTime.Now,
-                LastModifiedDate = DateTime.Now
+                CreatedDate = DateTimeOffset.Now,
+                LastModifiedDate = DateTimeOffset.Now
             };
 
             MessageGroup demoMG1 = new()
@@ -94,7 +94,7 @@
                 //Id = 1,
                 MessageGroupName = "TestMessageGroup1",
                 IsDeleted = false,
-                CreatedDate = DateTime.Now
+                CreatedDate = DateTimeOffset.Now
             };
 
             MessageGroup demoMG2 = new()
@@ -102,7 +102,7 @@
                 //Id = 2,
                 MessageGroupName = "Test Message_Group2",
                 IsDeleted = false,
-                CreatedDate = DateTime.Now
+                CreatedDate = DateTimeOffset.Now
             };
 
             MessageGroup demoMG3 = new()
@@ -110,7 +110,7 @@
                 //Id = 3,
                 MessageGroupName = "Test Message_Group3",
                 IsDeleted = false,
-                CreatedDate = DateTime.Now
+                CreatedDate = DateTimeOffset.Now
             };
 
             MessageGroupRole demoMGR1 = new()
@@ -173,7 +173,7 @@
                 InvitingUserId = 1,
                 InvitationActive = true,
                 InvitationAccepted = false,
-                CreatedDate = DateTime.Now
+                CreatedDate = DateTimeOffset.Now
             };
 
             MessageGroupInvitation demoMGI2 = new()
@@ -184,7 +184,7 @@
                 InvitingUserId = 1,
                 InvitationActive = true,
                 InvitationAccepted = false,
-                CreatedDate = DateTime.Now
+                CreatedDate = DateTimeOffset.Now
             };
 
             MessageGroupInvitation demoMGI3 = new()
@@ -195,8 +195,8 @@
                 InvitingUserId = 1,
                 InvitationActive = false,
                 InvitationAccepted = false,
-                CreatedDate = DateTime.Now.AddDays(-1),
-                ActionDate = DateTime.Now,
+                CreatedDate = DateTimeOffset.Now.AddDays(-1),
+                ActionDate = DateTimeOffset.Now,
             };
 
             MessageGroupInvitation demoMGI4 = new()
@@ -207,7 +207,7 @@
                 InvitingUserId = 1,
                 InvitationActive = true,
                 InvitationAccepted = false,
-                CreatedDate = DateTime.Now
+                CreatedDate = DateTimeOffset.Now
             };
 
             MessageGroupInvitation demoMGI5 = new()
@@ -218,7 +218,7 @@
                 InvitingUserId = 4,
                 InvitationActive = true,
                 InvitationAccepted = false,
-                CreatedDate = DateTime.Now
+                CreatedDate = DateTimeOffset.Now
             };
 
             MessageGroupInvitation demoMGI6 = new()
@@ -229,7 +229,7 @@
                 InvitingUserId = 2,
                 InvitationActive = true,
                 InvitationAccepted = false,
-                CreatedDate = DateTime.Now
+                CreatedDate = DateTimeOffset.Now
             };
 
             Post demoPost1 = new()
@@ -239,7 +239,7 @@
                 MessageGroupId = 1,
                 Message = "This is test message 1. Wow.",
                 IsDeleted = false,
-                CreatedDate = DateTime.Now,
+                CreatedDate = DateTimeOffset.Now,
                 StaleDate = null
             };
 
@@ -250,8 +250,8 @@
                 MessageGroupId = 2,
                 Message = "This is test message 2. Amazing.",
                 IsDeleted = false,
-                CreatedDate = DateTime.Now,
-                StaleDate = DateTime.Now.AddDays(1)
+                CreatedDate = DateTimeOffset.Now,
+                StaleDate = DateTimeOffset.Now.AddDays(1)
             };
 
             Post demoPost3 = new()
@@ -261,7 +261,7 @@
                 MessageGroupId = 1,
                 Message = "This is test message 3. Wow.",
                 IsDeleted = false,
-                CreatedDate = DateTime.Now,
+                CreatedDate = DateTimeOffset.Now,
                 StaleDate = null
             };
 
@@ -272,7 +272,7 @@
                 MessageGroupId = 1,
                 Message = "This is test message 4. Wow.",
                 IsDeleted = false,
-                CreatedDate = DateTime.Now,
+                CreatedDate = DateTimeOffset.Now,
                 StaleDate = null
             };
 
@@ -283,8 +283,8 @@
                 MessageGroupId = 1,
                 Message = "This is test message 5. Stale!",
                 IsDeleted = false,
-                CreatedDate = DateTime.Now,
-                StaleDate = DateTime.Now.AddDays(-1)
+                CreatedDate = DateTimeOffset.Now,
+                StaleDate = DateTimeOffset.Now.AddDays(-1)
             };
 
             Post demoPost6 = new()
@@ -294,8 +294,8 @@
                 MessageGroupId = 2,
                 Message = "This is test message 6. Delete me!",
                 IsDeleted = false,
-                CreatedDate = DateTime.Now,
-                StaleDate = DateTime.Now.AddDays(-1)
+                CreatedDate = DateTimeOffset.Now,
+                StaleDate = DateTimeOffset.Now.AddDays(-1)
             };
 
             Acknowledgement demoAcknowledgement1 = new()
@@ -303,7 +303,7 @@
                 //Id = 1, // Set by DB
                 PostId = 1,
                 UserId = 1,
-                CreatedDate = DateTime.Now
+                CreatedDate = DateTimeOffset.Now
             };
 
             Acknowledgement demoAcknowledgement2 = new()
@@ -311,7 +311,7 @@
                 //Id = 2, // Set by DB
                 PostId = 2,
                 UserId = 1,
-                CreatedDate = DateTime.Now
+                CreatedDate = DateTimeOffset.Now
             };
 
             Acknowledgement demoAcknowledgement3 = new()
@@ -319,7 +319,7 @@
                 //Id = 3, // Set by DB
                 PostId = 4,
                 UserId = 4,
-                CreatedDate = DateTime.Now
+                CreatedDate = DateTimeOffset.Now
             };
 
             Acknowledgement demoAcknowledgement4 = new()
@@ -327,7 +327,7 @@
                 //Id = 4, // Set by DB
                 PostId = 5,
                 UserId = 4,
-                CreatedDate = DateTime.Now
+                CreatedDate = DateTimeOffset.Now
             };
 
             Acknowledgement demoAcknowledgement5 = new()
@@ -335,7 +335,7 @@
                 //Id = 5, // Set by DB
                 PostId = 2,
                 UserId = 2,
-                CreatedDate = DateTime.Now
+                CreatedDate = DateTimeOffset.Now
             };
 
             context.Users!.Add(demoUser1);

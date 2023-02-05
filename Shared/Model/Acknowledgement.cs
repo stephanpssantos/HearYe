@@ -21,7 +21,7 @@ namespace HearYe.Shared
         public int UserId { get; set; }
 
         [Required]
-        public DateTime CreatedDate { get; set; }
+        public DateTimeOffset CreatedDate { get; set; }
 
         public virtual User? User { get; set; }
 

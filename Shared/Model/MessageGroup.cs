@@ -29,9 +29,9 @@ namespace HearYe.Shared
         public bool IsDeleted { get; set; } = false;
 
         [Required]
-        public DateTime CreatedDate { get; set; }
+        public DateTimeOffset CreatedDate { get; set; }
 
-        public DateTime? DeletedDate { get; set; }
+        public DateTimeOffset? DeletedDate { get; set; }
 
         public virtual ICollection<Post>? Posts { get; set; }
 

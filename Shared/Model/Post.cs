@@ -31,11 +31,11 @@ namespace HearYe.Shared
         public bool IsDeleted { get; set; } = false;
 
         [Required]
-        public DateTime CreatedDate { get; set; }
+        public DateTimeOffset CreatedDate { get; set; }
 
-        public DateTime? StaleDate { get; set; }
+        public DateTimeOffset? StaleDate { get; set; }
 
-        public DateTime? DeletedDate { get; set; }
+        public DateTimeOffset? DeletedDate { get; set; }
 
         public virtual User? User { get; set; }
 

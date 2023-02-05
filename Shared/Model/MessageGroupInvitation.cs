@@ -29,9 +29,9 @@ namespace HearYe.Shared
         public bool InvitationAccepted { get; set; } = false;
 
         [Required]
-        public DateTime CreatedDate { get; set; }
+        public DateTimeOffset CreatedDate { get; set; }
 
-        public DateTime? ActionDate { get; set; }
+        public DateTimeOffset? ActionDate { get; set; }
 
         public virtual MessageGroup? MessageGroup { get; set; }
 

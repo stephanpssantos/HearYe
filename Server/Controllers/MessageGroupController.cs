@@ -138,7 +138,7 @@ namespace HearYe.Server.Controllers
                 {
                     MessageGroupName = groupName,
                     IsDeleted = false,
-                    CreatedDate = DateTime.Now,
+                    CreatedDate = DateTimeOffset.Now,
                 };
                 EntityEntry<MessageGroup> newGroupEntry = await this.db.MessageGroups!.AddAsync(newGroup);
 
@@ -277,7 +277,7 @@ namespace HearYe.Server.Controllers
             }
 
             mg.IsDeleted = true;
-            mg.DeletedDate = DateTime.Now;
+            mg.DeletedDate = DateTimeOffset.Now;
             this.db.MessageGroups!.Update(mg);
 
             int completed = await this.db.SaveChangesAsync();

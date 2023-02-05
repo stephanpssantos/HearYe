@@ -407,7 +407,7 @@ namespace HearYe.Server.Tests
                     MessageGroupId = 1,
                     Message = "I'm not in this group!",
                     IsDeleted = false,
-                    CreatedDate = DateTime.Now
+                    CreatedDate = DateTimeOffset.Now
                 };
 
                 // Act
@@ -431,7 +431,7 @@ namespace HearYe.Server.Tests
                     MessageGroupId = 1,
                     Message = "I'm making a valid post. Test test...",
                     IsDeleted = false,
-                    CreatedDate = DateTime.Now
+                    CreatedDate = DateTimeOffset.Now
                 };
 
                 // Act

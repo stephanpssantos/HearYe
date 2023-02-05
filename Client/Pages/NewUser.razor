@@ -53,7 +53,7 @@
                 DisplayName = displayName,
                 AcceptGroupInvitations = true,
                 IsDeleted = false,
-                CreatedDate = DateTime.Now
+                CreatedDate = DateTimeOffset.Now
             };
 
         User? response = await service.NewUserAsync(newUser);

@@ -292,8 +292,8 @@ namespace HearYe.Server.Tests
                     DisplayName = "TestUser_1",
                     AcceptGroupInvitations = true,
                     IsDeleted = false,
-                    CreatedDate = DateTime.Now,
-                    LastModifiedDate = DateTime.Now
+                    CreatedDate = DateTimeOffset.Now,
+                    LastModifiedDate = DateTimeOffset.Now
                 };
 
                 // Act
@@ -317,8 +317,8 @@ namespace HearYe.Server.Tests
                     DisplayName = "TestUser_1",
                     AcceptGroupInvitations = true,
                     IsDeleted = false,
-                    CreatedDate = DateTime.Now,
-                    LastModifiedDate = DateTime.Now
+                    CreatedDate = DateTimeOffset.Now,
+                    LastModifiedDate = DateTimeOffset.Now
                 };
 
                 // Act
@@ -341,8 +341,8 @@ namespace HearYe.Server.Tests
                     DisplayName = "TestUser_fail_1",
                     AcceptGroupInvitations = true,
                     IsDeleted = false,
-                    CreatedDate = DateTime.Now,
-                    LastModifiedDate = DateTime.Now
+                    CreatedDate = DateTimeOffset.Now,
+                    LastModifiedDate = DateTimeOffset.Now
                 };
 
                 var controller = new UserController(context, _graphServiceClient, _logger)
@@ -371,8 +371,8 @@ namespace HearYe.Server.Tests
                     DisplayName = "TestUser_1",
                     AcceptGroupInvitations = true,
                     IsDeleted = false,
-                    CreatedDate = DateTime.Now,
-                    LastModifiedDate = DateTime.Now
+                    CreatedDate = DateTimeOffset.Now,
+                    LastModifiedDate = DateTimeOffset.Now
                 };
 
                 Microsoft.Graph.User newGraphUser = new()
@@ -413,8 +413,8 @@ namespace HearYe.Server.Tests
                     DisplayName = "TestUser_1",
                     AcceptGroupInvitations = true,
                     IsDeleted = false,
-                    CreatedDate = DateTime.Now,
-                    LastModifiedDate = DateTime.Now
+                    CreatedDate = DateTimeOffset.Now,
+                    LastModifiedDate = DateTimeOffset.Now
                 };
 
                 // Act
@@ -441,8 +441,8 @@ namespace HearYe.Server.Tests
                     DisplayName = "TestUser_1",
                     AcceptGroupInvitations = true,
                     IsDeleted = false,
-                    CreatedDate = DateTime.Now,
-                    LastModifiedDate = DateTime.Now
+                    CreatedDate = DateTimeOffset.Now,
+                    LastModifiedDate = DateTimeOffset.Now
                 };
 
                 // Act
@@ -467,8 +467,8 @@ namespace HearYe.Server.Tests
                     DisplayName = "TestUser_1",
                     AcceptGroupInvitations = true,
                     IsDeleted = false,
-                    CreatedDate = DateTime.Now,
-                    LastModifiedDate = DateTime.Now
+                    CreatedDate = DateTimeOffset.Now,
+                    LastModifiedDate = DateTimeOffset.Now
                 };
 
                 // Act
@@ -493,8 +493,8 @@ namespace HearYe.Server.Tests
                     DisplayName = "TestUser_1",
                     AcceptGroupInvitations = true,
                     IsDeleted = false,
-                    CreatedDate = DateTime.Now,
-                    LastModifiedDate = DateTime.Now
+                    CreatedDate = DateTimeOffset.Now,
+                    LastModifiedDate = DateTimeOffset.Now
                 };
 
                 // Act
