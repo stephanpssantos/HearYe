@@ -16,16 +16,25 @@
     <label for="newMessageText" class="visually-hidden">Write a new message.</label>
     <InputTextArea @bind-Value="newPost.Message" id="newMessageText" placeholder="Write a new message" class="form-control" aria-describedby="messageHelpBlock" />
     <div class="row align-top">
-        <div id="messageHelpBlock" class="form-text col-5">
+        <div id="messageHelpBlock" class="form-text col-sm-5">
             Your new message must be under 256 characters.
         </div>
-        <div class="col-2 text-end">
+        <div class="col-2 text-end d-none d-sm-block">
             <label for="newMessageStaleDate" class="form-text">(Optional) Expiry:</label>
         </div>
-        <div class="col-3 mt-2">
+        <div class="col-3 mt-2 d-none d-sm-block">
             <InputDate @bind-Value="newPost.StaleDate" id="newMessageStaleDate" class="form-control" />
         </div>
-        <div class="col-2 mt-2">
+        <div class="col-2 mt-2 d-none d-sm-block">
+            <button type="submit" class="btn btn-primary w-100">Post</button>
+        </div>
+    </div>
+    <div class="row d-sm-none">
+        <div class="col-6">
+            <label for="newMessageStaleDate" class="form-text">(Optional) Expiry:</label>
+            <InputDate @bind-Value="newPost.StaleDate" id="newMessageStaleDate" class="form-control" />
+        </div>
+        <div class="col-6 align-self-end">
             <button type="submit" class="btn btn-primary w-100">Post</button>
         </div>
     </div>
