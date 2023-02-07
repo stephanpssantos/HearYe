@@ -265,7 +265,12 @@ namespace HearYe.Server.Controllers
                 return this.NotFound();
             }
 
-            this.db.Users!.Update(user);
+            // These are the only properties that should be modifiable.
+            existing.DisplayName = user.DisplayName;
+            existing.AcceptGroupInvitations = user.AcceptGroupInvitations;
+            existing.LastModifiedDate = user.LastModifiedDate;
+
+            this.db.Users!.Update(existing);
             int completed = await this.db.SaveChangesAsync();
 
             if (completed == 1)
@@ -275,7 +280,7 @@ namespace HearYe.Server.Controllers
             else
             {
                 this.logger.LogError("Error when updating user.");
-                this.logger.LogError(JsonSerializer.Serialize(user), CustomJsonOptions.IgnoreCycles());
+                this.logger.LogError(JsonSerializer.Serialize(existing), CustomJsonOptions.IgnoreCycles());
                 return this.BadRequest("Failed to update user.");
             }
         }

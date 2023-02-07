@@ -36,7 +36,14 @@ namespace HearYe.Shared
         public virtual MessageGroup? MessageGroup { get; set; }
 
         public virtual User? InvitedUser { get; set; }
-        
+
         public virtual User? InvitingUser { get; set; }
+    }
+
+    public class MessageGroupInvitationWithNames : MessageGroupInvitation
+    {
+        public string? MessageGroupName { get; set; }
+        public string? InvitedUserName { get; set; }
+        public string? InvitingUserName { get; set; }
     }
 }

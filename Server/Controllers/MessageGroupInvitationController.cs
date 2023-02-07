@@ -72,23 +72,40 @@ namespace HearYe.Server.Controllers
         /// GET: api/messagegroupinvitation/user/[id]; <br />
         /// Get all message group invitations that a user has sent or received.
         /// </summary>
-        /// <param name="userId">Id of the specified user.</param>
+        /// <param name="id">Id of the specified user.</param>
         /// <returns>200 (with a list of member group invitations), or 401.</returns>
         [HttpGet("user/{id:int}", Name = nameof(GetMessageGroupInvitations))]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<MessageGroupInvitation>))]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<MessageGroupInvitationWithNames>))]
         [ProducesResponseType(401)]
-        public async Task<IActionResult> GetMessageGroupInvitations(int userId)
+        public async Task<IActionResult> GetMessageGroupInvitations(int id)
         {
             int claimId = AuthCheck.UserClaimCheck(this.HttpContext.User.Claims);
-            if (claimId == 0 || userId != claimId)
+            if (claimId == 0 || id != claimId)
             {
                 return this.Unauthorized();
             }
 
-            IEnumerable<MessageGroupInvitation> messageGroupInvitations = await this.db.MessageGroupInvitations!
+            IEnumerable<MessageGroupInvitationWithNames> messageGroupInvitations = await this.db.MessageGroupInvitations!
+                .Include(mgi => mgi.MessageGroup)
+                .Include(mgi => mgi.InvitedUser)
+                .Include(mgi => mgi.InvitingUser)
                 .Where(mgi => (mgi.InvitationActive == true)
-                    && ((mgi.InvitingUserId == userId)
-                    || (mgi.InvitedUserId == userId)))
+                    && ((mgi.InvitingUserId == id)
+                    || (mgi.InvitedUserId == id)))
+                .Select(i => new MessageGroupInvitationWithNames()
+                {
+                    Id = i.Id,
+                    MessageGroupId = i.MessageGroupId,
+                    InvitedUserId = i.InvitedUserId,
+                    InvitingUserId = i.InvitingUserId,
+                    InvitationActive = i.InvitationActive,
+                    InvitationAccepted = i.InvitationAccepted,
+                    CreatedDate = i.CreatedDate,
+                    ActionDate = i.ActionDate,
+                    MessageGroupName = i.MessageGroup != null ? i.MessageGroup.MessageGroupName : null,
+                    InvitedUserName = i.InvitedUser != null ? i.InvitedUser.DisplayName : null,
+                    InvitingUserName = i.InvitingUser != null ? i.InvitingUser.DisplayName : null,
+                })
                 .ToListAsync();
 
             return this.Ok(messageGroupInvitations);
@@ -324,16 +341,16 @@ namespace HearYe.Server.Controllers
         /// DELETE: api/messagegroupinvitation/delete/[id]; <br />
         /// Delete the specified message group invitation. Must be the requester of the invite.
         /// </summary>
-        /// <param name="inviteId">Id of the specified message group invite.</param>
+        /// <param name="id">Id of the specified message group invite.</param>
         /// <returns>204, 400, 401, or 404.</returns>
         [HttpDelete("delete/{id:int}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
-        public async Task<IActionResult> DeleteMessageGroupInvitation(int inviteId)
+        public async Task<IActionResult> DeleteMessageGroupInvitation(int id)
         {
-            if (inviteId < 1)
+            if (id < 1)
             {
                 return this.BadRequest("Invalid invite id.");
             }
@@ -345,7 +362,7 @@ namespace HearYe.Server.Controllers
             }
 
             MessageGroupInvitation? mgi = await this.db.MessageGroupInvitations!
-                .Where(inv => inv.Id == inviteId)
+                .Where(inv => inv.Id == id)
                 .FirstOrDefaultAsync();
 
             if (mgi == null)

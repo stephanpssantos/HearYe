@@ -17,7 +17,7 @@
                 //Id = 1, // Set by DB
                 AadOid = new Guid("f09cc0b1-f05d-40e0-9684-c4a945d4e7e0"),
                 DisplayName = "TestUser",
-                AcceptGroupInvitations = true,
+                AcceptGroupInvitations = false,
                 IsDeleted = false,
                 CreatedDate = DateTimeOffset.Now,
                 LastModifiedDate = DateTimeOffset.Now

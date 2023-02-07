@@ -142,5 +142,20 @@ namespace HearYe.Client.Data
                 return null;
             }
         }
+
+        public Task<List<MessageGroupInvitationWithNames>?> GetMessageGroupInvitationsAsync(int userId)
+        {
+            return http.GetFromJsonAsync<List<MessageGroupInvitationWithNames>?>($"api/messagegroupinvitation/user/{userId}");
+        }
+
+        public async Task<HttpResponseMessage> DeleteMGInvitationAsync(int inviteId)
+        {
+            return await http.DeleteAsync($"api/messagegroupinvitation/delete/{inviteId}");
+        }
+
+        public async Task<HttpResponseMessage> UpdateUserAsync(int id, User user)
+        {
+            return await http.PutAsJsonAsync($"api/user/{id}", user);
+        }
     }
 }
