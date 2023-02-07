@@ -1,6 +1,4 @@
-﻿@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
-
-<AuthorizeView>
+﻿<AuthorizeView>
     <Authorized>
         <nav class="navbar bg-white p-2 border-bottom border-2">
             <div class="container-lg justify-content-center">
@@ -12,19 +10,8 @@
                         <a href="/" class="fs-3 me-3 text-reset text-decoration-none">
                             <strong>Okay</strong>
                         </a>
-                        <div class="d-none d-xl-block">
-                            <GroupDropDown />
-                        </div>
-                    </div>
-                    
-                    <div class="d-none d-xl-block col-xl-4">
-                        <PostTypeSelector />
                     </div>
                     <AccountDropDown UserName="@context.User.Identity?.Name" />
-                </div>
-                <div class="d-flex d-xl-none flex-column align-items-end w-md-75 gap-2 mt-1">
-                    <GroupDropDown />
-                    <PostTypeSelector />
                 </div>
             </div>
         </nav>
