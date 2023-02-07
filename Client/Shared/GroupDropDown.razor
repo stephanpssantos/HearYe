@@ -21,12 +21,12 @@
             {
                 if (group.Id == State.ActiveGroupId)
                 {
-                    <li><a class="dropdown-item active" aria-current="true" role="button">@group.MessageGroupName</a></li>
+                    <li><a class="dropdown-item active text-truncate" aria-current="true" role="button">@group.MessageGroupName</a></li>
                 }
                 else
                 {
                     <li>
-                        <a class="dropdown-item" role="button" @onclick="(() => SetActiveGroup(group))">
+                        <a class="dropdown-item text-truncate" role="button" @onclick="(() => SetActiveGroup(group))">
                             @group.MessageGroupName
                         </a>
                     </li>

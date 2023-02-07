@@ -114,5 +114,33 @@ namespace HearYe.Client.Data
         {
             return http.GetFromJsonAsync<List<UserPublicInfo>?>($"api/post/acknowledged/{userId}");
         }
+
+        public async Task<MessageGroup?> NewMessageGroupAsync(string newGroupName)
+        {
+            try
+            {
+                HttpResponseMessage response = await http.PostAsJsonAsync("api/messagegroup/new", newGroupName);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadFromJsonAsync<MessageGroup>();
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (AccessTokenNotAvailableException ex)
+            {
+                //Navigation.NavigateToLogin("authentication/login"); in case ex.redirect causes issues
+                ex.Redirect();
+                return null;
+            }
+            catch (Exception ex)
+            {
+                // Do something here
+                return null;
+            }
+        }
     }
 }
