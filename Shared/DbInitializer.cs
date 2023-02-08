@@ -89,6 +89,17 @@
                 LastModifiedDate = DateTimeOffset.Now
             };
 
+            User demoUser8 = new()
+            {
+                //Id = 8, // Set by DB
+                AadOid = new Guid("f09cc0b1-f08d-48e0-9684-c8a945d4efec"),
+                DisplayName = "TestUser8",
+                AcceptGroupInvitations = true,
+                IsDeleted = false,
+                CreatedDate = DateTimeOffset.Now,
+                LastModifiedDate = DateTimeOffset.Now
+            };
+
             MessageGroup demoMG1 = new()
             {
                 //Id = 1,
@@ -179,6 +190,22 @@
                 MessageGroupId = 4,
                 MessageGroupRoleId = 1,
                 UserId = 2
+            };
+
+            MessageGroupMember demoMGM7 = new()
+            {
+                //Id = 7,
+                MessageGroupId = 1,
+                MessageGroupRoleId = 2,
+                UserId = 7
+            };
+
+            MessageGroupMember demoMGM8 = new()
+            {
+                //Id = 8,
+                MessageGroupId = 1,
+                MessageGroupRoleId = 1,
+                UserId = 8
             };
 
             MessageGroupInvitation demoMGI1 = new()
@@ -372,6 +399,7 @@
             context.Users!.Add(demoUser5);
             context.Users!.Add(demoUser6);
             context.Users!.Add(demoUser7);
+            context.Users!.Add(demoUser8);
             context.MessageGroups!.Add(demoMG1);
             context.MessageGroups!.Add(demoMG2);
             context.MessageGroups!.Add(demoMG3);
@@ -385,6 +413,8 @@
             context.MessageGroupMembers!.Add(demoMGM4);
             context.MessageGroupMembers!.Add(demoMGM5);
             context.MessageGroupMembers!.Add(demoMGM6);
+            context.MessageGroupMembers!.Add(demoMGM7);
+            context.MessageGroupMembers!.Add(demoMGM8);
             context.Posts!.Add(demoPost1);
             context.Posts!.Add(demoPost2);
             context.Posts!.Add(demoPost3);
