@@ -17,7 +17,9 @@ namespace HearYe.Client.Data
         Task<List<UserPublicInfo>?> GetPostAcknowledgedUsersAsync(int userId);
         Task<MessageGroup?> NewMessageGroupAsync(string newGroupName);
         Task<List<MessageGroupInvitationWithNames>?> GetMessageGroupInvitationsAsync(int userId);
-        Task<HttpResponseMessage> DeleteMGInvitationAsync(int inviteId);
+        Task<HttpResponseMessage> DeleteMessageGroupInvitationAsync(int inviteId);
         Task<HttpResponseMessage> UpdateUserAsync(int id, User user);
+        Task<HttpResponseMessage> AcceptMessageGroupInvitationAsync(int id);
+        Task<HttpResponseMessage> DeclineMessageGroupInvitationAsync(int id);
     }
 }

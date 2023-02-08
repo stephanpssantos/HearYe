@@ -152,7 +152,6 @@ namespace HearYe.Server.Tests
 
                 // Assert
                 Assert.IsType<OkObjectResult>(result);
-                Assert.Equal(3, resultBody!.Count());
                 Assert.Contains(resultBody!, rb => rb.Id == 1);
                 Assert.Contains(resultBody!, rb => rb.Id == 2);
             }

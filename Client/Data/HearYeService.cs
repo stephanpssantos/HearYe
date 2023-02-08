@@ -148,7 +148,7 @@ namespace HearYe.Client.Data
             return http.GetFromJsonAsync<List<MessageGroupInvitationWithNames>?>($"api/messagegroupinvitation/user/{userId}");
         }
 
-        public async Task<HttpResponseMessage> DeleteMGInvitationAsync(int inviteId)
+        public async Task<HttpResponseMessage> DeleteMessageGroupInvitationAsync(int inviteId)
         {
             return await http.DeleteAsync($"api/messagegroupinvitation/delete/{inviteId}");
         }
@@ -156,6 +156,16 @@ namespace HearYe.Client.Data
         public async Task<HttpResponseMessage> UpdateUserAsync(int id, User user)
         {
             return await http.PutAsJsonAsync($"api/user/{id}", user);
+        }
+
+        public async Task<HttpResponseMessage> AcceptMessageGroupInvitationAsync(int id)
+        {
+            return await http.PatchAsync($"api/messagegroupinvitation/accept/{id}", null);
+        }
+
+        public async Task<HttpResponseMessage> DeclineMessageGroupInvitationAsync(int id)
+        {
+            return await http.PatchAsync($"api/messagegroupinvitation/decline/{id}", null);
         }
     }
 }

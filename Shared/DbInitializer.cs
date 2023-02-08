@@ -113,6 +113,14 @@
                 CreatedDate = DateTimeOffset.Now
             };
 
+            MessageGroup demoMG4 = new()
+            {
+                //Id = 4,
+                MessageGroupName = "Test Message_Group4",
+                IsDeleted = false,
+                CreatedDate = DateTimeOffset.Now
+            };
+
             MessageGroupRole demoMGR1 = new()
             {
                 //Id = 1,
@@ -163,6 +171,14 @@
                 MessageGroupId = 3,
                 MessageGroupRoleId = 1,
                 UserId = 1
+            };
+
+            MessageGroupMember demoMGM6 = new()
+            {
+                //Id = 6,
+                MessageGroupId = 4,
+                MessageGroupRoleId = 1,
+                UserId = 2
             };
 
             MessageGroupInvitation demoMGI1 = new()
@@ -226,6 +242,17 @@
                 //Id = 6,
                 MessageGroupId = 2,
                 InvitedUserId = 6,
+                InvitingUserId = 2,
+                InvitationActive = true,
+                InvitationAccepted = false,
+                CreatedDate = DateTimeOffset.Now
+            };
+
+            MessageGroupInvitation demoMGI7 = new()
+            {
+                //Id = 7,
+                MessageGroupId = 4,
+                InvitedUserId = 1,
                 InvitingUserId = 2,
                 InvitationActive = true,
                 InvitationAccepted = false,
@@ -348,6 +375,7 @@
             context.MessageGroups!.Add(demoMG1);
             context.MessageGroups!.Add(demoMG2);
             context.MessageGroups!.Add(demoMG3);
+            context.MessageGroups!.Add(demoMG4);
             context.MessageGroupRoles!.Add(demoMGR1);
             context.MessageGroupRoles!.Add(demoMGR2);
             context.SaveChanges();
@@ -356,6 +384,7 @@
             context.MessageGroupMembers!.Add(demoMGM3);
             context.MessageGroupMembers!.Add(demoMGM4);
             context.MessageGroupMembers!.Add(demoMGM5);
+            context.MessageGroupMembers!.Add(demoMGM6);
             context.Posts!.Add(demoPost1);
             context.Posts!.Add(demoPost2);
             context.Posts!.Add(demoPost3);
@@ -369,6 +398,7 @@
             context.MessageGroupInvitations!.Add(demoMGI4);
             context.MessageGroupInvitations!.Add(demoMGI5);
             context.MessageGroupInvitations!.Add(demoMGI6);
+            context.MessageGroupInvitations!.Add(demoMGI7);
             context.Acknowledgements!.Add(demoAcknowledgement1);
             context.Acknowledgements!.Add(demoAcknowledgement2);
             context.Acknowledgements!.Add(demoAcknowledgement3);

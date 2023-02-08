@@ -184,16 +184,16 @@ namespace HearYe.Server.Controllers
         /// PATCH: api/messagegroupinvitation/decline/[id]; <br />
         /// Decline specified message group invitation. Must be the invitee.
         /// </summary>
-        /// <param name="inviteId">Id of the specified message group invitation.</param>
+        /// <param name="id">Id of the specified message group invitation.</param>
         /// <returns>204, 400, 401, or 404.</returns>
         [HttpPatch("decline/{id:int}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
-        public async Task<IActionResult> DeclineMessageGroupInvitation(int inviteId)
+        public async Task<IActionResult> DeclineMessageGroupInvitation(int id)
         {
-            if (inviteId < 1)
+            if (id < 1)
             {
                 return this.BadRequest("Invalid invite id.");
             }
@@ -205,7 +205,7 @@ namespace HearYe.Server.Controllers
             }
 
             MessageGroupInvitation? mgi = await this.db.MessageGroupInvitations!
-                .Where(inv => inv.Id == inviteId)
+                .Where(inv => inv.Id == id)
                 .FirstOrDefaultAsync();
 
             if (mgi == null)
@@ -254,16 +254,16 @@ namespace HearYe.Server.Controllers
         /// PATCH: api/messagegroupinvitation/accept/[id]; <br />
         /// Accept specified message group invitation. Must be the invitee.
         /// </summary>
-        /// <param name="inviteId">Id of the specified message group invitation.</param>
+        /// <param name="id">Id of the specified message group invitation.</param>
         /// <returns>204, 400, 401, or 404.</returns>
         [HttpPatch("accept/{id:int}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
-        public async Task<IActionResult> AcceptMessageGroupInvitation(int inviteId)
+        public async Task<IActionResult> AcceptMessageGroupInvitation(int id)
         {
-            if (inviteId < 1)
+            if (id < 1)
             {
                 return this.BadRequest("Invalid invite id.");
             }
@@ -275,7 +275,7 @@ namespace HearYe.Server.Controllers
             }
 
             MessageGroupInvitation? mgi = await this.db.MessageGroupInvitations!
-                .Where(inv => inv.Id == inviteId)
+                .Where(inv => inv.Id == id)
                 .FirstOrDefaultAsync();
 
             if (mgi == null)
