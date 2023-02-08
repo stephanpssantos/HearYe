@@ -301,5 +301,49 @@ namespace HearYe.Server.Controllers
                 return this.BadRequest("Message group found but failed to delete.");
             }
         }
+
+        /// <summary>
+        /// DELETE: api/messagegroup/member/[id]; <br />
+        /// Delete specified message group member. Requester must be a group admin.
+        /// </summary>
+        /// <param name="id">Id of the message group member to delete.</param>
+        /// <returns>204, 400, 401, 404.</returns>
+        [HttpDelete("member/{id:int}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> DeleteMessageGroupMember(int id)
+        {
+            MessageGroupMember? mgm = await this.db.MessageGroupMembers!.Where(mgm => mgm.Id == id).FirstOrDefaultAsync();
+
+            if (mgm == null || id == 0)
+            {
+                return this.NotFound();
+            }
+
+            int claimId = AuthCheck.UserClaimCheck(this.HttpContext.User.Claims);
+            int roleId = await AuthCheck.UserGroupAuthCheck(this.db, claimId, mgm.MessageGroupId);
+
+            if (roleId != 1)
+            {
+                return this.Unauthorized();
+            }
+
+            this.db.MessageGroupMembers!.Remove(mgm);
+
+            int completed = await this.db.SaveChangesAsync();
+
+            if (completed == 1)
+            {
+                return this.NoContent();
+            }
+            else
+            {
+                this.logger.LogError("Error when deleting message group member.");
+                this.logger.LogError(JsonSerializer.Serialize(mgm), CustomJsonOptions.IgnoreCycles());
+                return this.BadRequest("Message group member found but failed to delete.");
+            }
+        }
     }
 }

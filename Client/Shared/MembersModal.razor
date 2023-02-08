@@ -9,9 +9,25 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="CloseModal"></button>
     </div>
     <div class="modal-body">
+        @if (bannerMessage is not null && bannerType is not null)
+        {
+            <div class="alert @bannerType" role="alert">
+                @bannerMessage
+            </div>
+        }
         @if (displayError)
         {
             <p>Error loading user list. Please try again later.</p>
+        }
+        else if (displayConfirmation)
+        {
+            <div class="mt-3 mb-3">
+                <p>Are you sure you want to remove @confirmationUserName (ID: @confirmationUserId) from the group?</p>
+                <div class="d-flex gap-2 justify-content-center">
+                    <button class="btn btn-danger" @onclick="ConfirmRemoval">Remove</button>
+                    <button class="btn btn-secondary" @onclick="CloseConfirmation">Cancel</button>
+                </div>
+            </div>
         }
         else if (userList is not null && userList.Any())
         {
@@ -33,11 +49,11 @@
                                             <button class="dropdown-item active" type="button" aria-current="true">Admin</button>
                                         </li>
                                         <li>
-                                            <button class="dropdown-item" type="button">Member</button>
+                                            <button class="dropdown-item" type="button" @onclick="(() => MakeUserMember(user))">Member</button>
                                         </li>
                                     </ul>
                                 </div>
-                                <button class="btn btn-danger btn-sm">Remove user</button>
+                                <button class="btn btn-danger btn-sm" @onclick="(() => DisplayConfirmation(user))">Remove user</button>
                             }
                         </div>
                     </li>
@@ -59,14 +75,14 @@
                                     <button class="btn btn-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Member</button>
                                     <ul class="dropdown-menu">
                                         <li>
-                                            <button class="dropdown-item" type="button">Admin</button>
+                                            <button class="dropdown-item" type="button" @onclick="(() => MakeUserAdmin(user))">Admin</button>
                                         </li>
                                         <li>
                                             <button class="dropdown-item active" type="button" aria-current="true">Member</button>
                                         </li>
                                     </ul>
                                 </div>
-                                <button class="btn btn-danger btn-sm">Remove user</button>
+                                <button class="btn btn-danger btn-sm" @onclick="(() => DisplayConfirmation(user))">Remove user</button>
                             }
                         </div>
                     </li>
@@ -89,11 +105,17 @@
 </div>
 
 @code {
-    private string modalTitle = "Loading...";
     private bool displayError = false;
-    private IEnumerable<MessageGroupMemberWithName>? userList;
+    private bool displayConfirmation = false;
     private int userRole;
     private int userId;
+    private int confirmationUserId;
+    private string modalTitle = "Loading...";
+    private string? confirmationUserName;
+    private string? bannerMessage;
+    private string? bannerType;
+    private MessageGroupMemberWithName? confirmationUser;
+    private IEnumerable<MessageGroupMemberWithName>? userList;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -143,6 +165,95 @@
     public void Dispose()
     {
         State.OnChange -= StateHasChanged;
+    }
+
+    private async void MakeUserMember(MessageGroupMemberWithName mgmn)
+    {
+        MessageGroupMember mgm = new ()
+            {
+                Id = mgmn.Id,
+                MessageGroupId = mgmn.MessageGroupId,
+                UserId = mgmn.UserId,
+                MessageGroupRoleId = 2,
+            };
+
+        var response = await Service.SetMessageGroupRoleAsync(mgm);
+        if (response.IsSuccessStatusCode)
+        {
+            var userToUpdate = userList!.FirstOrDefault(u => u.Id == mgmn.Id);
+            if (userToUpdate is not null)
+            {
+                userToUpdate.MessageGroupRoleId = 2;
+            }
+        }
+        else
+        {
+            bannerType = "alert-warning";
+            bannerMessage = "⚠ User role assignment failed. Please try again later.";
+        }
+
+        StateHasChanged();
+    }
+
+    private async void MakeUserAdmin(MessageGroupMemberWithName mgmn)
+    {
+        MessageGroupMember mgm = new()
+            {
+                Id = mgmn.Id,
+                MessageGroupId = mgmn.MessageGroupId,
+                UserId = mgmn.UserId,
+                MessageGroupRoleId = 1,
+            };
+
+        var response = await Service.SetMessageGroupRoleAsync(mgm);
+        if (response.IsSuccessStatusCode)
+        {
+            var userToUpdate = userList!.FirstOrDefault(u => u.Id == mgmn.Id);
+            if (userToUpdate is not null)
+            {
+                userToUpdate.MessageGroupRoleId = 1;
+            }
+        }
+        else
+        {
+            bannerType = "alert-warning";
+            bannerMessage = "⚠ User role assignment failed. Please try again later.";
+        }
+
+        StateHasChanged();
+    }
+
+    private void DisplayConfirmation(MessageGroupMemberWithName user)
+    {
+        displayConfirmation = true;
+        confirmationUser = user;
+        confirmationUserId = user.UserId;
+        confirmationUserName = user.UserName;
+    }
+
+    private void CloseConfirmation()
+    {
+        displayConfirmation = false;
+        confirmationUser = null;
+        confirmationUserId = 0;
+        confirmationUserName = String.Empty;
+        StateHasChanged();
+    }
+
+    private async void ConfirmRemoval()
+    {
+        var response = await Service.DeleteMessageGroupMemberAsync(confirmationUser!.Id);
+        if (response.IsSuccessStatusCode)
+        {
+            userList = userList!.Where(u => u.UserId != confirmationUserId).ToList();
+        }
+        else
+        {
+            bannerType = "alert-warning";
+            bannerMessage = "⚠ User removal failed. Please try again later.";
+        }
+
+        CloseConfirmation();
     }
 
     private void CloseModal()
