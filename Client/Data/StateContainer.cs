@@ -12,6 +12,9 @@ namespace HearYe.Client.Data
         private PostTypes activePostType = PostTypes.New;
         private bool modalIsOpen = false;
         private int acknowledgedModalId;
+        private int membersModalId;
+        private int inviteModalId;
+        private int leaveModalId;
 
         public string? UserDbId { 
             get => userDbId; 
@@ -88,6 +91,36 @@ namespace HearYe.Client.Data
             set
             {
                 acknowledgedModalId = value;
+                NotifyStateChanged();
+            }
+        }
+
+        public int MembersModalId
+        {
+            get => membersModalId;
+            set
+            {
+                membersModalId = value;
+                NotifyStateChanged();
+            }
+        }
+
+        public int InviteModalId
+        {
+            get => inviteModalId;
+            set
+            {
+                inviteModalId = value;
+                NotifyStateChanged();
+            }
+        }
+
+        public int LeaveModalId
+        {
+            get => leaveModalId;
+            set
+            {
+                leaveModalId = value;
                 NotifyStateChanged();
             }
         }

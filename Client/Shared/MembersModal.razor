@@ -16,17 +16,13 @@
         else if (userList is not null && userList.Any())
         {
             <ul class="list-group">
-                @foreach (UserPublicInfo user in userList)
+                @foreach (var user in userList)
                 {
                     <li class="list-group-item">
-                        <strong>@user.DisplayName</strong> <span class="text-muted">(ID: @user.Id)</span>
+                        <strong>@user.UserName</strong> <span class="text-muted">(ID: @user.UserId)</span>
                     </li>
                 }
             </ul>
-        }
-        else if (userList is not null && !userList.Any())
-        {
-            <p>Nobody has acknowledged this post so far.</p>
         }
         else
         {
@@ -46,22 +42,31 @@
 @code {
     private string modalTitle = "Loading...";
     private bool displayError = false;
-    private IEnumerable<UserPublicInfo>? userList;
+    private IEnumerable<MessageGroupMemberWithName>? userList;
 
     protected override async Task OnParametersSetAsync()
     {
-        if (State.ModalIsOpen && State.AcknowledgedModalId > 0)
+        if (State.ModalIsOpen && State.MembersModalId > 0)
         {
-            userList = await Service.GetPostAcknowledgedUsersAsync(State.AcknowledgedModalId);
+            userList = await Service.GetMessageGroupMembersAsync(State.MembersModalId);
 
             if (userList is null)
             {
                 displayError = true;
             }
 
-            modalTitle = userList?.Count() == 1 ?
-                "1 person has acknowledged this message" :
-                $"{userList?.Count()} people have acknowledged this message.";
+            if (State.UserGroups is not null)
+            {
+                MessageGroup? group = State.UserGroups.Where(g => g.Id == State.MembersModalId).FirstOrDefault();
+                if (group is not null)
+                {
+                    modalTitle = group.MessageGroupName + " members";
+                }
+                else
+                {
+                    modalTitle = "Group members";
+                }
+            }
 
             StateHasChanged();
         }
@@ -79,7 +84,7 @@
 
     private void CloseModal()
     {
-        State.AcknowledgedModalId = 0;
+        State.MembersModalId = 0;
         State.ModalIsOpen = false;
     }
 }

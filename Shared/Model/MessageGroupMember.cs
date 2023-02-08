@@ -27,4 +27,9 @@ namespace HearYe.Shared
 
         public virtual User? User { get; set; }
     }
+
+    public class MessageGroupMemberWithName : MessageGroupMember
+    {
+        public string? UserName { get; set; }
+    }
 }

@@ -1,0 +1,120 @@
+﻿@page "/allgroups"
+@layout AltLayout
+@using HearYe.Client.Data
+@using HearYe.Shared;
+@using Microsoft.AspNetCore.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager Navigation
+@inject StateContainer State
+@inject IHearYeService Service
+@attribute [Authorize]
+
+<PageTitle>All Groups</PageTitle>
+
+<div class="container-lg">
+    <div class="modal fade" id="allGroupsModal">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            @if (State.ModalIsOpen)
+            {
+                @if (State.MembersModalId > 0)
+                {
+                    <MembersModal />
+                }
+            }
+        </div>
+    </div>
+    <div class="d-flex flex-column align-items-center">
+        <div class="w-md-75">
+            <h1 class="mt-3 mb-3">All groups</h1>
+            <hr />
+            @if (bannerMessage is not null && bannerType is not null)
+            {
+                <div class="alert @bannerType" role="alert">
+                    @bannerMessage
+                </div>
+            }
+            @if (State.UserGroups is not null && State.UserGroups.Any())
+            {
+                @foreach (var group in State.UserGroups)
+                {
+                    <div class="card mb-3">
+                        <div class="card-body card-text d-flex flex-column flex-lg-row justify-content-between align-items-center">
+                            <span class="p-1">@group.MessageGroupName</span>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-secondary" @onclick="(() => OpenMembersList(group.Id))" data-bs-toggle="modal" data-bs-target="#allGroupsModal">View members</button>
+                                <button type="button" class="btn btn-secondary">Invite new member</button>
+                                <button type="button" class="btn btn-secondary">Leave group</button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else if (State.UserGroups is not null)
+            {
+                <div class="text-muted">Not in any groups.</div>
+            }
+            else
+            {
+                <div class="card">
+                    <div class="card-body card-text">
+                        <div class="card mb-3">
+                            <div class="card-body card-text d-flex flex-column flex-lg-row justify-content-between align-items-center placeholder-glow">
+                                <span class="p-1 placeholder col-2"></span>
+                                <div class="d-flex gap-2 col-6">
+                                    <span class="placeholder col-4"></span>
+                                    <span class="placeholder col-4"></span>
+                                    <span class="placeholder col-3"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private string? bannerMessage;
+    private string? bannerType;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        // In case user arrives here first
+        if (State.UserDbId is null)
+        {
+            var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authenticationState.User;
+            if (user.Identity is null || !user.Identity.IsAuthenticated)
+            {
+                Navigation.NavigateTo("/");
+            }
+
+            string? userDbId = user.Claims.FirstOrDefault(x => x.Type.Equals("extension_DatabaseId"))?.Value;
+            if (userDbId is null)
+            {
+                Navigation.NavigateTo("/newuser");
+            }
+
+            State.UserDbId = userDbId;
+            var userGroups = await Service.GetUserMessageGroupsAsync(userDbId!);
+            State.UserGroups = userGroups;
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        State.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        State.OnChange -= StateHasChanged;
+    }
+
+    private void OpenMembersList(int id)
+    {
+        State.MembersModalId = id;
+        State.ModalIsOpen = true;
+    }
+}

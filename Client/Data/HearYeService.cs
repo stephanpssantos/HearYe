@@ -167,5 +167,15 @@ namespace HearYe.Client.Data
         {
             return await http.PatchAsync($"api/messagegroupinvitation/decline/{id}", null);
         }
+
+        public async Task<List<MessageGroupMemberWithName>?> GetMessageGroupMembersAsync(int id)
+        {
+            return await http.GetFromJsonAsync<List<MessageGroupMemberWithName>?>($"api/messagegroup/members/{id}");
+        }
+
+        public async Task<MessageGroup?> GetMessageGroupAsync(int id)
+        {
+            return await http.GetFromJsonAsync<MessageGroup?>($"api/messagegroup/{id}");
+        }
     }
 }

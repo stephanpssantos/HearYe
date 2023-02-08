@@ -73,7 +73,7 @@ namespace HearYe.Server.Controllers
         /// <param name="id">Id of the specified message group.</param>
         /// <returns>200 (with a list of member group member objects), 400, 401, or 404.</returns>
         [HttpGet("members/{id:int}", Name = nameof(GetMessageGroupMembers))]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<MessageGroupMember>))]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<MessageGroupMemberWithName>))]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
@@ -92,9 +92,17 @@ namespace HearYe.Server.Controllers
                 return this.Unauthorized();
             }
 
-            IEnumerable<MessageGroupMember?> mg = await this.db.MessageGroupMembers!
+            IEnumerable<MessageGroupMemberWithName?> mg = await this.db.MessageGroupMembers!
                 .Where(mgm => mgm.MessageGroupId == id)
                 .Include(mgm => mgm.User)
+                .Select(mgm => new MessageGroupMemberWithName()
+                {
+                    Id = mgm.Id,
+                    MessageGroupId = mgm.MessageGroupId,
+                    MessageGroupRoleId = mgm.MessageGroupRoleId,
+                    UserId = mgm.UserId,
+                    UserName = mgm.User != null ? mgm.User.DisplayName : "Unknown",
+                })
                 .ToListAsync();
 
             return this.Ok(mg);
