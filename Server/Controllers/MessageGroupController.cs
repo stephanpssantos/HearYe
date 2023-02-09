@@ -315,7 +315,7 @@ namespace HearYe.Server.Controllers
         [ProducesResponseType(404)]
         public async Task<IActionResult> DeleteMessageGroupMember(int id)
         {
-            MessageGroupMember? mgm = await this.db.MessageGroupMembers!.Where(mgm => mgm.Id == id).FirstOrDefaultAsync();
+            MessageGroupMember? mgm = await this.db.MessageGroupMembers!.Where(mgm => mgm.MessageGroupId == id).FirstOrDefaultAsync();
 
             if (mgm == null || id == 0)
             {

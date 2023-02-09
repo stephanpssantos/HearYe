@@ -159,6 +159,10 @@
                     State.ActiveGroupId = userShortcutGroups.First().Id;
                     State.ActiveGroupName = userShortcutGroups.First().MessageGroupName;
                 }
+                else
+                {
+                    State.PostCollection = new List<PostWithUserName>();
+                }
                 // If no default group chosen and no groups favorited, load nothing.
             }
             else
