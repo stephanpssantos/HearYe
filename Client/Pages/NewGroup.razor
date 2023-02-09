@@ -64,12 +64,49 @@
         if (editContext != null && editContext.Validate())
         {
             MessageGroup? newGroup = await Service.NewMessageGroupAsync(newMessageGroup!.MessageGroupName);
+
             if (newGroup is null)
             {
                 bannerType = "alert-warning";
                 bannerMessage = "⚠ Group creation failed. Please try again later.";
                 StateHasChanged();
                 return;
+            }
+            else if (State.UserShortcutGroups is not null && State.UserShortcutGroups.Count() < 5)
+            {
+                // Add new group to user's shortcut group list if that list has fewer than 5 entries.
+                MessageGroupShortcut newShortcut = new()
+                    {
+                        MessageGroupId = newGroup.Id,
+                        UserId = userDbId
+                    };
+
+                var addToShortcuts = await Service.NewMessageGroupShortcutAsync(newShortcut);
+
+                if (addToShortcuts.IsSuccessStatusCode)
+                {
+                    // Add group to State.UserShortcutGroups.
+                    var newShortcutGroupList = State.UserShortcutGroups.Append(newGroup);
+                    State.UserShortcutGroups = newShortcutGroupList;
+
+                    // If user has not selected a default group, set this group as default.
+                    if (State.DefaultGroupId == 0)
+                    {
+                        var userInfo = await Service.GetUserAsync(State.UserDbId!);
+
+                        if (userInfo is not null)
+                        {
+                            userInfo.DefaultGroupId = newGroup.Id;
+                            var updateUserDefaultGroup = await Service.UpdateUserAsync(userInfo.Id, userInfo);
+
+                            if (updateUserDefaultGroup.IsSuccessStatusCode)
+                            {
+                                State.DefaultGroupId = newGroup.Id;
+                            } 
+                        }
+                        
+                    }
+                }
             }
 
             Navigation.NavigateTo("/allgroups");
