@@ -5,7 +5,7 @@
 
 <div class="dropdown w-100">
     <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-        @if (State is not null && State.UserGroups is not null)
+        @if (State is not null && State.UserShortcutGroups is not null)
         {
             @(State.ActiveGroupName ?? "No groups")
         }
@@ -15,9 +15,9 @@
         }
     </button>
     <ul class="dropdown-menu w-100">
-        @if (State is not null && State.UserGroups is not null)
+        @if (State is not null && State.UserShortcutGroups is not null)
         {
-            @foreach (MessageGroup group in State.UserGroups.Take(5))
+            @foreach (MessageGroup group in State.UserShortcutGroups)
             {
                 if (group.Id == State.ActiveGroupId)
                 {
@@ -34,8 +34,8 @@
             }
         }
         <li><hr class="dropdown-divider"></li>
-        <li><a href="/allgroups" class="dropdown-item" role="button">See all groups</a></li>
-        <li><a href="/managegroupinvitations" class="dropdown-item" role="button">Manage invitations</a></li>
+        <li><a href="/allgroups" class="dropdown-item" role="button">All groups</a></li>
+        <li><a href="/managegroupinvitations" class="dropdown-item" role="button">Group invitations</a></li>
         <li><a href="/newgroup" class="dropdown-item" role="button">Create new group</a></li>
     </ul>
 </div>

@@ -32,6 +32,8 @@ namespace HearYe.Shared
         [Required]
         public bool AcceptGroupInvitations { get; set; } = true;
 
+        public int? DefaultGroupId { get; set; }
+
         [Required]
         public bool IsDeleted { get; set; } = false;
 
@@ -41,6 +43,8 @@ namespace HearYe.Shared
         public DateTimeOffset? LastModifiedDate { get; set; }
 
         public DateTimeOffset? DeletedDate { get; set; }
+
+        public virtual MessageGroup? DefaultGroup { get; set; }
 
         public virtual ICollection<Post>? Posts { get; set;}
 

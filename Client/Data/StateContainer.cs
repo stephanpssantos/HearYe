@@ -6,6 +6,8 @@ namespace HearYe.Client.Data
     {
         private string? userDbId;
         private IEnumerable<MessageGroup>? userGroups;
+        private IEnumerable<MessageGroup>? userShortcutGroups;
+        private int defaultGroupId;
         private int activeGroupId;
         private string? activeGroupName;
         private IEnumerable<PostWithUserName>? postCollection;
@@ -33,6 +35,26 @@ namespace HearYe.Client.Data
                 userGroups = value;
                 NotifyStateChanged();
             } 
+        }
+
+        public IEnumerable<MessageGroup>? UserShortcutGroups
+        {
+            get => userShortcutGroups;
+            set
+            {
+                userShortcutGroups = value;
+                NotifyStateChanged();
+            }
+        }
+
+        public int DefaultGroupId
+        {
+            get => defaultGroupId;
+            set
+            {
+                defaultGroupId = value;
+                NotifyStateChanged();
+            }
         }
 
         public int ActiveGroupId

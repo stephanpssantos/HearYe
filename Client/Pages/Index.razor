@@ -122,17 +122,51 @@
 
             State.UserDbId = userDbId;
 
-            var userGroups = await Service.GetUserMessageGroupsAsync(userDbId);
-            State.UserGroups = userGroups;
+            User? userDbInfo = await Service.GetUserAsync(userDbId);
 
-            var firstGroup = userGroups?.FirstOrDefault();
-            if (firstGroup is not null)
+            if (userDbInfo is null)
             {
-                State.ActiveGroupId = firstGroup.Id;
-                State.ActiveGroupName = firstGroup.MessageGroupName;
+                Navigation.NavigateTo("/newuser");
+                return;
+            }
 
-                var activeGroupPosts = await Service.GetNewPostsAsync(firstGroup.Id.ToString());
+            var userShortcutGroups = await Service.GetMessageGroupShortcutsAsync(userDbInfo.Id);
+
+            State.DefaultGroupId = userDbInfo.DefaultGroupId is null ? 0 : (int)userDbInfo.DefaultGroupId;
+            State.UserShortcutGroups = userShortcutGroups ?? new ();
+
+            MessageGroup? defaultGroup = null;
+            MessageGroup? defaultGroupInShortcutGroups = State.UserShortcutGroups.FirstOrDefault(g => g.Id == State.DefaultGroupId);
+            IEnumerable<PostWithUserName>? activeGroupPosts;
+
+            if (State.DefaultGroupId != 0 && defaultGroupInShortcutGroups is not null)
+            {
+                defaultGroup = defaultGroupInShortcutGroups;
+            } 
+            else if (State.DefaultGroupId != 0)
+            {
+                defaultGroup = await Service.GetMessageGroupAsync(State.DefaultGroupId);
+            }
+
+            // If no authorization to access group or group no longer exists or default not chosen.
+            if (defaultGroup is null || State.DefaultGroupId == 0)
+            {
+                if (userShortcutGroups is not null && userShortcutGroups.Any())
+                {
+                    var groupId = userShortcutGroups.First().Id.ToString();
+                    activeGroupPosts = await Service.GetNewPostsAsync(groupId);
+                    State.PostCollection = activeGroupPosts;
+                    State.ActiveGroupId = userShortcutGroups.First().Id;
+                    State.ActiveGroupName = userShortcutGroups.First().MessageGroupName;
+                }
+                // If no default group chosen and no groups favorited, load nothing.
+            }
+            else
+            {
+                activeGroupPosts = await Service.GetNewPostsAsync(State.DefaultGroupId.ToString());
                 State.PostCollection = activeGroupPosts;
+                State.ActiveGroupId = defaultGroup.Id;
+                State.ActiveGroupName = defaultGroup.MessageGroupName;
             }
         }
     }

@@ -27,5 +27,8 @@ namespace HearYe.Client.Data
         Task<HttpResponseMessage> SetMessageGroupRoleAsync(MessageGroupMember mgm);
         Task<UserPublicInfo?> GetUserPublicInfoAsync(int userId);
         Task<HttpResponseMessage> NewMessageGroupInvitationAsync(MessageGroupInvitation inv);
+        Task<List<MessageGroup>?> GetMessageGroupShortcutsAsync(int id);
+        Task<HttpResponseMessage> NewMessageGroupShortcutAsync(MessageGroupShortcut shortcut);
+        Task<HttpResponseMessage> DeleteMessageGroupShortcutAsync(int userId, int groupId);
     }
 }

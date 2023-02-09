@@ -203,9 +203,24 @@ namespace HearYe.Client.Data
 
         public async Task<HttpResponseMessage> NewMessageGroupInvitationAsync(MessageGroupInvitation inv)
         {
-            // This could immediately be transformed to a MessageGroupInvitation, but
-            // the error response messages are used to determine response status.
+            // This could immediately be transformed to a MessageGroupInvitation but
+            // the HttpResponseMessage is used to determine response status.
             return await http.PostAsJsonAsync("api/messagegroupinvitation/new", inv);
+        }
+
+        public async Task<List<MessageGroup>?> GetMessageGroupShortcutsAsync(int id)
+        {
+            return await http.GetFromJsonAsync<List<MessageGroup>?>($"api/messagegroupshortcut/{id}");
+        }
+
+        public async Task<HttpResponseMessage> NewMessageGroupShortcutAsync(MessageGroupShortcut shortcut)
+        {
+            return await http.PostAsJsonAsync("api/messagegroupshortcut/new", shortcut);
+        }
+
+        public async Task<HttpResponseMessage> DeleteMessageGroupShortcutAsync(int userId, int groupId)
+        {
+            return await http.DeleteAsync($"api/messagegroupshortcut/delete?userId={userId}&groupId={groupId}");
         }
     }
 }

@@ -21,12 +21,18 @@ namespace HearYe.Shared
         public DbSet<MessageGroupMember>? MessageGroupMembers { get; set; }
         public DbSet<MessageGroupRole> MessageGroupRoles { get; set; }
         public DbSet<MessageGroupInvitation> MessageGroupInvitations { get; set; }
+        public DbSet<MessageGroupShortcut> MessageGroupShortcuts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>(entity =>
             {
                 entity.HasIndex(e => e.AadOid).IsUnique();
+
+                entity.HasOne(e => e.DefaultGroup)
+                    .WithMany()
+                    .HasForeignKey(e => e.DefaultGroupId)
+                    .OnDelete(DeleteBehavior.SetNull); // Set User.DefaultGroup to null when MessageGroup is deleted.
             });
 
             modelBuilder.Entity<Post>(entity =>
@@ -107,6 +113,21 @@ namespace HearYe.Shared
             modelBuilder.Entity<MessageGroupRole>(entity =>
             {
                 entity.HasIndex(e => e.RoleName).IsUnique();
+            });
+
+            modelBuilder.Entity<MessageGroupShortcut>(entity =>
+            {
+                entity.HasOne(e => e.MessageGroup)
+                    .WithMany()
+                    .HasForeignKey(e => e.MessageGroupId)
+                    .OnDelete(DeleteBehavior.Cascade); // Delete MessageGroupShortcut if MessageGroup is deleted.
+
+                entity.HasOne(e => e.User)
+                    .WithMany()
+                    .HasForeignKey(e => e.UserId)
+                    .OnDelete(DeleteBehavior.Cascade); // Delete MessageGroupShortcut if User is deleted.
+
+                entity.HasIndex(e => new { e.UserId, e.MessageGroupId }).IsUnique(); // Prevent same user same group.
             });
         }
     }

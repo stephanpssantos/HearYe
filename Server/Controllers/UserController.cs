@@ -306,6 +306,7 @@ namespace HearYe.Server.Controllers
             existing.DisplayName = user.DisplayName;
             existing.AcceptGroupInvitations = user.AcceptGroupInvitations;
             existing.LastModifiedDate = user.LastModifiedDate;
+            existing.DefaultGroupId = user.DefaultGroupId;
 
             this.db.Users!.Update(existing);
             int completed = await this.db.SaveChangesAsync();

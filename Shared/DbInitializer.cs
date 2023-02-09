@@ -352,6 +352,27 @@
                 StaleDate = DateTimeOffset.Now.AddDays(-1)
             };
 
+            MessageGroupShortcut demoMGS1 = new()
+            {
+                //Id = 1,
+                MessageGroupId = 1,
+                UserId = 1
+            };
+
+            MessageGroupShortcut demoMGS2 = new()
+            {
+                //Id = 2,
+                MessageGroupId = 2,
+                UserId = 1
+            };
+
+            MessageGroupShortcut demoMGS3 = new()
+            {
+                //Id = 3,
+                MessageGroupId = 3,
+                UserId = 1
+            };
+
             Acknowledgement demoAcknowledgement1 = new()
             {
                 //Id = 1, // Set by DB
@@ -422,6 +443,9 @@
             context.Posts!.Add(demoPost5);
             context.Posts!.Add(demoPost6);
             context.SaveChanges();
+            context.MessageGroupShortcuts!.Add(demoMGS1);
+            context.MessageGroupShortcuts!.Add(demoMGS2);
+            context.MessageGroupShortcuts!.Add(demoMGS3);
             context.MessageGroupInvitations!.Add(demoMGI1);
             context.MessageGroupInvitations!.Add(demoMGI2);
             context.MessageGroupInvitations!.Add(demoMGI3);

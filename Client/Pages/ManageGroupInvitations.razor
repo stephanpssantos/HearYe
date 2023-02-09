@@ -204,6 +204,46 @@
 
         if (response.IsSuccessStatusCode)
         {
+            var acceptedInviteInfo = invitationsReceivedList!
+                .Where(i => i.Id == invitationId)
+                .First();
+
+            // Add new group to user's shortcut group list if that list has fewer than 5 entries.
+            if (State.UserShortcutGroups is not null && State.UserShortcutGroups.Count() < 5)
+            {
+                MessageGroupShortcut newShortcut = new()
+                    {
+                        MessageGroupId = acceptedInviteInfo.MessageGroupId,
+                        UserId = acceptedInviteInfo.InvitedUserId
+                    };
+
+                var addToShortcuts = await Service.NewMessageGroupShortcutAsync(newShortcut);
+
+                if (addToShortcuts.IsSuccessStatusCode)
+                {
+                    // If MessageGroupShortcut record successfully created, retrieve info about group.
+                    var groupToAddToShortcuts = await Service.GetMessageGroupAsync(acceptedInviteInfo.MessageGroupId);
+
+                    if (groupToAddToShortcuts is not null)
+                    {
+                        // Add group to State.UserShortcutGroups.
+                        var newShortcutGroupList = State.UserShortcutGroups.Append(groupToAddToShortcuts);
+                        State.UserShortcutGroups = newShortcutGroupList;
+
+                        // If user has not selected a default group, set this group as default.
+                        if (userInfo is not null && (userInfo.DefaultGroupId is null || userInfo.DefaultGroupId == 0))
+                        {
+                            userInfo.DefaultGroupId = acceptedInviteInfo.MessageGroupId;
+                            var updateUserDefaultGroup = await Service.UpdateUserAsync(userInfo.Id, userInfo);
+                            if (updateUserDefaultGroup.IsSuccessStatusCode)
+                            {
+                                State.DefaultGroupId = acceptedInviteInfo.MessageGroupId;
+                            }
+                        }
+                    }
+                }
+            }
+
             invitationsReceivedList = invitationsReceivedList!
                 .Where(i => i.Id != invitationId)
                 .OrderByDescending(x => x.CreatedDate)
