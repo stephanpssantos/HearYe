@@ -311,7 +311,7 @@ namespace HearYe.Server.Tests
 
                 // Assert
                 Assert.IsType<BadRequestObjectResult>(result);
-                Assert.Equal("Error when creating invitation.", resultObject!.Value);
+                Assert.Equal("Duplicate invitation exists.", resultObject!.Value);
             }
         }
 
@@ -338,7 +338,7 @@ namespace HearYe.Server.Tests
 
                 // Assert
                 Assert.IsType<BadRequestObjectResult>(result);
-                Assert.Equal("User not accepting invitations", resultObject!.Value);
+                Assert.Equal("User not accepting invitations.", resultObject!.Value);
             }
         }
 
