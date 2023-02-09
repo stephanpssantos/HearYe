@@ -52,7 +52,7 @@
                     <PostTemplate Post="@post" />
                 }
             }
-            else if ((State.PostCollection is not null && !State.PostCollection.Any()) || State.ActiveGroupId == 0)
+            else if (State.PostCollection is not null && !State.PostCollection.Any())
             {
                 <h3 class="text-muted">No posts found.</h3>
             }
