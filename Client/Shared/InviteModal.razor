@@ -70,6 +70,10 @@
                 groupName = $"Unknown (ID: {State.InviteModalId})";
             }
         }
+        else
+        {
+            groupName = "Unknown";
+        }
     }
 
     protected override void OnInitialized()
@@ -161,6 +165,8 @@
             bannerMessage = "Invitation sent!";
         }
 
+        newInvite = new();
+        editContext = new(newInvite);
         confirmationLock = false;
         invitee = null;
         displayConfirmation = false;

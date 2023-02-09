@@ -304,7 +304,7 @@ namespace HearYe.Server.Controllers
 
         /// <summary>
         /// DELETE: api/messagegroup/member/[id]; <br />
-        /// Delete specified message group member. Requester must be a group admin.
+        /// Delete specified message group member. Requester must be the user or a group admin.
         /// </summary>
         /// <param name="id">Id of the message group member to delete.</param>
         /// <returns>204, 400, 401, 404.</returns>
@@ -325,7 +325,7 @@ namespace HearYe.Server.Controllers
             int claimId = AuthCheck.UserClaimCheck(this.HttpContext.User.Claims);
             int roleId = await AuthCheck.UserGroupAuthCheck(this.db, claimId, mgm.MessageGroupId);
 
-            if (roleId != 1)
+            if (roleId != 1 && mgm.UserId != claimId)
             {
                 return this.Unauthorized();
             }

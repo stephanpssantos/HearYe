@@ -1,0 +1,91 @@
+﻿@using HearYe.Client.Data
+@using HearYe.Shared;
+@inject IHearYeService Service
+@inject StateContainer State
+
+<div class="modal-content">
+    <div class="modal-header">
+        <h5 class="modal-title">Leave @groupName</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="CloseModal"></button>
+    </div>
+    <div class="modal-body">
+        @if (bannerMessage is not null && bannerType is not null && !displayConfirmation)
+        {
+            <div class="alert @bannerType" role="alert">
+                @bannerMessage
+            </div>
+        }
+        @if (displayConfirmation)
+        {
+            <div>
+                You've left @(groupName).
+            </div>
+            <div class="d-flex justify-content-end mt-3">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick="CloseModal">Close</button>
+            </div>
+        }
+        else
+        {
+            <div>
+                Are you sure you want to leave @(groupName)?
+            </div>
+            <div class="d-flex justify-content-end mt-3 gap-2">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick="CloseModal">Cancel</button>
+                <button type="button" class="btn btn-primary" @onclick="ConfirmLeave">Leave</button>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private string? groupName;
+    private string? bannerMessage;
+    private string? bannerType;
+    private bool displayConfirmation = false;
+
+    protected override void OnParametersSet()
+    {
+        if (State.UserGroups is not null && State.LeaveModalId != 0)
+        {
+            MessageGroup? group = State.UserGroups.Where(g => g.Id == State.LeaveModalId).FirstOrDefault();
+            if (group is not null)
+            {
+                groupName = $"{group.MessageGroupName}";
+            }
+            else
+            {
+                groupName = $"Unknown (ID: {State.LeaveModalId})";
+            }
+        }
+        else
+        {
+            groupName = "Unknown";
+        }
+    }
+
+    private async void ConfirmLeave()
+    {
+        var response = await Service.DeleteMessageGroupMemberAsync(State.LeaveModalId);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            bannerType = "alert-warning";
+            bannerMessage = "⚠ Failed to leave group. Please try again later.";
+        }
+        else
+        {
+            bannerType = null;
+            bannerMessage = null;
+            displayConfirmation = true;
+            State.UserGroups = State.UserGroups!.Where(g => g.Id != State.LeaveModalId).ToList();
+        }
+
+        StateHasChanged();
+    }
+
+    private void CloseModal()
+    {
+        State.LeaveModalId = 0;
+        State.ModalIsOpen = false;
+    }
+}

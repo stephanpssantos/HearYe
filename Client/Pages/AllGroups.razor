@@ -24,6 +24,10 @@
                 {
                     <InviteModal />
                 }
+                else if (State.LeaveModalId > 0)
+                {
+                    <LeaveModal />
+                }
             }
         </div>
     </div>
@@ -46,9 +50,9 @@
                         <div class="card-body card-text d-flex flex-column flex-lg-row justify-content-between align-items-center">
                             <span class="p-1">@group.MessageGroupName</span>
                             <div class="d-flex gap-2">
-                                <button type="button" class="btn btn-secondary" @onclick="(() => OpenMembersList(group.Id))" data-bs-toggle="modal" data-bs-target="#allGroupsModal">View members</button>
-                                <button type="button" class="btn btn-secondary" @onclick="(() => OpenInvitationRequest(group.Id))" data-bs-toggle="modal" data-bs-target="#allGroupsModal">Invite new member</button>
-                                <button type="button" class="btn btn-secondary">Leave group</button>
+                                <button type="button" class="btn btn-secondary" @onclick="(() => OpenModal(group.Id, 1))" data-bs-toggle="modal" data-bs-target="#allGroupsModal">View members</button>
+                                <button type="button" class="btn btn-secondary" @onclick="(() => OpenModal(group.Id, 2))" data-bs-toggle="modal" data-bs-target="#allGroupsModal">Invite new member</button>
+                                <button type="button" class="btn btn-secondary" @onclick="(() => OpenModal(group.Id, 3))" data-bs-toggle="modal" data-bs-target="#allGroupsModal">Leave group</button>
                             </div>
                         </div>
                     </div>
@@ -117,19 +121,11 @@
         State.OnChange -= StateHasChanged;
     }
 
-    private void OpenMembersList(int id)
+    private void OpenModal(int id, int modal)
     {
-        State.MembersModalId = id;
-        State.InviteModalId = 0;
-        State.LeaveModalId = 0;
-        State.ModalIsOpen = true;
-    }
-
-    private void OpenInvitationRequest(int id)
-    {
-        State.MembersModalId = 0;
-        State.InviteModalId = id;
-        State.LeaveModalId = 0;
+        State.MembersModalId = modal == 1 ? id : 0;
+        State.InviteModalId = modal == 2 ? id : 0;
+        State.LeaveModalId = modal == 3 ? id : 0;
         State.ModalIsOpen = true;
     }
 }
