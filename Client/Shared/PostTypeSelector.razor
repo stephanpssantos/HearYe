@@ -39,21 +39,24 @@
         State.ActivePostType = type;
         IEnumerable<PostWithUserName>? postCollection;
 
-        switch(type)
+        if (State.ActiveGroupId != 0)
         {
-            case PostTypes.Acknowledged:
-                postCollection = await Service.GetAcknowledgedPostsAsync(State.ActiveGroupId.ToString());
-                break;
-            case PostTypes.Stale:
-                postCollection = await Service.GetStalePostsAsync(State.ActiveGroupId.ToString());
-                break;
-            case PostTypes.New:
-            default:
-                postCollection = await Service.GetNewPostsAsync(State.ActiveGroupId.ToString());
-                break;
-        }
+            switch (type)
+            {
+                case PostTypes.Acknowledged:
+                    postCollection = await Service.GetAcknowledgedPostsAsync(State.ActiveGroupId.ToString());
+                    break;
+                case PostTypes.Stale:
+                    postCollection = await Service.GetStalePostsAsync(State.ActiveGroupId.ToString());
+                    break;
+                case PostTypes.New:
+                default:
+                    postCollection = await Service.GetNewPostsAsync(State.ActiveGroupId.ToString());
+                    break;
+            }
 
-        State.PostCollection = postCollection;
+            State.PostCollection = postCollection;
+        }
     }
 
     private string checkClass(PostTypes type)

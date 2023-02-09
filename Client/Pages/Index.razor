@@ -45,14 +45,14 @@
         }
 
         <div class="w-md-75">
-            @if (State.PostCollection is not null && State.PostCollection.Any())
+            @if (State.PostCollection is not null && State.PostCollection.Any() && State.ActiveGroupId != 0)
             {
                 @foreach (PostWithUserName post in State.PostCollection)
                 {
                     <PostTemplate Post="@post" />
                 }
             }
-            else if (State.PostCollection is not null && !State.PostCollection.Any())
+            else if ((State.PostCollection is not null && !State.PostCollection.Any()) || State.ActiveGroupId == 0)
             {
                 <h3 class="text-muted">No posts found.</h3>
             }
