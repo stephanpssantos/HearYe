@@ -78,6 +78,29 @@
             bannerMessage = null;
             displayConfirmation = true;
             State.UserGroups = State.UserGroups!.Where(g => g.Id != State.LeaveModalId).ToList();
+
+            // Check if group is the user's default group. Set user default group to null if it is.
+            var userDbInfo = await Service.GetUserAsync(State.UserDbId!);
+
+            if (userDbInfo is not null && userDbInfo.DefaultGroupId == State.LeaveModalId)
+            {
+                userDbInfo.DefaultGroupId = null;
+                var updateUser = await Service.UpdateUserAsync(userDbInfo.Id, userDbInfo);
+            }
+
+            // Check if group is in shortcuts. Remove it from shortcuts if it is.
+            if (State.UserShortcutGroups is not null)
+            {
+                var groupInShorcuts = State.UserShortcutGroups.FirstOrDefault(g => g.Id == State.LeaveModalId);
+                bool validDbId = int.TryParse(State.UserDbId, out int userDbId);
+
+                if (groupInShorcuts is not null && validDbId)
+                {
+                    var removeFromShortcuts = await Service.DeleteMessageGroupShortcutAsync(userDbId, State.LeaveModalId);
+                }
+
+                State.UserShortcutGroups = State.UserShortcutGroups.Where(g => g.Id != State.LeaveModalId).ToList();
+            }
         }
 
         StateHasChanged();
