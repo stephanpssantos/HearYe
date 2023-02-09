@@ -98,8 +98,9 @@ namespace HearYe.Server.Controllers
                 .Where(a => a.PostId == id)
                 .Select(a => new UserPublicInfo
                 {
-                    DisplayName = a.User == null ? "Unknown" : a.User.DisplayName,
                     Id = a.UserId,
+                    DisplayName = a.User == null ? "Unknown" : a.User.DisplayName,
+                    AcceptGroupInvitations = a.User == null ? false : a.User.AcceptGroupInvitations,
                 })
                 .ToListAsync();
 

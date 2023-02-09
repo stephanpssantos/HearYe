@@ -17,6 +17,7 @@ namespace HearYe.Shared
         public int MessageGroupId { get; set; }
 
         [Required]
+        [Range(0, int.MaxValue, ErrorMessage = "Please enter a positive whole number.")]
         public int InvitedUserId { get; set; }
 
         [Required]

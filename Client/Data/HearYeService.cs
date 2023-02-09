@@ -187,5 +187,25 @@ namespace HearYe.Client.Data
         {
             return await http.PutAsJsonAsync("api/messagegroup/setrole", mgm);
         }
+
+        public async Task<UserPublicInfo?> GetUserPublicInfoAsync(int userId)
+        {
+            HttpResponseMessage response = await http.GetAsync($"api/user/public/{userId}");
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<UserPublicInfo>();
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public async Task<HttpResponseMessage> NewMessageGroupInvitationAsync(MessageGroupInvitation inv)
+        {
+            // This could immediately be transformed to a MessageGroupInvitation, but
+            // the error response messages are used to determine response status.
+            return await http.PostAsJsonAsync("api/messagegroupinvitation/new", inv);
+        }
     }
 }

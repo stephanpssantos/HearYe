@@ -7,6 +7,7 @@ using HearYe.Server.Helpers;
 using HearYe.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Identity.Web.Resource;
@@ -112,7 +113,7 @@ namespace HearYe.Server.Controllers
         }
 
         /// <summary>
-        /// POST: api/messagegroupinvitations/new; <br />
+        /// POST: api/messagegroupinvitation/new; <br />
         /// Create new message group invitation.
         /// </summary>
         /// <param name="invite">MessageGroupInvitation object included in request body in JSON format.</param>
@@ -152,7 +153,7 @@ namespace HearYe.Server.Controllers
             }
             else if (user.AcceptGroupInvitations == false)
             {
-                return this.BadRequest("User not accepting invitations");
+                return this.BadRequest("User not accepting invitations.");
             }
 
             try
@@ -170,6 +171,19 @@ namespace HearYe.Server.Controllers
                 routeName: nameof(this.GetMessageGroupInvitation),
                 routeValues: new { id = newInvitation.Entity.Id },
                 value: newInvitation.Entity);
+            }
+            catch (DbUpdateException exception)
+            {
+                // Cannot insert duplicate key row in object error
+                var ex = exception.InnerException as SqlException;
+                if (ex is not null && ex.Number == 2601)
+                {
+                    return this.BadRequest("Duplicate invitation exists.");
+                }
+                else
+                {
+                    throw new Exception(exception.Message);
+                }
             }
             catch (Exception ex)
             {

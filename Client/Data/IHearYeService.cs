@@ -25,5 +25,7 @@ namespace HearYe.Client.Data
         Task<MessageGroup?> GetMessageGroupAsync(int id);
         Task<HttpResponseMessage> DeleteMessageGroupMemberAsync(int id);
         Task<HttpResponseMessage> SetMessageGroupRoleAsync(MessageGroupMember mgm);
+        Task<UserPublicInfo?> GetUserPublicInfoAsync(int userId);
+        Task<HttpResponseMessage> NewMessageGroupInvitationAsync(MessageGroupInvitation inv);
     }
 }

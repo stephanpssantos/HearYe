@@ -57,5 +57,6 @@ namespace HearYe.Shared
     {
         public int Id { get; set; }
         public string DisplayName { get; set; } = String.Empty;
+        public bool AcceptGroupInvitations { get; set; } = true;
     }
 }

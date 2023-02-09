@@ -71,6 +71,43 @@ namespace HearYe.Server.Controllers
         }
 
         /// <summary>
+        /// GET: api/user/public/[id]; <br />
+        /// Get public info about the specified user. Can be called even when not
+        /// logged in as the specified user.
+        /// </summary>
+        /// <param name="id">Id of specified user.</param>
+        /// <returns>200 (with user public info object in body), 401, or 404.</returns>
+        [HttpGet("public/{id:int}", Name = nameof(GetUserPublicInfo))]
+        [ProducesResponseType(200, Type = typeof(UserPublicInfo))]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> GetUserPublicInfo(int id)
+        {
+            int claimId = AuthCheck.UserClaimCheck(this.HttpContext.User.Claims);
+
+            if (claimId == 0)
+            {
+                return this.Unauthorized();
+            }
+
+            User? user = await this.db.Users!.FirstOrDefaultAsync(user => user.Id == id);
+
+            if (user == null)
+            {
+                return this.NotFound();
+            }
+
+            UserPublicInfo userPublic = new ()
+            {
+                Id = user.Id,
+                DisplayName = user.DisplayName,
+                AcceptGroupInvitations = user.AcceptGroupInvitations,
+            };
+
+            return this.Ok(userPublic);
+        }
+
+        /// <summary>
         /// GET: api/user/?aadOid=[aadOid]; <br />
         /// Get user by Azure AD Object Id.
         /// Used for verifying new user claims (before the user's database ID is saved in their claims.)

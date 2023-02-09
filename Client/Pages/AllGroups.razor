@@ -20,12 +20,17 @@
                 {
                     <MembersModal />
                 }
+                else if (State.InviteModalId > 0)
+                {
+                    <InviteModal />
+                }
             }
         </div>
     </div>
     <div class="d-flex flex-column align-items-center">
         <div class="w-md-75">
             <h1 class="mt-3 mb-3">All groups</h1>
+            <h4 class="text-muted">Your user ID is: @State.UserDbId</h4>
             <hr />
             @if (bannerMessage is not null && bannerType is not null)
             {
@@ -42,7 +47,7 @@
                             <span class="p-1">@group.MessageGroupName</span>
                             <div class="d-flex gap-2">
                                 <button type="button" class="btn btn-secondary" @onclick="(() => OpenMembersList(group.Id))" data-bs-toggle="modal" data-bs-target="#allGroupsModal">View members</button>
-                                <button type="button" class="btn btn-secondary">Invite new member</button>
+                                <button type="button" class="btn btn-secondary" @onclick="(() => OpenInvitationRequest(group.Id))" data-bs-toggle="modal" data-bs-target="#allGroupsModal">Invite new member</button>
                                 <button type="button" class="btn btn-secondary">Leave group</button>
                             </div>
                         </div>
@@ -115,6 +120,16 @@
     private void OpenMembersList(int id)
     {
         State.MembersModalId = id;
+        State.InviteModalId = 0;
+        State.LeaveModalId = 0;
+        State.ModalIsOpen = true;
+    }
+
+    private void OpenInvitationRequest(int id)
+    {
+        State.MembersModalId = 0;
+        State.InviteModalId = id;
+        State.LeaveModalId = 0;
         State.ModalIsOpen = true;
     }
 }
