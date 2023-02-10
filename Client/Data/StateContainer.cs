@@ -4,6 +4,7 @@ namespace HearYe.Client.Data
 {
     public class StateContainer
     {
+        private bool initiated = false;
         private string? userDbId;
         private IEnumerable<MessageGroup>? userGroups;
         private IEnumerable<MessageGroup>? userShortcutGroups;
@@ -18,6 +19,16 @@ namespace HearYe.Client.Data
         private int membersModalId;
         private int inviteModalId;
         private int leaveModalId;
+
+        public bool Initiated
+        {
+            get => initiated;
+            set
+            {
+                initiated = value;
+                NotifyStateChanged();
+            }
+        }
 
         public string? UserDbId { 
             get => userDbId; 

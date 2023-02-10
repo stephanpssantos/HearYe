@@ -1,5 +1,4 @@
 ﻿@page "/allgroups"
-@layout AltLayout
 @using HearYe.Client.Data
 @using HearYe.Shared;
 @using Microsoft.AspNetCore.Authorization
@@ -127,37 +126,6 @@
     private string? bannerType;
     private MessageGroup? defaultMessageGroup;
 
-    protected override async Task OnParametersSetAsync()
-    {
-        // In case user arrives here first
-        if (State.UserDbId is null)
-        {
-            var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-            var user = authenticationState.User;
-            if (user.Identity is null || !user.Identity.IsAuthenticated)
-            {
-                Navigation.NavigateTo("/");
-            }
-
-            string? userDbId = user.Claims.FirstOrDefault(x => x.Type.Equals("extension_DatabaseId"))?.Value;
-            if (userDbId is null)
-            {
-                Navigation.NavigateTo("/newuser");
-            }
-
-            State.UserDbId = userDbId;
-        }
-
-        if (State.UserGroups is null)
-        {
-            var userGroups = await Service.GetUserMessageGroupsAsync(State.UserDbId!);
-            State.UserGroups = userGroups;
-        }
-
-        defaultMessageGroup = State.UserGroups!.FirstOrDefault(g => g.Id == State.DefaultGroupId);
-        State.ActiveLocation = ActiveLocations.Groups;
-    }
-
     private async void AddToShortcuts(int groupId)
     {
         bool validDbId = int.TryParse(State.UserDbId, out int userDbId);
@@ -249,14 +217,37 @@
         return;
     }
 
+    private void CheckLoadGroups()
+    {
+        if (State.Initiated && State.UserGroups is null)
+        {
+            LoadGroups();
+        }
+    }
+
+    private async void LoadGroups()
+    {
+        var userGroups = await Service.GetUserMessageGroupsAsync(State.UserDbId!);
+        if (userGroups is not null)
+        {
+            defaultMessageGroup = userGroups.FirstOrDefault(g => g.Id == State.DefaultGroupId);
+        }
+        
+        State.UserGroups = userGroups;
+    }
+
     protected override void OnInitialized()
     {
         State.OnChange += StateHasChanged;
+        State.OnChange += CheckLoadGroups;
+
+        State.ActiveLocation = ActiveLocations.Groups;
     }
 
     public void Dispose()
     {
         State.OnChange -= StateHasChanged;
+        State.OnChange -= CheckLoadGroups;
     }
 
     private async void GoToGroup(int groupId)
