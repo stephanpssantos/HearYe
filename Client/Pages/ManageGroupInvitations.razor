@@ -209,6 +209,13 @@
                 .Where(i => i.Id == invitationId)
                 .First();
 
+            var newGroupInfo = await Service.GetMessageGroupAsync(acceptedInviteInfo.MessageGroupId);
+
+            if (newGroupInfo is not null && State.UserGroups is not null)
+            {
+                State.UserGroups = State.UserGroups.Append(newGroupInfo);
+            }
+
             // Add new group to user's shortcut group list if that list has fewer than 5 entries.
             if (State.UserShortcutGroups is not null && State.UserShortcutGroups.Count() < 5)
             {
@@ -220,26 +227,20 @@
 
                 var addToShortcuts = await Service.NewMessageGroupShortcutAsync(newShortcut);
 
-                if (addToShortcuts.IsSuccessStatusCode)
+                if (addToShortcuts.IsSuccessStatusCode && newGroupInfo is not null)
                 {
-                    // If MessageGroupShortcut record successfully created, retrieve info about group.
-                    var groupToAddToShortcuts = await Service.GetMessageGroupAsync(acceptedInviteInfo.MessageGroupId);
+                    // Add group to State.UserShortcutGroups.
+                    var newShortcutGroupList = State.UserShortcutGroups.Append(newGroupInfo);
+                    State.UserShortcutGroups = newShortcutGroupList;
 
-                    if (groupToAddToShortcuts is not null)
+                    // If user has not selected a default group, set this group as default.
+                    if (userInfo is not null && (userInfo.DefaultGroupId is null || userInfo.DefaultGroupId == 0))
                     {
-                        // Add group to State.UserShortcutGroups.
-                        var newShortcutGroupList = State.UserShortcutGroups.Append(groupToAddToShortcuts);
-                        State.UserShortcutGroups = newShortcutGroupList;
-
-                        // If user has not selected a default group, set this group as default.
-                        if (userInfo is not null && (userInfo.DefaultGroupId is null || userInfo.DefaultGroupId == 0))
+                        userInfo.DefaultGroupId = acceptedInviteInfo.MessageGroupId;
+                        var updateUserDefaultGroup = await Service.UpdateUserAsync(userInfo.Id, userInfo);
+                        if (updateUserDefaultGroup.IsSuccessStatusCode)
                         {
-                            userInfo.DefaultGroupId = acceptedInviteInfo.MessageGroupId;
-                            var updateUserDefaultGroup = await Service.UpdateUserAsync(userInfo.Id, userInfo);
-                            if (updateUserDefaultGroup.IsSuccessStatusCode)
-                            {
-                                State.DefaultGroupId = acceptedInviteInfo.MessageGroupId;
-                            }
+                            State.DefaultGroupId = acceptedInviteInfo.MessageGroupId;
                         }
                     }
                 }
