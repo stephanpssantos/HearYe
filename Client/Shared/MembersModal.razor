@@ -242,7 +242,7 @@
 
     private async void ConfirmRemoval()
     {
-        var response = await Service.DeleteMessageGroupMemberAsync(confirmationUser!.Id);
+        var response = await Service.DeleteMessageGroupMemberAsync(confirmationUser!.Id, State.MembersModalId);
         if (response.IsSuccessStatusCode)
         {
             userList = userList!.Where(u => u.UserId != confirmationUserId).ToList();

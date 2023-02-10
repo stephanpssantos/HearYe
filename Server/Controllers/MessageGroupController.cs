@@ -303,21 +303,23 @@ namespace HearYe.Server.Controllers
         }
 
         /// <summary>
-        /// DELETE: api/messagegroup/member/[id]; <br />
+        /// DELETE: api/messagegroup/member?userId=[userId]&amp;groupId=[groupId]; <br />
         /// Delete specified message group member. Requester must be the user or a group admin.
         /// </summary>
-        /// <param name="id">Id of the message group member to delete.</param>
+        /// <param name="userId">User id of user of member to delete.</param>
+        /// <param name="groupId">Id of message groupto remove user from.</param>
         /// <returns>204, 400, 401, 404.</returns>
-        [HttpDelete("member/{id:int}")]
+        [HttpDelete("member")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
-        public async Task<IActionResult> DeleteMessageGroupMember(int id)
+        public async Task<IActionResult> DeleteMessageGroupMember(int userId, int groupId)
         {
-            MessageGroupMember? mgm = await this.db.MessageGroupMembers!.Where(mgm => mgm.MessageGroupId == id).FirstOrDefaultAsync();
+            MessageGroupMember? mgm = await this.db.MessageGroupMembers!
+                .FirstOrDefaultAsync(mgm => mgm.MessageGroupId == groupId && mgm.UserId == userId);
 
-            if (mgm == null || id == 0)
+            if (mgm == null)
             {
                 return this.NotFound();
             }
@@ -325,7 +327,7 @@ namespace HearYe.Server.Controllers
             int claimId = AuthCheck.UserClaimCheck(this.HttpContext.User.Claims);
             int roleId = await AuthCheck.UserGroupAuthCheck(this.db, claimId, mgm.MessageGroupId);
 
-            if (roleId != 1 && mgm.UserId != claimId)
+            if (roleId == 0 || (roleId == 2 && mgm.UserId != claimId))
             {
                 return this.Unauthorized();
             }

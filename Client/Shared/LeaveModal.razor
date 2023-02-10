@@ -65,7 +65,16 @@
 
     private async void ConfirmLeave()
     {
-        var response = await Service.DeleteMessageGroupMemberAsync(State.LeaveModalId);
+        bool validDbId = int.TryParse(State.UserDbId, out int userDbId);
+
+        if (!validDbId)
+        {
+            bannerType = "alert-warning";
+            bannerMessage = "⚠ Failed to leave group. Please try again later.";
+            return;
+        }
+
+        var response = await Service.DeleteMessageGroupMemberAsync(userDbId, State.LeaveModalId);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -101,9 +110,8 @@
             if (State.UserShortcutGroups is not null)
             {
                 var groupInShorcuts = State.UserShortcutGroups.FirstOrDefault(g => g.Id == State.LeaveModalId);
-                bool validDbId = int.TryParse(State.UserDbId, out int userDbId);
 
-                if (groupInShorcuts is not null && validDbId)
+                if (groupInShorcuts is not null)
                 {
                     var removeFromShortcuts = await Service.DeleteMessageGroupShortcutAsync(userDbId, State.LeaveModalId);
                 }

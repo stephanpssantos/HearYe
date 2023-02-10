@@ -178,9 +178,9 @@ namespace HearYe.Client.Data
             return await http.GetFromJsonAsync<MessageGroup?>($"api/messagegroup/{id}");
         }
 
-        public async Task<HttpResponseMessage> DeleteMessageGroupMemberAsync(int id)
+        public async Task<HttpResponseMessage> DeleteMessageGroupMemberAsync(int userId, int groupId)
         {
-            return await http.DeleteAsync($"api/messagegroup/member/{id}");
+            return await http.DeleteAsync($"api/messagegroup/member?userId={userId}&groupId={groupId}");
         }
 
         public async Task<HttpResponseMessage> SetMessageGroupRoleAsync(MessageGroupMember mgm)

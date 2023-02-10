@@ -23,7 +23,7 @@ namespace HearYe.Client.Data
         Task<HttpResponseMessage> DeclineMessageGroupInvitationAsync(int id);
         Task<List<MessageGroupMemberWithName>?> GetMessageGroupMembersAsync(int id);
         Task<MessageGroup?> GetMessageGroupAsync(int id);
-        Task<HttpResponseMessage> DeleteMessageGroupMemberAsync(int id);
+        Task<HttpResponseMessage> DeleteMessageGroupMemberAsync(int userId, int groupId);
         Task<HttpResponseMessage> SetMessageGroupRoleAsync(MessageGroupMember mgm);
         Task<UserPublicInfo?> GetUserPublicInfoAsync(int userId);
         Task<HttpResponseMessage> NewMessageGroupInvitationAsync(MessageGroupInvitation inv);
