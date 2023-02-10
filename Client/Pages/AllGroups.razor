@@ -127,34 +127,45 @@
     private string? bannerType;
     private MessageGroup? defaultMessageGroup;
 
-    protected override async Task OnParametersSetAsync()
+    protected override void OnParametersSet()
     {
-        // In case user arrives here first
-        if (State.UserDbId is null)
+        CheckState();
+    }
+
+    private void CheckState()
+    {
+        if (State.UserDbId is not null && State.UserGroups is null)
         {
-            var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-            var user = authenticationState.User;
-            if (user.Identity is null || !user.Identity.IsAuthenticated)
-            {
-                Navigation.NavigateTo("/");
-            }
-
-            string? userDbId = user.Claims.FirstOrDefault(x => x.Type.Equals("extension_DatabaseId"))?.Value;
-            if (userDbId is null)
-            {
-                Navigation.NavigateTo("/newuser");
-            }
-
-            State.UserDbId = userDbId;
+            LoadGroups();
         }
-
-        if (State.UserGroups is null)
+        else if (State.UserDbId is not null && defaultMessageGroup is null)
         {
-            var userGroups = await Service.GetUserMessageGroupsAsync(State.UserDbId!);
-            State.UserGroups = userGroups;
+            LoadDefault();
         }
+    }
 
-        defaultMessageGroup = State.UserGroups!.FirstOrDefault(g => g.Id == State.DefaultGroupId);
+    private async void LoadGroups()
+    {
+        var userGroups = await Service.GetUserMessageGroupsAsync(State.UserDbId!);
+        State.UserGroups = userGroups;
+
+        if (State.DefaultGroupId == 0)
+        {
+            LoadDefault();
+        }
+    }
+
+    private async void LoadDefault()
+    {
+        var user = await Service.GetUserAsync(State.UserDbId!);
+
+        if (user is not null && user.DefaultGroupId is not null)
+        {
+            defaultMessageGroup = State.UserGroups!.FirstOrDefault(g => g.Id == user.DefaultGroupId);
+            State.DefaultGroupId = (int)user.DefaultGroupId;
+        }
+        
+        StateHasChanged();
     }
 
     private async void AddToShortcuts(int groupId)
@@ -251,11 +262,13 @@
     protected override void OnInitialized()
     {
         State.OnChange += StateHasChanged;
+        State.OnChange += CheckState;
     }
 
     public void Dispose()
     {
         State.OnChange -= StateHasChanged;
+        State.OnChange -= CheckState;
     }
 
     private async void GoToGroup(int groupId)

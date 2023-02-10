@@ -27,7 +27,7 @@
                         }
                         <div class="mb-3">
                             <label for="newGroupName" class="form-label">New group name</label>
-                            <InputText @bind-Value="newMessageGroup.MessageGroupName" id="newGroupName" class="form-control"/>
+                            <InputText @bind-Value="newMessageGroup.MessageGroupName" id="newGroupName" class="form-control" />
                         </div>
                         <button type="submit" class="btn btn-primary">Save</button>
                     </EditForm>
@@ -72,44 +72,62 @@
                 StateHasChanged();
                 return;
             }
-            else if (State.UserShortcutGroups is not null && State.UserShortcutGroups.Count() < 5)
+            else
             {
-                // Add new group to user's shortcut group list if that list has fewer than 5 entries.
-                MessageGroupShortcut newShortcut = new()
-                    {
-                        MessageGroupId = newGroup.Id,
-                        UserId = userDbId
-                    };
-
-                var addToShortcuts = await Service.NewMessageGroupShortcutAsync(newShortcut);
-
-                if (addToShortcuts.IsSuccessStatusCode)
+                if (State.UserGroups is null)
                 {
-                    // Add group to State.UserShortcutGroups.
-                    var newShortcutGroupList = State.UserShortcutGroups.Append(newGroup);
-                    State.UserShortcutGroups = newShortcutGroupList;
+                    State.UserGroups = new List<MessageGroup>();
+                }
 
-                    // If user has not selected a default group, set this group as default.
-                    if (State.DefaultGroupId == 0)
-                    {
-                        var userInfo = await Service.GetUserAsync(State.UserDbId!);
+                // Add new group to user group list.
+                State.UserGroups = State.UserGroups.Append(newGroup);
 
-                        if (userInfo is not null)
+                // If no prior groups, set new group as current group.
+                if (State.ActiveGroupId == 0)
+                {
+                    State.ActiveGroupId = newGroup.Id;
+                    State.ActiveGroupName = newGroup.MessageGroupName;
+                }
+
+                if (State.UserShortcutGroups is not null && State.UserShortcutGroups.Count() < 5)
+                {
+                    // Add new group to user's shortcut group list if that list has fewer than 5 entries.
+                    MessageGroupShortcut newShortcut = new()
                         {
-                            userInfo.DefaultGroupId = newGroup.Id;
-                            var updateUserDefaultGroup = await Service.UpdateUserAsync(userInfo.Id, userInfo);
+                            MessageGroupId = newGroup.Id,
+                            UserId = userDbId
+                        };
 
-                            if (updateUserDefaultGroup.IsSuccessStatusCode)
+                    var addToShortcuts = await Service.NewMessageGroupShortcutAsync(newShortcut);
+
+                    if (addToShortcuts.IsSuccessStatusCode)
+                    {
+                        // Add group to State.UserShortcutGroups.
+                        var newShortcutGroupList = State.UserShortcutGroups.Append(newGroup);
+                        State.UserShortcutGroups = newShortcutGroupList;
+
+                        // If user has not selected a default group, set this group as default.
+                        if (State.DefaultGroupId == 0)
+                        {
+                            var userInfo = await Service.GetUserAsync(State.UserDbId!);
+
+                            if (userInfo is not null)
                             {
-                                State.DefaultGroupId = newGroup.Id;
-                            } 
+                                userInfo.DefaultGroupId = newGroup.Id;
+                                var updateUserDefaultGroup = await Service.UpdateUserAsync(userInfo.Id, userInfo);
+
+                                if (updateUserDefaultGroup.IsSuccessStatusCode)
+                                {
+                                    State.DefaultGroupId = newGroup.Id;
+                                }
+                            }
+
                         }
-                        
                     }
                 }
-            }
 
-            Navigation.NavigateTo("/allgroups");
+                Navigation.NavigateTo("/allgroups");
+            }
         }
     }
 }
