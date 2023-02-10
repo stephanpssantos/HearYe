@@ -86,15 +86,6 @@
             {
                 userDbInfo.DefaultGroupId = null;
                 var updateUser = await Service.UpdateUserAsync(userDbInfo.Id, userDbInfo);
-                State.DefaultGroupId = 0;
-            }
-
-            // if current group is the active group, reset it.
-            if (State.LeaveModalId == State.ActiveGroupId)
-            {
-                State.ActiveGroupName = "No group selected";
-                State.ActiveGroupId = 0;
-                State.PostCollection = new List<PostWithUserName>();
             }
 
             // Check if group is in shortcuts. Remove it from shortcuts if it is.
