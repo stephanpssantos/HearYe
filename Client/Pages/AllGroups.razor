@@ -223,6 +223,10 @@
         {
             LoadGroups();
         }
+        else if (State.Initiated && State.UserGroups is not null && defaultMessageGroup is null)
+        {
+            defaultMessageGroup = State.UserGroups.FirstOrDefault(g => g.Id == State.DefaultGroupId);
+        }
     }
 
     private async void LoadGroups()
@@ -232,7 +236,6 @@
         {
             defaultMessageGroup = userGroups.FirstOrDefault(g => g.Id == State.DefaultGroupId);
         }
-        
         State.UserGroups = userGroups;
     }
 
