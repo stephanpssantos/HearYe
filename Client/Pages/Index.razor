@@ -98,6 +98,11 @@
 
     protected override void OnParametersSet()
     {
+        if (State.ActiveLocation != ActiveLocations.Index)
+        {
+            State.ActiveLocation = ActiveLocations.Index;    
+        }
+
         if (State.UserDbId is null)
         {
             InitializeState();

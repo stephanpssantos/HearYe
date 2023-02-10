@@ -12,6 +12,7 @@ namespace HearYe.Client.Data
         private string? activeGroupName;
         private IEnumerable<PostWithUserName>? postCollection;
         private PostTypes activePostType = PostTypes.New;
+        private ActiveLocations activeLocation = ActiveLocations.Index;
         private bool modalIsOpen = false;
         private int acknowledgedModalId;
         private int membersModalId;
@@ -97,6 +98,16 @@ namespace HearYe.Client.Data
             }
         }
 
+        public ActiveLocations ActiveLocation
+        {
+            get => activeLocation;
+            set
+            {
+                activeLocation = value;
+                NotifyStateChanged();
+            }
+        }
+
         public bool ModalIsOpen
         {
             get => modalIsOpen;
@@ -153,4 +164,6 @@ namespace HearYe.Client.Data
     }
 
     public enum PostTypes { New, Acknowledged, Stale }
+
+    public enum ActiveLocations { Index, Groups, Invite, CreateGroup }
 }

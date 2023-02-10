@@ -2,12 +2,25 @@
 @using HearYe.Shared
 @inject IHearYeService Service
 @inject StateContainer State
+@inject NavigationManager Navigation
 
 <div class="dropdown w-100">
     <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-        @if (State is not null && State.UserShortcutGroups is not null)
+        @if (State is not null && State.UserShortcutGroups is not null && State.ActiveLocation == ActiveLocations.Index)
         {
             @(State.ActiveGroupName ?? "No groups")
+        }
+        else if (State is not null && State.ActiveLocation == ActiveLocations.Groups)
+        {
+            <span>All groups</span>
+        }
+        else if (State is not null && State.ActiveLocation == ActiveLocations.Invite)
+        {
+            <span>Group invitations</span>
+        }
+        else if (State is not null && State.ActiveLocation == ActiveLocations.CreateGroup)
+        {
+            <span>Create new group</span>
         }
         else
         {
@@ -19,7 +32,7 @@
         {
             @foreach (MessageGroup group in State.UserShortcutGroups)
             {
-                if (group.Id == State.ActiveGroupId)
+                if (group.Id == State.ActiveGroupId && State.ActiveLocation == ActiveLocations.Index)
                 {
                     <li><a class="dropdown-item active text-truncate" aria-current="true" role="button">@group.MessageGroupName</a></li>
                 }
@@ -74,6 +87,11 @@
             }
 
             State.PostCollection = postCollection;
+
+            if (State.ActiveLocation != ActiveLocations.Index)
+            {
+                Navigation.NavigateTo("/");
+            }
         }
     }
 }

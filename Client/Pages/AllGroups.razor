@@ -155,6 +155,7 @@
         }
 
         defaultMessageGroup = State.UserGroups!.FirstOrDefault(g => g.Id == State.DefaultGroupId);
+        State.ActiveLocation = ActiveLocations.Groups;
     }
 
     private async void AddToShortcuts(int groupId)

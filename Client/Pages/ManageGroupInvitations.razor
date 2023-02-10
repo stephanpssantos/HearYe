@@ -152,6 +152,8 @@
                 .OrderByDescending(x => x.CreatedDate)
                 .Take(15);
         }
+
+        State.ActiveLocation = ActiveLocations.Invite;
     }
 
     private async void ToggleAcceptInvitation()
