@@ -352,6 +352,166 @@
                 StaleDate = DateTimeOffset.Now.AddDays(-1)
             };
 
+            Post demoPost7 = new()
+            {
+                //Id = 7, // Set by DB
+                UserId = 1,
+                MessageGroupId = 1,
+                Message = "This is test message 7. Delete me!",
+                IsDeleted = false,
+                CreatedDate = DateTimeOffset.Now,
+            };
+
+            Post demoPost8 = new()
+            {
+                //Id = 8, // Set by DB
+                UserId = 1,
+                MessageGroupId = 1,
+                Message = "This is test message 8. Delete me!",
+                IsDeleted = false,
+                CreatedDate = DateTimeOffset.Now,
+            };
+
+            Post demoPost9 = new()
+            {
+                //Id = 9, // Set by DB
+                UserId = 1,
+                MessageGroupId = 1,
+                Message = "This is test message 9. Delete me!",
+                IsDeleted = false,
+                CreatedDate = DateTimeOffset.Now,
+            };
+
+            Post demoPost10 = new()
+            {
+                //Id = 10, // Set by DB
+                UserId = 1,
+                MessageGroupId = 1,
+                Message = "This is test message 10. Delete me!",
+                IsDeleted = false,
+                CreatedDate = DateTimeOffset.Now,
+            };
+
+            Post demoPost11 = new()
+            {
+                //Id = 11, // Set by DB
+                UserId = 1,
+                MessageGroupId = 1,
+                Message = "This is test message 11. Delete me!",
+                IsDeleted = false,
+                CreatedDate = DateTimeOffset.Now,
+            };
+
+            Post demoPost12 = new()
+            {
+                //Id = 12, // Set by DB
+                UserId = 1,
+                MessageGroupId = 1,
+                Message = "This is test message 12. Delete me!",
+                IsDeleted = false,
+                CreatedDate = DateTimeOffset.Now,
+            };
+
+            Post demoPost13 = new()
+            {
+                //Id = 13, // Set by DB
+                UserId = 1,
+                MessageGroupId = 1,
+                Message = "This is test message 13. Delete me!",
+                IsDeleted = false,
+                CreatedDate = DateTimeOffset.Now,
+            };
+
+            Post demoPost14 = new()
+            {
+                //Id = 14, // Set by DB
+                UserId = 1,
+                MessageGroupId = 1,
+                Message = "This is test message 14. Delete me!",
+                IsDeleted = false,
+                CreatedDate = DateTimeOffset.Now,
+            };
+
+            Post demoPost15 = new()
+            {
+                //Id = 15, // Set by DB
+                UserId = 1,
+                MessageGroupId = 1,
+                Message = "This is test message 15. Delete me!",
+                IsDeleted = false,
+                CreatedDate = DateTimeOffset.Now,
+            };
+
+            Post demoPost16 = new()
+            {
+                //Id = 16, // Set by DB
+                UserId = 1,
+                MessageGroupId = 1,
+                Message = "This is test message 16. Delete me!",
+                IsDeleted = false,
+                CreatedDate = DateTimeOffset.Now,
+            };
+
+            Post demoPost17 = new()
+            {
+                //Id = 17, // Set by DB
+                UserId = 1,
+                MessageGroupId = 1,
+                Message = "This is test message 17. Delete me!",
+                IsDeleted = false,
+                CreatedDate = DateTimeOffset.Now,
+            };
+
+            Post demoPost18 = new()
+            {
+                //Id = 18, // Set by DB
+                UserId = 1,
+                MessageGroupId = 1,
+                Message = "This is test message 18. Delete me!",
+                IsDeleted = false,
+                CreatedDate = DateTimeOffset.Now,
+            };
+
+            Post demoPost19 = new()
+            {
+                //Id = 19, // Set by DB
+                UserId = 1,
+                MessageGroupId = 1,
+                Message = "This is test message 19. Delete me!",
+                IsDeleted = false,
+                CreatedDate = DateTimeOffset.Now,
+            };
+
+            Post demoPost20 = new()
+            {
+                //Id = 20, // Set by DB
+                UserId = 1,
+                MessageGroupId = 1,
+                Message = "This is test message 6. Delete me!",
+                IsDeleted = false,
+                CreatedDate = DateTimeOffset.Now,
+            };
+
+            Post demoPost21 = new()
+            {
+                //Id = 21, // Set by DB
+                UserId = 1,
+                MessageGroupId = 1,
+                Message = "This is test message 21. Delete me!",
+                IsDeleted = false,
+                CreatedDate = DateTimeOffset.Now,
+            };
+
+            Post demoPost22 = new()
+            {
+                //Id = 22, // Set by DB
+                UserId = 1,
+                MessageGroupId = 1,
+                Message = "This is test message 22. Delete me!",
+                IsDeleted = false,
+                CreatedDate = DateTimeOffset.Now,
+            };
+
             MessageGroupShortcut demoMGS1 = new()
             {
                 //Id = 1,
@@ -442,6 +602,22 @@
             context.Posts!.Add(demoPost4);
             context.Posts!.Add(demoPost5);
             context.Posts!.Add(demoPost6);
+            context.Posts!.Add(demoPost7);
+            context.Posts!.Add(demoPost8);
+            context.Posts!.Add(demoPost9);
+            context.Posts!.Add(demoPost10);
+            context.Posts!.Add(demoPost11);
+            context.Posts!.Add(demoPost12);
+            context.Posts!.Add(demoPost13);
+            context.Posts!.Add(demoPost14);
+            context.Posts!.Add(demoPost15);
+            context.Posts!.Add(demoPost16);
+            context.Posts!.Add(demoPost17);
+            context.Posts!.Add(demoPost18);
+            context.Posts!.Add(demoPost19);
+            context.Posts!.Add(demoPost20);
+            context.Posts!.Add(demoPost21);
+            context.Posts!.Add(demoPost22);
             context.SaveChanges();
             context.MessageGroupShortcuts!.Add(demoMGS1);
             context.MessageGroupShortcuts!.Add(demoMGS2);

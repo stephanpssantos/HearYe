@@ -14,6 +14,8 @@ namespace HearYe.Client.Data
         private IEnumerable<PostWithUserName>? postCollection;
         private PostTypes activePostType = PostTypes.New;
         private ActiveLocations activeLocation = ActiveLocations.Index;
+        private int postCount = 15;
+        private int postSkip = 0;
         private bool modalIsOpen = false;
         private int acknowledgedModalId;
         private int membersModalId;
@@ -115,6 +117,26 @@ namespace HearYe.Client.Data
             set
             {
                 activeLocation = value;
+                NotifyStateChanged();
+            }
+        }
+
+        public int PostCount
+        {
+            get => postCount;
+            set
+            {
+                postCount = value;
+                NotifyStateChanged();
+            }
+        }
+
+        public int PostSkip
+        {
+            get => postSkip;
+            set
+            {
+                postSkip = value;
                 NotifyStateChanged();
             }
         }

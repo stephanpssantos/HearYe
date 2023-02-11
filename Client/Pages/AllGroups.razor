@@ -259,7 +259,7 @@
     {
         var groupInfo = State.UserGroups!.First(g => g.Id == groupId);
 
-        var groupPosts = await Service.GetNewPostsAsync(groupId.ToString());
+        var groupPosts = await Service.GetNewPostsAsync(groupId.ToString(), State.PostCount, State.PostSkip);
 
         State.PostCollection = groupPosts;
         State.ActiveGroupId = groupId;

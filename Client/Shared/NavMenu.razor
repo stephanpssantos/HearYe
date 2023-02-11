@@ -112,7 +112,7 @@
                 if (userShortcutGroups is not null && userShortcutGroups.Any())
                 {
                     var groupId = userShortcutGroups.First().Id.ToString();
-                    activeGroupPosts = await Service.GetNewPostsAsync(groupId);
+                    activeGroupPosts = await Service.GetNewPostsAsync(groupId, State.PostCount, State.PostSkip);
                     State.PostCollection = activeGroupPosts;
                     State.ActiveGroupId = userShortcutGroups.First().Id;
                     State.ActiveGroupName = userShortcutGroups.First().MessageGroupName;
@@ -125,7 +125,7 @@
             }
             else
             {
-                activeGroupPosts = await Service.GetNewPostsAsync(State.DefaultGroupId.ToString());
+                activeGroupPosts = await Service.GetNewPostsAsync(State.DefaultGroupId.ToString(), State.PostCount, State.PostSkip);
                 State.PostCollection = activeGroupPosts;
                 State.ActiveGroupId = defaultGroup.Id;
                 State.ActiveGroupName = defaultGroup.MessageGroupName;

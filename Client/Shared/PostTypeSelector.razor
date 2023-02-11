@@ -44,14 +44,14 @@
             switch (type)
             {
                 case PostTypes.Acknowledged:
-                    postCollection = await Service.GetAcknowledgedPostsAsync(State.ActiveGroupId.ToString());
+                    postCollection = await Service.GetAcknowledgedPostsAsync(State.ActiveGroupId.ToString(), State.PostCount, State.PostSkip);
                     break;
                 case PostTypes.Stale:
-                    postCollection = await Service.GetStalePostsAsync(State.ActiveGroupId.ToString());
+                    postCollection = await Service.GetStalePostsAsync(State.ActiveGroupId.ToString(), State.PostCount, State.PostSkip);
                     break;
                 case PostTypes.New:
                 default:
-                    postCollection = await Service.GetNewPostsAsync(State.ActiveGroupId.ToString());
+                    postCollection = await Service.GetNewPostsAsync(State.ActiveGroupId.ToString(), State.PostCount, State.PostSkip);
                     break;
             }
 

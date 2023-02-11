@@ -87,16 +87,22 @@ namespace HearYe.Client.Data
 
         public Task<List<PostWithUserName>?> GetNewPostsAsync(string messageGroupId, int count = 15, int skip = 0)
         {
+            // Get 1 more than usual so we know whether or not to active the 'next' button.
+            count = ++count;
             return http.GetFromJsonAsync<List<PostWithUserName>?>($"api/post/new?messageGroupId={messageGroupId}&count={count}&skip={skip}");
         }
 
         public Task<List<PostWithUserName>?> GetAcknowledgedPostsAsync(string messageGroupId, int count = 15, int skip = 0)
         {
+            // Get 1 more than usual so we know whether or not to active the 'next' button.
+            count = ++count;
             return http.GetFromJsonAsync<List<PostWithUserName>?>($"api/post/acknowledged?messageGroupId={messageGroupId}&count={count}&skip={skip}");
         }
 
         public Task<List<PostWithUserName>?> GetStalePostsAsync(string messageGroupId, int count = 15, int skip = 0)
         {
+            // Get 1 more than usual so we know whether or not to active the 'next' button.
+            count = ++count;
             return http.GetFromJsonAsync<List<PostWithUserName>?>($"api/post/stale?messageGroupId={messageGroupId}&count={count}&skip={skip}");
         }
 
