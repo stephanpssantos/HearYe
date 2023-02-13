@@ -14,6 +14,7 @@ namespace HearYe.Client.Data
             this.http = http;
         }
 
+        #region USER
         public Task<User?> GetUserAsync(string userId)
         {
             return http.GetFromJsonAsync<User?>($"api/user/{userId}");
@@ -22,6 +23,19 @@ namespace HearYe.Client.Data
         public Task<User?> GetUserByOIDAsync(string userOidGuid)
         {
             return http.GetFromJsonAsync<User?>($"api/user/?aadOid={userOidGuid}");
+        }
+
+        public async Task<UserPublicInfo?> GetUserPublicInfoAsync(int userId)
+        {
+            HttpResponseMessage response = await http.GetAsync($"api/user/public/{userId}");
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<UserPublicInfo>();
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public Task<List<MessageGroup>?> GetUserMessageGroupsAsync(string userId) 
@@ -52,39 +66,19 @@ namespace HearYe.Client.Data
             }
             catch (Exception ex)
             {
-                // Do something here
+                //If using a monitoring service, place a call to it here.
+                Console.WriteLine(ex.Message);
                 return null;
             }
         }
 
-        public async Task<Post?> NewPostAsync(Post post)
+        public async Task<HttpResponseMessage> UpdateUserAsync(int id, User user)
         {
-            try
-            {
-                HttpResponseMessage response = await http.PostAsJsonAsync("api/post", post);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    return await response.Content.ReadFromJsonAsync<Post>();
-                }
-                else
-                {
-                    return null;
-                }
-            }
-            catch (AccessTokenNotAvailableException ex)
-            {
-                //Navigation.NavigateToLogin("authentication/login"); in case ex.redirect causes issues
-                ex.Redirect();
-                return null;
-            }
-            catch (Exception ex)
-            {
-                // Do something here
-                return null;
-            }
+            return await http.PutAsJsonAsync($"api/user/{id}", user);
         }
+        #endregion USER
 
+        #region POST
         public Task<List<PostWithUserName>?> GetNewPostsAsync(string messageGroupId, int count = 15, int skip = 0)
         {
             // Get 1 more than usual so we know whether or not to active the 'next' button.
@@ -106,19 +100,48 @@ namespace HearYe.Client.Data
             return http.GetFromJsonAsync<List<PostWithUserName>?>($"api/post/stale?messageGroupId={messageGroupId}&count={count}&skip={skip}");
         }
 
-        public async Task<HttpResponseMessage> NewAcknowledgementAsync(Acknowledgement acknowledgement)
-        {
-            return await http.PostAsJsonAsync("api/acknowledgement", acknowledgement);
-        }
-
-        public async Task<HttpResponseMessage> DeleteAcknowledgementAsync(int postId, int userId)
-        {
-            return await http.DeleteAsync($"api/acknowledgement/delete?postId={postId}&userId={userId}");
-        }
-
         public Task<List<UserPublicInfo>?> GetPostAcknowledgedUsersAsync(int userId)
         {
             return http.GetFromJsonAsync<List<UserPublicInfo>?>($"api/post/acknowledged/{userId}");
+        }
+
+        public async Task<Post?> NewPostAsync(Post post)
+        {
+            try
+            {
+                HttpResponseMessage response = await http.PostAsJsonAsync("api/post", post);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadFromJsonAsync<Post>();
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (AccessTokenNotAvailableException ex)
+            {
+                ex.Redirect();
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
+            }
+        }
+        #endregion POST
+
+        #region MESSAGE GROUP
+        public async Task<MessageGroup?> GetMessageGroupAsync(int id)
+        {
+            return await http.GetFromJsonAsync<MessageGroup?>($"api/messagegroup/{id}");
+        }
+
+        public async Task<List<MessageGroupMemberWithName>?> GetMessageGroupMembersAsync(int id)
+        {
+            return await http.GetFromJsonAsync<List<MessageGroupMemberWithName>?>($"api/messagegroup/members/{id}");
         }
 
         public async Task<MessageGroup?> NewMessageGroupAsync(string newGroupName)
@@ -138,30 +161,38 @@ namespace HearYe.Client.Data
             }
             catch (AccessTokenNotAvailableException ex)
             {
-                //Navigation.NavigateToLogin("authentication/login"); in case ex.redirect causes issues
                 ex.Redirect();
                 return null;
             }
             catch (Exception ex)
             {
-                // Do something here
+                Console.WriteLine(ex.Message);
                 return null;
             }
         }
 
+        public async Task<HttpResponseMessage> SetMessageGroupRoleAsync(MessageGroupMember mgm)
+        {
+            return await http.PutAsJsonAsync("api/messagegroup/setrole", mgm);
+        }
+
+        public async Task<HttpResponseMessage> DeleteMessageGroupMemberAsync(int userId, int groupId)
+        {
+            return await http.DeleteAsync($"api/messagegroup/member?userId={userId}&groupId={groupId}");
+        }
+        #endregion MESSAGE GROUP
+
+        #region MESSAGE GROUP INVITATIONS
         public Task<List<MessageGroupInvitationWithNames>?> GetMessageGroupInvitationsAsync(int userId)
         {
             return http.GetFromJsonAsync<List<MessageGroupInvitationWithNames>?>($"api/messagegroupinvitation/user/{userId}");
         }
 
-        public async Task<HttpResponseMessage> DeleteMessageGroupInvitationAsync(int inviteId)
+        public async Task<HttpResponseMessage> NewMessageGroupInvitationAsync(MessageGroupInvitation inv)
         {
-            return await http.DeleteAsync($"api/messagegroupinvitation/delete/{inviteId}");
-        }
-
-        public async Task<HttpResponseMessage> UpdateUserAsync(int id, User user)
-        {
-            return await http.PutAsJsonAsync($"api/user/{id}", user);
+            // This could immediately be transformed to a MessageGroupInvitation but
+            // the HttpResponseMessage is used to determine response status.
+            return await http.PostAsJsonAsync("api/messagegroupinvitation/new", inv);
         }
 
         public async Task<HttpResponseMessage> AcceptMessageGroupInvitationAsync(int id)
@@ -174,46 +205,25 @@ namespace HearYe.Client.Data
             return await http.PatchAsync($"api/messagegroupinvitation/decline/{id}", null);
         }
 
-        public async Task<List<MessageGroupMemberWithName>?> GetMessageGroupMembersAsync(int id)
+        public async Task<HttpResponseMessage> DeleteMessageGroupInvitationAsync(int inviteId)
         {
-            return await http.GetFromJsonAsync<List<MessageGroupMemberWithName>?>($"api/messagegroup/members/{id}");
+            return await http.DeleteAsync($"api/messagegroupinvitation/delete/{inviteId}");
+        }
+        #endregion MESSAGE GROUP INVITATIONS
+
+        #region ACKNOWLEDGEMENTS
+        public async Task<HttpResponseMessage> NewAcknowledgementAsync(Acknowledgement acknowledgement)
+        {
+            return await http.PostAsJsonAsync("api/acknowledgement", acknowledgement);
         }
 
-        public async Task<MessageGroup?> GetMessageGroupAsync(int id)
+        public async Task<HttpResponseMessage> DeleteAcknowledgementAsync(int postId, int userId)
         {
-            return await http.GetFromJsonAsync<MessageGroup?>($"api/messagegroup/{id}");
+            return await http.DeleteAsync($"api/acknowledgement/delete?postId={postId}&userId={userId}");
         }
+        #endregion ACKNOWLEDGEMENTS
 
-        public async Task<HttpResponseMessage> DeleteMessageGroupMemberAsync(int userId, int groupId)
-        {
-            return await http.DeleteAsync($"api/messagegroup/member?userId={userId}&groupId={groupId}");
-        }
-
-        public async Task<HttpResponseMessage> SetMessageGroupRoleAsync(MessageGroupMember mgm)
-        {
-            return await http.PutAsJsonAsync("api/messagegroup/setrole", mgm);
-        }
-
-        public async Task<UserPublicInfo?> GetUserPublicInfoAsync(int userId)
-        {
-            HttpResponseMessage response = await http.GetAsync($"api/user/public/{userId}");
-            if (response.IsSuccessStatusCode)
-            {
-                return await response.Content.ReadFromJsonAsync<UserPublicInfo>();
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        public async Task<HttpResponseMessage> NewMessageGroupInvitationAsync(MessageGroupInvitation inv)
-        {
-            // This could immediately be transformed to a MessageGroupInvitation but
-            // the HttpResponseMessage is used to determine response status.
-            return await http.PostAsJsonAsync("api/messagegroupinvitation/new", inv);
-        }
-
+        #region MESSAGE GROUP SHORTCUTS
         public async Task<List<MessageGroup>?> GetMessageGroupShortcutsAsync(int id)
         {
             return await http.GetFromJsonAsync<List<MessageGroup>?>($"api/messagegroupshortcut/{id}");
@@ -228,5 +238,6 @@ namespace HearYe.Client.Data
         {
             return await http.DeleteAsync($"api/messagegroupshortcut/delete?userId={userId}&groupId={groupId}");
         }
+        #endregion MESSAGE GROUP SHORTCUTS
     }
 }
