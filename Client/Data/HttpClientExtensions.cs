@@ -22,20 +22,20 @@ namespace HearYe.Client.Data
                 }
                 else
                 {
-                    return default(TValue);
+                    return default;
                 }
             }
             catch (AccessTokenNotAvailableException ex)
             {
                 //Navigation.NavigateToLogin("authentication/login"); in case ex.redirect causes issues
                 ex.Redirect();
-                return default(TValue);
+                return default;
             }
             catch (Exception ex)
             {
                 //If using a monitoring service, place a call to it here.
                 Console.WriteLine(ex.Message);
-                return default(TValue);
+                return default;
             }
         }
 
@@ -51,18 +51,18 @@ namespace HearYe.Client.Data
                 }
                 else
                 {
-                    return default(TValue);
+                    return default;
                 }
             }
             catch (AccessTokenNotAvailableException ex)
             {
                 ex.Redirect();
-                return default(TValue);
+                return default;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                return default(TValue);
+                return default;
             }
         }
     }
