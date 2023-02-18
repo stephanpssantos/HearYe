@@ -27,7 +27,7 @@
                     @acknowledgementCount
                 </button>
             </div>
-            <span>Old news on: @(Post?.StaleDate is null ? "Never" : Post?.StaleDate.ToString())</span>
+            <span>Old news on: @(Post?.StaleDate is null ? "Never" : Post?.StaleDate.Value.Date.ToShortDateString())</span>
         </div>
     </div>
 </div>
