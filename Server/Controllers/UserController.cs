@@ -3,6 +3,7 @@
 // </copyright>
 
 using System.Text.Json;
+using Azure.Identity;
 using HearYe.Server.Helpers;
 using HearYe.Shared;
 using Microsoft.AspNetCore.Authorization;
@@ -237,6 +238,9 @@ namespace HearYe.Server.Controllers
 
                 try
                 {
+                    // Sometimes transient errors occur here. If it's happening, try doing:
+                    // this.graph.Users[aadOid].Request().WithMaxRetry(MaxRetry).WithShoudRetry(Func <in T, out TResult>(T arg)).UpdateAsync;
+                    // Look at the docs of WithMaxRetry and WithShouldRetry for more info.
                     await this.graph.Users[aadOid].Request().UpdateAsync(newGraphUser);
                 }
                 catch (Exception ex)

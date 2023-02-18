@@ -21,7 +21,7 @@ namespace HearYe.Client.Shared
             }
 
             postId = Post.Id; // Prevents rerenders from resetting these values (unless it's a whole new post)
-            acknowledgementCount = Post.Acknowledgements.Count();
+            acknowledgementCount = Post.Acknowledgements.Count;
             isAcknowledged = Post.Acknowledgements.Where(a => a.UserId.ToString() == State.UserDbId).FirstOrDefault()is not null;
         }
 
@@ -104,7 +104,7 @@ namespace HearYe.Client.Shared
         }
 
         // https://stackoverflow.com/questions/11/calculate-relative-time-in-c-sharp
-        private string GetPostTime(DateTimeOffset postTime)
+        private static string GetPostTime(DateTimeOffset postTime)
         {
             const int SECOND = 1;
             const int MINUTE = 60 * SECOND;
