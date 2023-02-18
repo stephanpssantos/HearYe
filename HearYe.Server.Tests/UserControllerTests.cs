@@ -505,6 +505,7 @@ namespace HearYe.Server.Tests
             }
         }
 
+
         [Fact]
         public async void UpdateUser_UpdatesUserWithValidRequest()
         {
@@ -521,6 +522,45 @@ namespace HearYe.Server.Tests
                 // Assert
                 Assert.IsType<NoContentResult>(result);
                 Assert.Equal("TestUser3_Updated", context.Users!.Where(x => x.Id == 3).First().DisplayName);
+            }
+        }
+
+        [Fact]
+        public async void UpdateUser_OnlyUpdatesUnprotectedFields()
+        {
+            // Arrange
+            using (HearYeContext context = Fixture.CreateContext())
+            {
+                var controller = new UserController(context, _graphServiceClient, _logger).WithAuthenticatedIdentity("3");
+                var aDate = new DateTimeOffset(2000, 1, 1, 0, 0, 0, TimeSpan.Zero);
+                var aGuid = Guid.NewGuid();
+
+                Shared.User userUpdates = new()
+                {
+                    // Unprotected Fields
+                    DisplayName = "TestUser3_Updated",
+                    LastModifiedDate = DateTimeOffset.Now,
+                    AcceptGroupInvitations = false,
+                    DefaultGroupId = 1,
+                    // Protected Fields
+                    Id = 3,
+                    AadOid = aGuid,
+                    IsDeleted = true,
+                    CreatedDate = aDate,
+                    DeletedDate = aDate,
+                };
+
+                // Act
+                var result = await controller.UpdateUser(3, userUpdates);
+                var user = context.Users!.Where(x => x.Id == 3).First();
+
+                // Assert
+                Assert.IsType<NoContentResult>(result);
+                Assert.Equal("TestUser3_Updated", user.DisplayName);
+                Assert.NotEqual(aGuid, user.AadOid);
+                Assert.False(user.IsDeleted);
+                Assert.NotEqual(aDate, user.CreatedDate);
+                Assert.NotEqual(aDate, user.DeletedDate);
             }
         }
 
