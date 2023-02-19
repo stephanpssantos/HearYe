@@ -25,14 +25,14 @@ namespace HearYe.Server.Controllers
     public class MessageGroupShortcutController : ControllerBase
     {
         private readonly HearYeContext db;
-        private readonly ILogger<AcknowledgementController> logger;
+        private readonly ILogger<MessageGroupShortcutController> logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MessageGroupShortcutController"/> class.
         /// </summary>
         /// <param name="db">HearYeContext instance.</param>
         /// <param name="logger">ILogger instance.</param>
-        public MessageGroupShortcutController(HearYeContext db, ILogger<AcknowledgementController> logger)
+        public MessageGroupShortcutController(HearYeContext db, ILogger<MessageGroupShortcutController> logger)
         {
             this.db = db;
             this.logger = logger;
