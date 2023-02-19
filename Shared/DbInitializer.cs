@@ -370,6 +370,13 @@
                 StaleDate = null
             };
 
+            var yesterday2355 = new DateTimeOffset(
+                DateTimeOffset.Now.Year, 
+                DateTimeOffset.Now.Month, 
+                DateTimeOffset.Now.Day - 1, 
+                23, 55, 0, 
+                new TimeSpan(-8, 0, 0));
+
             Post demoPost5 = new()
             {
                 //Id = 5, // Set by DB
@@ -378,7 +385,7 @@
                 Message = "This is test message 5. Stale!",
                 IsDeleted = false,
                 CreatedDate = DateTimeOffset.Now,
-                StaleDate = DateTimeOffset.Now.AddDays(-1)
+                StaleDate = yesterday2355
             };
 
             Post demoPost6 = new()
