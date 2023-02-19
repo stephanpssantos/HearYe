@@ -284,6 +284,87 @@ namespace HearYe.Server.Tests
         }
 
         [Fact]
+        public async void NewMessageGroupInvitation_ReturnsBadRequestWhenUserDoesNotExist()
+        {
+            // Arrange
+            using (HearYeContext context = Fixture.CreateContext())
+            {
+                var controller = new MessageGroupInvitationController(context, this.logger).WithAuthenticatedIdentity("1");
+                var invite = new MessageGroupInvitation()
+                {
+                    MessageGroupId = 1,
+                    InvitedUserId = 9999,
+                    InvitingUserId = 1,
+                    InvitationActive = true,
+                    InvitationAccepted = false,
+                    CreatedDate = DateTimeOffset.Now
+                };
+
+                // Act
+                var result = await controller.NewMessageGroupInvitation(invite);
+                var resultObject = result as BadRequestObjectResult;
+
+                // Assert
+                Assert.IsType<BadRequestObjectResult>(result);
+                Assert.Equal("Invited user does not exist.", resultObject!.Value);
+            }
+        }
+
+        [Fact]
+        public async void NewMessageGroupInvitation_ReturnsBadRequestWhenUserNotAcceptingInvites()
+        {
+            // Arrange
+            using (HearYeContext context = Fixture.CreateContext())
+            {
+                var controller = new MessageGroupInvitationController(context, this.logger).WithAuthenticatedIdentity("1");
+                var invite = new MessageGroupInvitation()
+                {
+                    MessageGroupId = 1,
+                    InvitedUserId = 3,
+                    InvitingUserId = 1,
+                    InvitationActive = true,
+                    InvitationAccepted = false,
+                    CreatedDate = DateTimeOffset.Now
+                };
+
+                // Act
+                var result = await controller.NewMessageGroupInvitation(invite);
+                var resultObject = result as BadRequestObjectResult;
+
+                // Assert
+                Assert.IsType<BadRequestObjectResult>(result);
+                Assert.Equal("User not accepting invitations.", resultObject!.Value);
+            }
+        }
+
+        [Fact]
+        public async void NewMessageGroupInvitation_ReturnsBadRequestWhenDuplicateInvitationExists()
+        {
+            // Arrange
+            using (HearYeContext context = Fixture.CreateContext())
+            {
+                var controller = new MessageGroupInvitationController(context, this.logger).WithAuthenticatedIdentity("1");
+                var invite = new MessageGroupInvitation()
+                {
+                    MessageGroupId = 1,
+                    InvitedUserId = 2,
+                    InvitingUserId = 1,
+                    InvitationActive = true,
+                    InvitationAccepted = false,
+                    CreatedDate = DateTimeOffset.Now
+                };
+
+                // Act
+                var result = await controller.NewMessageGroupInvitation(invite);
+                var resultObject = result as BadRequestObjectResult;
+
+                // Assert
+                Assert.IsType<BadRequestObjectResult>(result);
+                Assert.Equal("Duplicate invitation exists.", resultObject!.Value);
+            }
+        }
+
+        [Fact]
         public async void NewMessageGroupInvitation_ReturnsBadRequestWhenInvitePropertiesInvalid()
         {
             // Arrange
