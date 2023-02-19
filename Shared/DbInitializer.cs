@@ -100,6 +100,28 @@
                 LastModifiedDate = DateTimeOffset.Now
             };
 
+            User demoUser9 = new()
+            {
+                //Id = 9, // Set by DB
+                AadOid = new Guid("f09cc0b1-f08d-48e0-9684-c8a945e4eeec"),
+                DisplayName = "TestUser9",
+                AcceptGroupInvitations = true,
+                IsDeleted = false,
+                CreatedDate = DateTimeOffset.Now,
+                LastModifiedDate = DateTimeOffset.Now
+            };
+
+            User demoUser10 = new()
+            {
+                //Id = 10, // Set by DB
+                AadOid = new Guid("f09cc0b1-f08d-48e0-9184-c1a945e4eeec"),
+                DisplayName = "TestUser10",
+                AcceptGroupInvitations = true,
+                IsDeleted = false,
+                CreatedDate = DateTimeOffset.Now,
+                LastModifiedDate = DateTimeOffset.Now
+            };
+
             MessageGroup demoMG1 = new()
             {
                 //Id = 1,
@@ -206,6 +228,24 @@
                 MessageGroupId = 1,
                 MessageGroupRoleId = 1,
                 UserId = 8
+            };
+
+            // To be deleted by test
+            MessageGroupMember demoMGM9 = new()
+            {
+                //Id = 9,
+                MessageGroupId = 1,
+                MessageGroupRoleId = 2,
+                UserId = 9
+            };
+
+            // To be deleted by test
+            MessageGroupMember demoMGM10 = new()
+            {
+                //Id = 10,
+                MessageGroupId = 1,
+                MessageGroupRoleId = 2,
+                UserId = 10
             };
 
             MessageGroupInvitation demoMGI1 = new()
@@ -581,6 +621,8 @@
             context.Users!.Add(demoUser6);
             context.Users!.Add(demoUser7);
             context.Users!.Add(demoUser8);
+            context.Users!.Add(demoUser9);
+            context.Users!.Add(demoUser10);
             context.MessageGroups!.Add(demoMG1);
             context.MessageGroups!.Add(demoMG2);
             context.MessageGroups!.Add(demoMG3);
@@ -596,6 +638,8 @@
             context.MessageGroupMembers!.Add(demoMGM6);
             context.MessageGroupMembers!.Add(demoMGM7);
             context.MessageGroupMembers!.Add(demoMGM8);
+            context.MessageGroupMembers!.Add(demoMGM9);
+            context.MessageGroupMembers!.Add(demoMGM10);
             context.Posts!.Add(demoPost1);
             context.Posts!.Add(demoPost2);
             context.Posts!.Add(demoPost3);

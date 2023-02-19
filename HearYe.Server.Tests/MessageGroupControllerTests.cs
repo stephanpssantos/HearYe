@@ -433,5 +433,92 @@ namespace HearYe.Server.Tests
                 Assert.True(verifymgbody!.IsDeleted);
             }
         }
+
+        [Fact]
+        public async void DeleteMessageGroupMember_ReturnsNotFoundWhenNonExistent()
+        {
+            // Arrange
+            using (HearYeContext context = Fixture.CreateContext())
+            {
+                var controller = new MessageGroupController(context, this.logger).WithAnonymousIdentity();
+
+                // Act
+                var result1 = await controller.DeleteMessageGroupMember(1, 9999);
+                var result2 = await controller.DeleteMessageGroupMember(9999, 1);
+
+                // Assert
+                Assert.IsType<NotFoundResult>(result1);
+                Assert.IsType<NotFoundResult>(result2);
+            }
+        }
+
+        [Fact]
+        public async void DeleteMessageGroupMember_ReturnsUnauthorizedWhenUnauthorized()
+        {
+            // Arrange
+            using (HearYeContext context = Fixture.CreateContext())
+            {
+                var controller = new MessageGroupController(context, this.logger).WithAnonymousIdentity();
+
+                // Act
+                var result = await controller.DeleteMessageGroupMember(1, 1);
+
+                // Assert
+                Assert.IsType<UnauthorizedResult>(result);
+            }
+        }
+
+        [Fact]
+        public async void DeleteMessageGroupMember_ReturnsUnauthorizedWhenNotGroupAdminOrSelf()
+        {
+            // Arrange
+            using (HearYeContext context = Fixture.CreateContext())
+            {
+                var controller = new MessageGroupController(context, this.logger).WithAuthenticatedIdentity("7");
+
+                // Act
+                var result = await controller.DeleteMessageGroupMember(4, 1);
+
+                // Assert
+                Assert.IsType<UnauthorizedResult>(result);
+            }
+        }
+
+        [Fact]
+        public async void DeleteMessageGroupMember_NoContentResultWhenRequestFromAdminIsValid()
+        {
+            // Arrange
+            using (HearYeContext context = Fixture.CreateContext())
+            {
+                var controller = new MessageGroupController(context, this.logger).WithAuthenticatedIdentity("1");
+
+                // Act
+                var result = await controller.DeleteMessageGroupMember(9, 1);
+                var verifymgm = await controller.GetMessageGroupMembers(1) as OkObjectResult;
+                var verifymgmbody = verifymgm!.Value as IEnumerable<MessageGroupMemberWithName>;
+
+                // Assert
+                Assert.IsType<NoContentResult>(result);
+                Assert.DoesNotContain(verifymgmbody!, x => x.Id == 9);
+            }
+        }
+
+        [Fact]
+        public async void DeleteMessageGroupMember_NoContentResultWhenRequestFromSelfIsValid()
+        {
+            // Arrange
+            using (HearYeContext context = Fixture.CreateContext())
+            {
+                var controller = new MessageGroupController(context, this.logger).WithAuthenticatedIdentity("10");
+
+                // Act
+                var result = await controller.DeleteMessageGroupMember(10, 1);
+                var verify = context.MessageGroupMembers!.Where(x => x.MessageGroupId == 1 && x.UserId == 10).FirstOrDefault();
+
+                // Assert
+                Assert.IsType<NoContentResult>(result);
+                Assert.Null(verify);
+            }
+        }
     }
 }
