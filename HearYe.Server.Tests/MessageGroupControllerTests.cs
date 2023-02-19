@@ -137,6 +137,26 @@ namespace HearYe.Server.Tests
         }
 
         [Fact]
+        public async void GetMessageGroupMembers_ReturnedMemberListIncludesUserDisplayName()
+        {
+            // Arrange
+            using (HearYeContext context = Fixture.CreateContext())
+            {
+                var controller = new MessageGroupController(context, this.logger).WithAuthenticatedIdentity("1");
+
+                // Act
+                var result = await controller.GetMessageGroupMembers(1);
+                var resultBody = result as OkObjectResult;
+                var mg = resultBody!.Value as IEnumerable<MessageGroupMemberWithName>;
+
+                // Assert
+                Assert.IsType<OkObjectResult>(result);
+                Assert.Contains<MessageGroupMemberWithName>(mg!, mgm => mgm.UserId == 1);
+                Assert.Contains<MessageGroupMemberWithName>(mg!, mgm => mgm.UserName == "TestUser");
+            }
+        }
+
+        [Fact]
         public async void NewMessageGroupMembers_ReturnsUnauthorizedWhenUnauthorized()
         {
             // Arrange
