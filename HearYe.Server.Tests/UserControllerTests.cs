@@ -101,6 +101,59 @@ namespace HearYe.Server.Tests
         }
 
         [Fact]
+        public async void GetUserPublicInfo_ReturnsUnauthorizedWhenUnauthorized()
+        {
+            // Arrange
+            using (HearYeContext context = Fixture.CreateContext())
+            {
+                var controller = new UserController(context, _graphServiceClient, _logger).WithAnonymousIdentity();
+
+                // Act
+                var result = await controller.GetUserPublicInfo(1);
+
+                // Assert
+                Assert.IsType<UnauthorizedResult>(result);
+            }
+        }
+
+        [Fact]
+        public async void GetUserPublicInfo_ReturnsNotFoundWhenRequestingNonexistentUser()
+        {
+            // Arrange
+            using (HearYeContext context = Fixture.CreateContext())
+            {
+                var controller = new UserController(context, _graphServiceClient, _logger).WithAuthenticatedIdentity("1");
+
+                // Act
+                var result = await controller.GetUserPublicInfo(9999);
+
+                // Assert
+                Assert.IsType<NotFoundResult>(result);
+            }
+        }
+
+        [Fact]
+        public async void GetUserPublicInfo_ReturnsUserWithValidRequest()
+        {
+            // Arrange
+            using (HearYeContext context = Fixture.CreateContext())
+            {
+                var controller = new UserController(context, _graphServiceClient, _logger).WithAuthenticatedIdentity("1");
+
+                // Act
+                var result = await controller.GetUserPublicInfo(1);
+                var okResult = result as OkObjectResult;
+                var resultBody = okResult!.Value as Shared.UserPublicInfo;
+
+                // Assert
+                Assert.IsType<OkObjectResult>(result);
+                Assert.Equal(1, resultBody!.Id);
+                Assert.Equal("TestUser", resultBody.DisplayName);
+                Assert.False(resultBody.AcceptGroupInvitations);
+            }
+        }
+
+        [Fact]
         public async void GetUserByOid_ReturnsUnauthorizedWhenUnauthorized()
         {
             // Arrange
