@@ -158,6 +158,26 @@ namespace HearYe.Server.Tests
         }
 
         [Fact]
+        public async void GetMessageGroupInvitation_IncludesPlainUserNames()
+        {
+            // Arrange
+            using (HearYeContext context = Fixture.CreateContext())
+            {
+                var controller = new MessageGroupInvitationController(context, this.logger).WithAuthenticatedIdentity("1");
+
+                // Act
+                var result = await controller.GetMessageGroupInvitations(1);
+                var resultObject = result as OkObjectResult;
+                var resultBody = resultObject!.Value as IEnumerable<MessageGroupInvitationWithNames>;
+
+                // Assert
+                Assert.IsType<OkObjectResult>(result);
+                Assert.Contains(resultBody!, rb => rb.InvitedUserName == "TestUser");
+                Assert.Contains(resultBody!, rb => rb.MessageGroupName == "TestMessageGroup1");
+            }
+        }
+
+        [Fact]
         public async void GetMessageGroupInvitations_DoesNotReturnExpiredInvitations()
         {
             // Arrange
