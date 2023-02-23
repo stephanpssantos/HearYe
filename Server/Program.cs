@@ -3,10 +3,12 @@
 // </copyright>
 
 using System.Text.Json.Serialization;
+using HearYe.Client;
 using HearYe.Server;
 using HearYe.Shared;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpLogging; // HttpLoggingFields
+using Microsoft.Data.SqlClient;
 using Microsoft.Identity.Web;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
@@ -35,8 +37,13 @@ builder.Services.Configure<JwtBearerOptions>(
         options.TokenValidationParameters.NameClaimType = "name";
     });
 
-// builder.Services.AddHearYeContext(builder.Configuration["Azure:SQL"] !);
-builder.Services.AddHearYeContext(builder.Configuration.GetConnectionString("DefaultConnection") !);
+SqlConnectionStringBuilder scBuilder = new (builder.Configuration.GetConnectionString("PartialConnection") !);
+scBuilder.DataSource = builder.Configuration.GetSection("AzureSQL")["ServerName"] !;
+scBuilder.UserID = builder.Configuration.GetSection("AzureSQL")["AppId"] !;
+scBuilder.Password = builder.Configuration["AzureSQL:AppRegSecret"];
+
+// builder.Services.AddHearYeContext(builder.Configuration.GetConnectionString("DefaultConnection") !);
+builder.Services.AddHearYeContext(scBuilder.ConnectionString);
 
 string[] graphScopes = builder.Configuration.GetSection("MicrosoftGraph:Scopes").Get<List<string>>() !.ToArray();
 string graphTenantId = builder.Configuration.GetSection("MicrosoftGraph")["TenantId"] !;
@@ -104,6 +111,9 @@ builder.Services.AddHealthChecks().AddDbContextCheck<HearYeContext>();
 
 var app = builder.Build();
 
+// API management requires Swagger definitions to always be generated.
+app.UseSwagger();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -111,7 +121,6 @@ if (app.Environment.IsDevelopment())
 
     app.UseHttpLogging();
 
-    app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint(
