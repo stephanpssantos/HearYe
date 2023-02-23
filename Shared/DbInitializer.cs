@@ -4,7 +4,7 @@
     {
         public static void Initialize(HearYeContext context)
         {
-            context.Database.EnsureDeleted();
+            //context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
 
             if (context.Users!.Any())

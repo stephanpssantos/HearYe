@@ -35,6 +35,7 @@ builder.Services.Configure<JwtBearerOptions>(
         options.TokenValidationParameters.NameClaimType = "name";
     });
 
+// builder.Services.AddHearYeContext(builder.Configuration["Azure:SQL"] !);
 builder.Services.AddHearYeContext(builder.Configuration.GetConnectionString("DefaultConnection") !);
 
 string[] graphScopes = builder.Configuration.GetSection("MicrosoftGraph:Scopes").Get<List<string>>() !.ToArray();
@@ -43,15 +44,29 @@ string graphClientId = builder.Configuration.GetSection("MicrosoftGraph")["Clien
 string graphAppRegSecret = builder.Configuration["Graph:AppRegSecret"] !;
 builder.Services.AddGraphClient(graphScopes, graphTenantId, graphClientId, graphAppRegSecret);
 
-builder.Services.AddControllersWithViews()
-    .AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
-builder.Services.AddRazorPages();
+// Converting to a Web API;
+// builder.Services.AddControllersWithViews()
+//    .AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+// builder.Services.AddRazorPages();
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddHttpLogging(options =>
 {
     options.LoggingFields = HttpLoggingFields.All;
     options.RequestBodyLogLimit = 4096; // default is  32k
     options.ResponseBodyLogLimit = 4096; // default is  32k
+});
+
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins(builder.Configuration["ClientAddress"] !)
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
 });
 
 builder.Services.AddSwaggerGen(c =>
@@ -131,17 +146,18 @@ else
 
 app.UseHttpsRedirection();
 
-app.UseBlazorFrameworkFiles();
-app.UseStaticFiles();
-
+// Converting to a Web API;
+// app.UseBlazorFrameworkFiles();
+// app.UseStaticFiles();
 app.UseRouting();
+app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseHealthChecks(path: "/healthcheck");
 
-app.MapRazorPages();
+// app.MapRazorPages();
 app.MapControllers();
-app.MapFallbackToFile("index.html");
 
+// app.MapFallbackToFile("index.html");
 app.Run();

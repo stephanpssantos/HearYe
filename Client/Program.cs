@@ -3,15 +3,31 @@ using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using HearYe.Client;
 using HearYe.Client.Data;
+using Microsoft.AspNetCore.Components;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-builder.Services.AddHttpClient("HearYe.ServerAPI", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))
-    .AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>()
+builder.Services.AddTransient(sp => 
+{ 
+    return new CustomAuthorizationMessageHandler(
+        sp.GetRequiredService<IAccessTokenProvider>(), 
+        sp.GetRequiredService<NavigationManager>(),
+        builder.Configuration["APIBaseURI"] !);
+});
+builder.Services.AddHttpClient("HearYe.ServerAPI", client => client.BaseAddress = new Uri(builder.Configuration["APIBaseURI"] !))
+    .AddHttpMessageHandler<CustomAuthorizationMessageHandler>()
     .SetHandlerLifetime(TimeSpan.FromMinutes(5))
     .AddPolicyHandler(Policies.GetRetryPolicy());
+
+/* BaseAddressAuthorizationMessageHandler will not send auth claims to the server address unless it matches the client's
+   address. Therefore, a custom message handler (with the API's server address configured) must be used. */
+
+// builder.Services.AddHttpClient("HearYe.ServerAPI", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))
+//    .AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>()
+//    .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+//    .AddPolicyHandler(Policies.GetRetryPolicy());
 
 // Supply HttpClient instances that include access tokens when making requests to the server project
 // In Blazor, Scoped behaves like a singleton i.e. a single instance is created and shared.
