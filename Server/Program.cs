@@ -55,7 +55,8 @@ builder.Services.AddGraphClient(graphScopes, graphTenantId, graphClientId, graph
 // builder.Services.AddControllersWithViews()
 //    .AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 // builder.Services.AddRazorPages();
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddHttpLogging(options =>
