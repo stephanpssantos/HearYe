@@ -1,0 +1,9 @@
+services:
+  hearye-docker-api:
+    build:
+      context: .
+    ports:
+     - 7193:7193
+    environment:
+      Graph_AppRegSecret: ${Graph_AppRegSecret:?Graph secret not set}
+      AzureSQL_AppRegSecret: ${AzureSQL_AppRegSecret:?SQL secret not set}

@@ -3,7 +3,6 @@
 // </copyright>
 
 using System.Text.Json.Serialization;
-using HearYe.Client;
 using HearYe.Server;
 using HearYe.Shared;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -37,18 +36,28 @@ builder.Services.Configure<JwtBearerOptions>(
         options.TokenValidationParameters.NameClaimType = "name";
     });
 
-SqlConnectionStringBuilder scBuilder = new (builder.Configuration.GetConnectionString("PartialConnection") !);
-scBuilder.DataSource = builder.Configuration.GetSection("AzureSQL")["ServerName"] !;
-scBuilder.UserID = builder.Configuration.GetSection("AzureSQL")["AppId"] !;
-scBuilder.Password = builder.Configuration["AzureSQL:AppRegSecret"];
+if (builder.Environment.IsProduction())
+{
+    SqlConnectionStringBuilder scBuilder = new (builder.Configuration.GetConnectionString("PartialConnection") !)
+    {
+        DataSource = builder.Configuration.GetSection("AzureSQL")["ServerName"] !,
+        UserID = builder.Configuration.GetSection("AzureSQL")["AppId"] !,
+        Password = builder.Configuration["AzureSQL_AppRegSecret"],
+    };
 
-// builder.Services.AddHearYeContext(builder.Configuration.GetConnectionString("DefaultConnection") !);
-builder.Services.AddHearYeContext(scBuilder.ConnectionString);
+    builder.Services.AddHearYeContext(scBuilder.ConnectionString);
+}
+else if (builder.Environment.IsDevelopment())
+{
+    string filePath = Path.Combine(Directory.GetCurrentDirectory(), "Logs");
+    builder.Logging.AddProvider(new DevFileLoggerProvider(filePath));
+    builder.Services.AddHearYeContext(builder.Configuration.GetConnectionString("DefaultConnection") !);
+}
 
 string[] graphScopes = builder.Configuration.GetSection("MicrosoftGraph:Scopes").Get<List<string>>() !.ToArray();
 string graphTenantId = builder.Configuration.GetSection("MicrosoftGraph")["TenantId"] !;
 string graphClientId = builder.Configuration.GetSection("MicrosoftGraph")["ClientId"] !;
-string graphAppRegSecret = builder.Configuration["Graph:AppRegSecret"] !;
+string graphAppRegSecret = builder.Configuration["Graph_AppRegSecret"] !;
 builder.Services.AddGraphClient(graphScopes, graphTenantId, graphClientId, graphAppRegSecret);
 
 // Converting to a Web API;
@@ -150,7 +159,7 @@ if (app.Environment.IsDevelopment())
 else
 {
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseExceptionHandler("/Error");
+    // app.UseExceptionHandler("/Error");
     app.UseHsts();
 }
 

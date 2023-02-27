@@ -9,14 +9,26 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
+string apiURI = string.Empty;
+if (builder.HostEnvironment.IsDevelopment())
+{
+    apiURI = builder.Configuration["APIDevURI"]!;
+    builder.Logging.SetMinimumLevel(LogLevel.Information);
+}
+else
+{
+    apiURI = builder.Configuration["APIBaseURI"]!;
+    builder.Logging.SetMinimumLevel(LogLevel.Warning);
+}
+
 builder.Services.AddTransient(sp => 
 { 
     return new CustomAuthorizationMessageHandler(
         sp.GetRequiredService<IAccessTokenProvider>(), 
         sp.GetRequiredService<NavigationManager>(),
-        builder.Configuration["APIBaseURI"] !);
+        apiURI);
 });
-builder.Services.AddHttpClient("HearYe.ServerAPI", client => client.BaseAddress = new Uri(builder.Configuration["APIBaseURI"] !))
+builder.Services.AddHttpClient("HearYe.ServerAPI", client => client.BaseAddress = new Uri(apiURI))
     .AddHttpMessageHandler<CustomAuthorizationMessageHandler>()
     .SetHandlerLifetime(TimeSpan.FromMinutes(5))
     .AddPolicyHandler(Policies.GetRetryPolicy());
