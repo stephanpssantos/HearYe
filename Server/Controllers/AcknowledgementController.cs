@@ -42,7 +42,7 @@ namespace HearYe.Server.Controllers
         /// </summary>
         /// <param name="acknowledgement">Acknowledgement object included in request body in JSON format.</param>
         /// <returns>204, 400, or 401.</returns>
-        [HttpPost]
+        [HttpPost(Name = nameof(NewAcknowledgement))]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
@@ -105,7 +105,7 @@ namespace HearYe.Server.Controllers
         /// <param name="postId">Post ID of acknowledgement to delete.</param>
         /// <param name="userId">User ID of acknowledgement to delete.</param>
         /// <returns>204, 400, 401, or 404.</returns>
-        [HttpDelete("delete")]
+        [HttpDelete("delete", Name = nameof(DeleteAcknowledgement))]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]

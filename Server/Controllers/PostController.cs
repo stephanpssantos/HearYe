@@ -72,7 +72,7 @@ namespace HearYe.Server.Controllers
         /// </summary>
         /// <param name="id">Id of the specified post.</param>
         /// <returns>200 (with a post object), 401, or 400.</returns>
-        [HttpGet("acknowledged/{id:int}")]
+        [HttpGet("acknowledged/{id:int}", Name = nameof(GetPostAcknowledgedUsers))]
         [ProducesResponseType(200, Type = typeof(IEnumerable<UserPublicInfo>))]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
@@ -115,7 +115,7 @@ namespace HearYe.Server.Controllers
         /// <param name="count">Number of posts to return.</param>
         /// <param name="skip">Number of posts to skip. Posts are ordered by creation date.</param>
         /// <returns>200 (with a list of post objects), 400, or 401.</returns>
-        [HttpGet("new")]
+        [HttpGet("new", Name = nameof(GetNewPosts))]
         [ProducesResponseType(200, Type = typeof(IEnumerable<PostWithUserName>))]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
@@ -169,7 +169,7 @@ namespace HearYe.Server.Controllers
         /// <param name="count">Number of posts to return.</param>
         /// <param name="skip">Number of posts to skip. Posts are ordered by creation date.</param>
         /// <returns>200 (with a list of post objects), 400, or 401.</returns>
-        [HttpGet("acknowledged")]
+        [HttpGet("acknowledged", Name = nameof(GetAcknowledgedPosts))]
         [ProducesResponseType(200, Type = typeof(IEnumerable<PostWithUserName>))]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
@@ -223,7 +223,7 @@ namespace HearYe.Server.Controllers
         /// <param name="count">Number of posts to return.</param>
         /// <param name="skip">Number of posts to skip. Posts are ordered by creation date.</param>
         /// <returns>200 (with a list of post objects), 400, or 401.</returns>
-        [HttpGet("stale")]
+        [HttpGet("stale", Name = nameof(GetStalePosts))]
         [ProducesResponseType(200, Type = typeof(IEnumerable<PostWithUserName>))]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
@@ -272,7 +272,7 @@ namespace HearYe.Server.Controllers
         /// </summary>
         /// <param name="post">Post object included in request body in JSON format.</param>
         /// <returns>201, 400, or 404.</returns>
-        [HttpPost]
+        [HttpPost(Name = nameof(NewPost))]
         [ProducesResponseType(201, Type = typeof(Post))]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
@@ -313,7 +313,7 @@ namespace HearYe.Server.Controllers
         /// </summary>
         /// <param name="id">Id of the specified post.</param>
         /// <returns>204, 400, 401, or 404.</returns>
-        [HttpDelete("{id:int}")]
+        [HttpDelete("{id:int}", Name = nameof(DeletePost))]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]

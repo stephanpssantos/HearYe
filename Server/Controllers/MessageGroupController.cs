@@ -114,7 +114,7 @@ namespace HearYe.Server.Controllers
         /// </summary>
         /// <param name="groupName">Group name included in request body in JSON format.</param>
         /// <returns>201, 400, 401.</returns>
-        [HttpPost("new")]
+        [HttpPost("new", Name = nameof(NewMessageGroup))]
         [ProducesResponseType(201, Type = typeof(MessageGroup))]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
@@ -202,7 +202,7 @@ namespace HearYe.Server.Controllers
         /// </summary>
         /// <param name="mgm">MessageGroupMember object included in request body in JSON format.</param>
         /// <returns>204, 401, or 400.</returns>
-        [HttpPut("setrole")]
+        [HttpPut("setrole", Name = nameof(SetMessageGroupRole))]
         [ProducesResponseType(204)]
         [ProducesResponseType(401)]
         [ProducesResponseType(400)]
@@ -262,7 +262,7 @@ namespace HearYe.Server.Controllers
         /// </summary>
         /// <param name="id">Id of the message group to delete.</param>
         /// <returns>204, 400, 401, 404.</returns>
-        [HttpDelete("{id:int}")]
+        [HttpDelete("{id:int}", Name = nameof(DeleteMessageGroup))]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
@@ -309,7 +309,7 @@ namespace HearYe.Server.Controllers
         /// <param name="userId">User id of user of member to delete.</param>
         /// <param name="groupId">Id of message groupto remove user from.</param>
         /// <returns>204, 400, 401, 404.</returns>
-        [HttpDelete("member")]
+        [HttpDelete("member", Name = nameof(DeleteMessageGroupMember))]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]

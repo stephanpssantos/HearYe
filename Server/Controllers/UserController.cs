@@ -115,7 +115,7 @@ namespace HearYe.Server.Controllers
         /// </summary>
         /// <param name="aadOid">User's Azure AD OID.</param>
         /// <returns>200 (with user object in body), 400, 401, or 404.</returns>
-        [HttpGet]
+        [HttpGet(Name = nameof(GetUserByOid))]
         [ProducesResponseType(200, Type = typeof(User))]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
@@ -157,7 +157,7 @@ namespace HearYe.Server.Controllers
         /// </summary>
         /// <param name="id">Id of the specified user.</param>
         /// <returns>200 (with a list of message group objects in body), or 401.</returns>
-        [HttpGet("groups/{id:int}")]
+        [HttpGet("groups/{id:int}", Name = nameof(GetUserMessageGroups))]
         [ProducesResponseType(200, Type = typeof(IEnumerable<MessageGroup>))]
         [ProducesResponseType(401)]
         public async Task<IActionResult> GetUserMessageGroups(int id)
@@ -184,7 +184,7 @@ namespace HearYe.Server.Controllers
         /// </summary>
         /// <param name="user">User object included in request body in JSON format.</param>
         /// <returns>201, 400, or 401.</returns>
-        [HttpPost]
+        [HttpPost(Name = nameof(NewUser))]
         [ProducesResponseType(201, Type = typeof(User))]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
@@ -281,7 +281,7 @@ namespace HearYe.Server.Controllers
         /// <param name="id">Id of the user to update.</param>
         /// <param name="user">User object included in request body in JSON format.</param>
         /// <returns>204, 400, 401, or 404.</returns>
-        [HttpPut("{id:int}")]
+        [HttpPut("{id:int}", Name = nameof(UpdateUser))]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
@@ -334,7 +334,7 @@ namespace HearYe.Server.Controllers
         /// </summary>
         /// <param name="id">Id of the user to delete.</param>
         /// <returns>204, 400, 401, or 404.</returns>
-        [HttpDelete("{id:int}")]
+        [HttpDelete("{id:int}", Name = nameof(DeleteUser))]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]

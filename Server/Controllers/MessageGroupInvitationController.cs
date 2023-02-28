@@ -118,7 +118,7 @@ namespace HearYe.Server.Controllers
         /// </summary>
         /// <param name="invite">MessageGroupInvitation object included in request body in JSON format.</param>
         /// <returns>201, 400, or 401.</returns>
-        [HttpPost("new")]
+        [HttpPost("new", Name = nameof(NewMessageGroupInvitation))]
         [ProducesResponseType(201, Type = typeof(MessageGroupInvitation))]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
@@ -200,7 +200,7 @@ namespace HearYe.Server.Controllers
         /// </summary>
         /// <param name="id">Id of the specified message group invitation.</param>
         /// <returns>204, 400, 401, or 404.</returns>
-        [HttpPatch("decline/{id:int}")]
+        [HttpPatch("decline/{id:int}", Name = nameof(DeclineMessageGroupInvitation))]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
@@ -270,7 +270,7 @@ namespace HearYe.Server.Controllers
         /// </summary>
         /// <param name="id">Id of the specified message group invitation.</param>
         /// <returns>204, 400, 401, or 404.</returns>
-        [HttpPatch("accept/{id:int}")]
+        [HttpPatch("accept/{id:int}", Name = nameof(AcceptMessageGroupInvitation))]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
@@ -357,7 +357,7 @@ namespace HearYe.Server.Controllers
         /// </summary>
         /// <param name="id">Id of the specified message group invite.</param>
         /// <returns>204, 400, 401, or 404.</returns>
-        [HttpDelete("delete/{id:int}")]
+        [HttpDelete("delete/{id:int}", Name = nameof(DeleteMessageGroupInvitation))]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]

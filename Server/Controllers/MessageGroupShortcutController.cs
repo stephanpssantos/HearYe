@@ -44,7 +44,7 @@ namespace HearYe.Server.Controllers
         /// </summary>
         /// <param name="id">Id of the specified user.</param>
         /// <returns>200 (with a list of message groups), or 401.</returns>
-        [HttpGet("{id:int}")]
+        [HttpGet("{id:int}", Name = nameof(GetMessageGroupShortcuts))]
         [ProducesResponseType(200, Type = typeof(IEnumerable<MessageGroup>))]
         [ProducesResponseType(401)]
         public async Task<IActionResult> GetMessageGroupShortcuts(int id)
@@ -70,7 +70,7 @@ namespace HearYe.Server.Controllers
         /// </summary>
         /// <param name="shortcut">MessageGroupShortcut object included in request body in JSON format.</param>
         /// <returns>204, 400, or 401.</returns>
-        [HttpPost("new")]
+        [HttpPost("new", Name = nameof(NewMessageGroupShortcut))]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
@@ -126,7 +126,7 @@ namespace HearYe.Server.Controllers
         /// <param name="userId">User id of user who owns the shortcut.</param>
         /// <param name="groupId">Message group id of a message group.</param>
         /// <returns>204, 400, 401, or 404.</returns>
-        [HttpDelete("delete")]
+        [HttpDelete("delete", Name = nameof(DeleteMessageGroupShortcut))]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
