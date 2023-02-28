@@ -88,7 +88,7 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v2", new () { Title = "HearYe Service API", Version = "v2" });
+    c.SwaggerDoc("v1", new () { Title = "HearYe Service API", Version = "v1" });
 
     c.AddSecurityDefinition(
         "AuthToken",
@@ -134,7 +134,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint(
-            "/swagger/v2/swagger.json",
+            "/swagger/v1/swagger.json",
             "HearYe Service API Version 1");
 
         c.SupportedSubmitMethods(new[]
