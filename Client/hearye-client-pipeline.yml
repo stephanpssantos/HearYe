@@ -20,11 +20,11 @@ variables:
   readonly: true
 
 - name: projectFile
-  value: 'BWA\Client\*.csproj'
+  value: 'BWA/Client/*.csproj'
   readonly: true
 
 - name: solution
-  value: 'BWA\*.sln'
+  value: 'BWA/*.sln'
   readonly: true
 
 - name: artifactName
