@@ -38,8 +38,7 @@
     dependsOn: build
     pool:
       vmImage: windows-latest
-    #environment: ${{ parameters.azdoEnv }}
-    environment: hearye
+    environment: ${{ parameters.azdoEnv }}
     strategy:
       runOnce:
         deploy:
