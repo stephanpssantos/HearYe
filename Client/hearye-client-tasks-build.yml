@@ -1,0 +1,46 @@
+﻿steps:
+
+# NuGet Tool Installer
+- task: NuGetToolInstaller@1
+  displayName: 'NuGet tool installer'
+  inputs:
+    checkLatest: true # Optional
+
+# Nuget Restore
+- task: NuGetCommand@2
+  displayName: 'NuGet restore'
+  inputs:
+    command: 'restore' # Options: restore, pack, push, custom
+    restoreSolution: $(solution) # Required when command == Restore
+    #feedsToUse: 'select' # Options: select, config
+    #vstsFeed: $(feed) # Required when feedsToUse == Select
+    #includeNuGetOrg: 'true' # Required when feedsToUse == Select
+    #nugetConfigPath: # Required when feedsToUse == Config
+    #externalFeedCredentials: # Optional
+    #noCache: false
+    #disableParallelProcessing: false
+    #restoreDirectory: # Specifies the folder in which packages are installed. If no folder is specified, packages are restored into a packages/ folder alongside the selected solution, packages.config, or project.json.
+    verbosityRestore: 'Detailed' # Options: quiet, normal, detailed
+
+# MSBuild
+- task: MSBuild@1
+  displayName: 'Build solution'
+  inputs:
+    solution: $(projectFile)
+    vsVersion: 'latest' # Optional. Options: latest, 16.0, 15.0, 14.0, 12.0, 11.0
+    msbuildArgs: $(msbuildArgs)
+    platform: $(buildPlatform) # Optional
+    configuration: $(buildConfiguration) # Optional
+    clean: true # Optional
+
+    # ADVANCED
+    #maximumCpuCount: false # Optional
+    #restoreNugetPackages: false # Optional
+    #msbuildArchitecture: 'x86' # Optional. Options: x86, x64
+    #logProjectEvents: true # Optional
+    #createLogFile: false # Optional
+    #logFileVerbosity: 'normal' # Optional. Options: quiet, minimal, normal, detailed, diagnostic
+
+# Publish Pipeline Artifact
+- publish: $(Build.ArtifactStagingDirectory) # Don't change this unless you need another location.
+  artifact: $(artifactName) # Don't change this unless you're publishing an artifact other than the default.

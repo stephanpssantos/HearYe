@@ -1,0 +1,75 @@
+﻿name: $(SourceBranchName)-client-$(date:yyyyMMdd)$(rev:.r)
+
+resources:
+  repositories:
+  - repository: self
+    type: git
+    name: self
+
+trigger:
+  branches:
+    include:
+    - main
+  paths:
+    include:
+    - BWA/Client
+
+variables:
+- name: projectName
+  value: 'hearye' # Example: 'hearye'
+  readonly: true
+
+- name: projectFile
+  value: 'BWA\Client\*.csproj'
+  readonly: true
+
+- name: solution
+  value: 'BWA\*.sln'
+  readonly: true
+
+- name: artifactName
+  value: '$(Build.SourceBranchName)-drop' # do not adjust unless required
+  readonly: true
+
+- name: system.debug
+  value: false
+
+# Choose which set of build arguments you want to determine what build output you want
+- name: msBuildArgs
+  # To get a zip file: 
+  #value: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:PackageLocation="$(build.artifactstagingdirectory)\\" /p:SkipInvalidConfigurations=true'
+  # To get files and folders: 
+  value: '/p:DeployOnBuild=true /p:WebPublishMethod=FileSystem /p:DeployDefaultTarget=WebPublish /p:publishUrl="$(build.artifactstagingdirectory)\\" /p:SkipInvalidConfigurations=true'
+  readonly: true
+        
+stages:
+
+# Dev
+#- template: 'hearye-client-stages.yml'
+#  parameters:
+#    branch: 'dev'
+#    azdoEnv: 'Dev'
+#    buildConfiguration: 'debug'
+#    buildPlatform: 'any cpu'
+#    azureSubscription: 'Azure-Dev'
+#    siteName: '$(project)-dev-web'
+
+# Test
+#- template: 'webApp-stages.yml'
+#  parameters:
+#    branch: 'test'
+#    azdoEnv: 'Test'
+#    buildConfiguration: 'release'
+#    buildPlatform: 'any cpu'
+#    azureSubscription: 'Azure-Test'
+#    siteName: '$(project)-test-web'
+
+# Production
+- template: 'webApp-stages.yml'
+  parameters:
+    branch: 'main'
+    azdoEnv: 'Production'
+    buildConfiguration: 'release'
+    buildPlatform: 'any cpu'
+    azureSubscription: 'Stephan'
+    siteName: '$(projectName)-swa'
