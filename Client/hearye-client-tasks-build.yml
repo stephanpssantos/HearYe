@@ -24,7 +24,7 @@
     #publishVstsFeed: # string. Alias: feedPublish. Required when command = push && nuGetFeedType = internal. Target feed. 
     #publishFeedCredentials: # string. Alias: externalEndpoint. Required when command = push && nuGetFeedType = external. NuGet server. 
     #packagesToPack: '**/*.csproj' # string. Alias: searchPatternPack. Required when command = pack. Path to csproj or nuspec file(s) to pack. Default: **/*.csproj.
-    #configuration: '$(BuildConfiguration)' # string. Alias: configurationToPack. Optional. Use when command = pack. Configuration to Package. Default: $(BuildConfiguration).
+    configuration: $(buildConfiguration) # string. Alias: configurationToPack. Optional. Use when command = pack. Configuration to Package. Default: $(BuildConfiguration).
     #packDirectory: '$(Build.ArtifactStagingDirectory)' # string. Alias: outputDir. Optional. Use when command = pack. Package Folder. Default: $(Build.ArtifactStagingDirectory).
     #nobuild: false # boolean. Optional. Use when command = pack. Do not build. Default: false.
     #includesymbols: false # boolean. Optional. Use when command = pack. Include Symbols. Default: false.

@@ -17,8 +17,10 @@
       Write-Host "Getting deploy key for $env:SWA_NAME"
       $secretInfo = $(az staticwebapp secrets list --name $env:SWA_NAME) | ConvertFrom-JSON
       Write-Host "##vso[task.setvariable variable=swa-deploy-token;issecret=true;isreadonly=true;]$($secretInfo.properties.apiKey)"
-      cd "$(Pipeline.Workspace)/$(artifactName)/"
-      ls
+      if (Test-Path -Path $(Pipeline.Workspace)) { Write-Host "Workspace path exists" } else { Write-Host "workspace path does not exist" }
+      if (Test-Path -Path $(Pipeline.Workspace)/$(artifactName)/) { Write-Host "Workspace/article path exists" } else { Write-Host "workspace/article path does not exist" }
+      if (Test-Path -Path $(Build.ArtifactStagingDirectory)) { Write-Host "asd path exists" } else { Write-Host "asd path does not exist" }
+      if (Test-Path -Path $(Build.ArtifactStagingDirectory)/$(artifactName)/) { Write-Host "asd/a path exists" } else { Write-Host "asd/a path does not exist" }
 
 # Azure SWA Deploy
 - task: AzureStaticWebApp@0
