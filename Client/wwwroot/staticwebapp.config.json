@@ -4,8 +4,5 @@
     "rewrite": "index.html",
     "exclude": [ "/images/*.{png,jpg,gif}", "/css/*" ]
   },
-  "mimeTypes": {
-    ".json": "text/json"
-  },
   "platform": { "apiRuntime": "dotnet-isolated:7.0" }
 }
