@@ -9,7 +9,7 @@
     SWA_NAME: $(siteName)
   inputs:
     # Name of the ARM connection
-    azureSubscription: '$(azureSubscription)'
+    azureSubscription: $(azureSubscription)
     # All Platforms
     scriptType: 'pscore' 
     scriptLocation: 'inlineScript'
