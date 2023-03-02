@@ -23,7 +23,7 @@
   displayName: 'Deploy Static Web App'
   inputs:
     workingDirectory: '$(Pipeline.Workspace)/$(artifactName)/'
-    app_location: 'Client'
+    app_location: 'Client/wwwroot'
     #app_build_command: # string. App build command. 
     output_location: ''
     #api_location: # string. Api location. 
