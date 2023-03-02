@@ -71,5 +71,5 @@ stages:
     azdoEnv: 'Production'
     buildConfiguration: 'release'
     buildPlatform: 'any cpu'
-    azureSubscription: 'Stephan'
+    azureSubscription: 'stephan-hearye-sc'
     siteName: '$(projectName)-swa'

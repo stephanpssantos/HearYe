@@ -1,6 +1,24 @@
 ﻿steps:
 
-# Azure App Service Deploy
+# https://svrooij.io/2022/05/05/deploy-static-web-app-without-token/
+# Azure CLI; Get deployment token
+- task: AzureCLI@2
+  displayName: 'Load deploy token for SWA'
+  condition: and(succeeded(), ne(variables['siteName'], ''))
+  env:
+    SWA_NAME: $(siteName)
+  inputs:
+    # Name of the ARM connection
+    azureSubscription: '$(azureSubscription)'
+    # All Platforms
+    scriptType: 'pscore' 
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      Write-Host "Getting deploy key for $env:SWA_NAME"
+      $secretInfo = $(az staticwebapp secrets list --name $env:SWA_NAME) | ConvertFrom-JSON
+      Write-Host "##vso[task.setvariable variable=swa-deploy-token;issecret=true;isreadonly=true;]$($secretInfo.properties.apiKey)"
+
+# Azure SWA Deploy
 - task: AzureStaticWebApp@0
   displayName: 'Deploy Static Web App'
   inputs:
@@ -17,6 +35,6 @@
     is_static_export: true
     #verbose: # boolean. Verbose. 
     #build_timeout_in_minutes: # string. Build timeout in minutes. 
-    #azure_static_web_apps_api_token: # string. Azure Static Web Apps api token. 
+    azure_static_web_apps_api_token: $(swa-deploy-token)# string. Azure Static Web Apps api token. 
     #deployment_environment: # string. Deployment Environment. 
     #production_branch: # string. Production Branch.
