@@ -33,14 +33,6 @@ variables:
 
 - name: system.debug
   value: false
-
-# Choose which set of build arguments you want to determine what build output you want
-- name: msBuildArgs
-  # To get a zip file: 
-  #value: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:PackageLocation="$(build.artifactstagingdirectory)\\" /p:SkipInvalidConfigurations=true'
-  # To get files and folders: 
-  value: '/p:DeployOnBuild=true /p:WebPublishMethod=FileSystem /p:DeployDefaultTarget=WebPublish /p:publishUrl="$(build.artifactstagingdirectory)\\" /p:SkipInvalidConfigurations=true'
-  readonly: true
         
 stages:
 
