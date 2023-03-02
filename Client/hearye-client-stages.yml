@@ -37,7 +37,7 @@
     displayName: 'deploy client'
     dependsOn: build
     pool:
-      vmImage: windows-latest
+      vmImage: ubuntu-latest
     environment: ${{ parameters.azdoEnv }}
     strategy:
       runOnce:
