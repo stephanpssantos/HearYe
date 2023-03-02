@@ -1,0 +1,40 @@
+﻿steps:
+
+# https://svrooij.io/2022/05/05/deploy-static-web-app-without-token/
+# Azure CLI; Get deployment token
+- task: AzureCLI@2
+  displayName: 'Load deploy token for SWA'
+  condition: and(succeeded(), ne(variables['siteName'], ''))
+  env:
+    SWA_NAME: $(siteName)
+  inputs:
+    # Name of the ARM connection
+    azureSubscription: ${{ parameters.azureSubscription }}
+    # All Platforms
+    scriptType: 'pscore' 
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      Write-Host "Getting deploy key for $env:SWA_NAME"
+      $secretInfo = $(az staticwebapp secrets list --name $env:SWA_NAME) | ConvertFrom-JSON
+      Write-Host "##vso[task.setvariable variable=swa-deploy-token;issecret=true;isreadonly=true;]$($secretInfo.properties.apiKey)"
+
+# Azure SWA Deploy
+- task: AzureStaticWebApp@0
+  displayName: 'Deploy Static Web App'
+  inputs:
+    workingDirectory: '$(Pipeline.Workspace)/$(artifactName)/'
+    app_location: 'Client/wwwroot'
+    #app_build_command: # string. App build command. 
+    output_location: ''
+    #api_location: # string. Api location. 
+    #api_build_command: # string. Api build command. 
+    #routes_location: # string. Routes location. 
+    #config_file_location: # string. Config file location. 
+    skip_app_build: true
+    skip_api_build: true
+    #is_static_export: true
+    verbose: true # boolean. Verbose. 
+    #build_timeout_in_minutes: # string. Build timeout in minutes. 
+    azure_static_web_apps_api_token: $(swa-deploy-token) # string. Azure Static Web Apps api token. 
+    #deployment_environment: # string. Deployment Environment. 
+    #production_branch: # string. Production Branch.
