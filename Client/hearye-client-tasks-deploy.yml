@@ -16,7 +16,6 @@
     inlineScript: |
       Write-Host "Getting deploy key for $env:SWA_NAME"
       $secretInfo = $(az staticwebapp secrets list --name $env:SWA_NAME) | ConvertFrom-JSON
-      Write-Host "$($secretInfo.properties.apiKey)"
       Write-Host "##vso[task.setvariable variable=swa-deploy-token;issecret=true;isreadonly=true;]$($secretInfo.properties.apiKey)"
 
 # Azure SWA Deploy
@@ -24,9 +23,9 @@
   displayName: 'Deploy Static Web App'
   inputs:
     workingDirectory: '$(Pipeline.Workspace)/$(artifactName)/'
-    #app_location: # string. App location. 
+    app_location: 'bin\Release\net7.0\browser-wasm\publish\'
     #app_build_command: # string. App build command. 
-    output_location: 'bin\Release\net7.0\browser-wasm\publish\'
+    #output_location: 
     #api_location: # string. Api location. 
     #api_build_command: # string. Api build command. 
     #routes_location: # string. Routes location. 
