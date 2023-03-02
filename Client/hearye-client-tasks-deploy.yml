@@ -16,7 +16,7 @@
     inlineScript: |
       Write-Host "Getting deploy key for $env:SWA_NAME"
       $secretInfo = $(az staticwebapp secrets list --name $env:SWA_NAME) | ConvertFrom-JSON
-      Write-Host "$(secretInfo.properties.apiKey)"
+      Write-Host "$($secretInfo.properties.apiKey)"
       Write-Host "##vso[task.setvariable variable=swa-deploy-token;issecret=true;isreadonly=true;]$($secretInfo.properties.apiKey)"
 
 # Azure SWA Deploy
