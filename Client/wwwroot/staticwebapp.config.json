@@ -6,7 +6,7 @@
   },
   "platform": { "apiRuntime": "dotnet-isolated:7.0" },
   "globalHeaders": {
-    "content-security-policy": "object-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'stephansdomain.b2clogin.com'; base-uri 'self'"
+    "content-security-policy": "base-uri 'self'; default-src 'self'; img-src data: https:; object-src 'none'; script-src 'self' https://stephansdomain.b2clogin.com https://cdn.jsdelivr.net"
   },
   "mimeTypes": {
     ".json": "text/json",
