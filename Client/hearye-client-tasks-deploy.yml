@@ -25,7 +25,7 @@
   displayName: 'Deploy Static Web App'
   inputs:
     workingDirectory: '$(Pipeline.Workspace)/$(artifactName)/'
-    app_location: '**/bin/Release/net7.0/browser-wasm/publish/'
+    app_location: 'Client/bin/release/net7.0/browser-wasm/publish/'
     #app_build_command: # string. App build command. 
     output_location: ''
     #api_location: # string. Api location. 
