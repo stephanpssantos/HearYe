@@ -6,7 +6,7 @@
   },
   "platform": { "apiRuntime": "dotnet-isolated:7.0" },
   "globalHeaders": {
-    "content-security-policy": "object-src 'none'; script-src 'nonce-{random}' 'unsafe-inline' 'strict-dynamic' https: http:; base-uri 'none';"
+    "content-security-policy": "object-src 'none'; script-src 'self' 'nonce-{random}' 'unsafe-inline' 'strict-dynamic' https: http:;"
   },
   "mimeTypes": {
     ".json": "text/json",
