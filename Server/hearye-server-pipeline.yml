@@ -64,5 +64,7 @@ stages:
     buildConfiguration: 'release'
     buildPlatform: 'any cpu'
     buildId: $(Build.BuildId)
+    apiName: '$(projectName)-api'
     azureSubscription: 'stephan-hearye-sc'
     dockerRegistry: 'stephan-dockerhub-sc'
+    kvName: 'hearye-kv'
