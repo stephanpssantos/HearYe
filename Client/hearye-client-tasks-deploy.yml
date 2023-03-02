@@ -23,9 +23,9 @@
   displayName: 'Deploy Static Web App'
   inputs:
     workingDirectory: '$(Pipeline.Workspace)/$(artifactName)/'
-    app_location: 'bin\Release\net7.0\browser-wasm\publish\'
+    app_location: '**/bin/Release/net7.0/browser-wasm/publish/'
     #app_build_command: # string. App build command. 
-    #output_location: 
+    output_location: ''
     #api_location: # string. Api location. 
     #api_build_command: # string. Api build command. 
     #routes_location: # string. Routes location. 
@@ -33,7 +33,7 @@
     skip_app_build: true
     skip_api_build: true
     is_static_export: true
-    #verbose: # boolean. Verbose. 
+    verbose: true # boolean. Verbose. 
     #build_timeout_in_minutes: # string. Build timeout in minutes. 
     azure_static_web_apps_api_token: $(swa-deploy-token)# string. Azure Static Web Apps api token. 
     #deployment_environment: # string. Deployment Environment. 
