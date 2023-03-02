@@ -30,7 +30,8 @@
       clean: all # Options: outputs, resources, all
     steps:
     - template: 'hearye-server-tasks-build.yml'
-      parameters: ${{ parameters.dockerRegistry }}
+      parameters: 
+        dockerRegistry: ${{ parameters.dockerRegistry }}
 
 # Deploy
 
