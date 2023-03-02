@@ -4,5 +4,15 @@
     "rewrite": "index.html",
     "exclude": [ "/images/*.{png,jpg,gif}", "/css/*" ]
   },
-  "platform": { "apiRuntime": "dotnet-isolated:7.0" }
+  "platform": { "apiRuntime": "dotnet-isolated:7.0" },
+  "globalHeaders": {
+    "content-security-policy": "object-src 'none'; script-src 'nonce-{random}' 'unsafe-inline' 'strict-dynamic' https: http:; base-uri 'none';"
+  },
+  "mimeTypes": {
+    ".json": "text/json",
+    ".html": "text/html",
+    ".svg": "image/svg+xml",
+    ".css": "text/css",
+    ".png": "image/png"
+  }
 }
