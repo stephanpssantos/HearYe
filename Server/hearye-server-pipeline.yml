@@ -63,5 +63,6 @@ stages:
     azdoEnv: 'Production'
     buildConfiguration: 'release'
     buildPlatform: 'any cpu'
+    buildId: $(Build.BuildId)
     azureSubscription: 'stephan-hearye-sc'
     dockerRegistry: 'stephan-dockerhub-sc'
