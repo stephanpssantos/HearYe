@@ -35,6 +35,6 @@
     #is_static_export: true
     verbose: true # boolean. Verbose. 
     #build_timeout_in_minutes: # string. Build timeout in minutes. 
-    azure_static_web_apps_api_token: $(swa-deploy-token)# string. Azure Static Web Apps api token. 
+    azure_static_web_apps_api_token: $(swa-deploy-token) # string. Azure Static Web Apps api token. 
     #deployment_environment: # string. Deployment Environment. 
     #production_branch: # string. Production Branch.
