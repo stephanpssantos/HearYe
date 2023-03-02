@@ -32,7 +32,7 @@
     #config_file_location: # string. Config file location. 
     skip_app_build: true
     skip_api_build: true
-    is_static_export: true
+    #is_static_export: true
     verbose: true # boolean. Verbose. 
     #build_timeout_in_minutes: # string. Build timeout in minutes. 
     azure_static_web_apps_api_token: $(swa-deploy-token)# string. Azure Static Web Apps api token. 
