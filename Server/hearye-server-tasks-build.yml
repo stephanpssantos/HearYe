@@ -7,13 +7,13 @@
   inputs:
   # Container Repository
     containerRegistry: ${{ parameters.dockerRegistry }} # string. Container registry. 
-    repository: stephansantos/hearye # string. Optional. Use when command != login && command != logout && command != start && command != stop. Container repository. 
+    repository: stephansantos/hearye-docker # string. Optional. Use when command != login && command != logout && command != start && command != stop. Container repository. 
   # Commands
     command: 'buildAndPush' # 'buildAndPush' | 'build' | 'push' | 'login' | 'logout' | 'start' | 'stop'. Required. Command. Default: buildAndPush.
     Dockerfile: '**/Dockerfile' # string. Required when command = build || command = buildAndPush. Dockerfile. Default: **/Dockerfile.
     buildContext: '.' # string. Optional. Use when command = build || command = buildAndPush. Build context. Default: **.
-    tags: '$(Build.BuildNumber)' # string. Optional. Use when command = build || command = push || command = buildAndPush. Tags. Default: $(Build.BuildId).
-    arguments: '-p 7193:7193' # string. Optional. Use when command != login && command != logout && command != buildAndPush. Arguments. 
+    tags: 'v1.$(Rev:r)' # string. Optional. Use when command = build || command = push || command = buildAndPush. Tags. Default: $(Build.BuildId).
+    #arguments: # string. Optional. Use when command != login && command != logout && command != buildAndPush. Arguments. 
     #addPipelineData: true # boolean. Add Pipeline metadata to image(s). Default: true.
     #addBaseImageData: true # boolean. Add base image metadata to image(s). Default: true.
     #container: # string. Optional. Use when command = start || command = stop. Container.
@@ -23,13 +23,13 @@
   inputs:
   # Container Repository
     containerRegistry: ${{ parameters.dockerRegistry }} # string. Container registry. 
-    repository: stephansantos/hearye # string. Optional. Use when command != login && command != logout && command != start && command != stop. Container repository. 
+    repository: stephansantos/hearye-docker # string. Optional. Use when command != login && command != logout && command != start && command != stop. Container repository. 
   # Commands
     command: 'buildAndPush' # 'buildAndPush' | 'build' | 'push' | 'login' | 'logout' | 'start' | 'stop'. Required. Command. Default: buildAndPush.
     Dockerfile: '**/Dockerfile' # string. Required when command = build || command = buildAndPush. Dockerfile. Default: **/Dockerfile.
     buildContext: '.' # string. Optional. Use when command = build || command = buildAndPush. Build context. Default: **.
     tags: 'latest' # string. Optional. Use when command = build || command = push || command = buildAndPush. Tags. Default: $(Build.BuildId).
-    arguments: '-p 7193:7193' # string. Optional. Use when command != login && command != logout && command != buildAndPush. Arguments. 
+    #arguments: # string. Optional. Use when command != login && command != logout && command != buildAndPush. Arguments. 
     #addPipelineData: true # boolean. Add Pipeline metadata to image(s). Default: true.
     #addBaseImageData: true # boolean. Add base image metadata to image(s). Default: true.
     #container: # string. Optional. Use when command = start || command = stop. Container.
