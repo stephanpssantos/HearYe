@@ -3,7 +3,7 @@
 - stage: ${{ parameters.azdoEnv }}
   displayName: ${{ parameters.azdoEnv }}
   dependsOn: []
-  condition: eq(variables['Build.SourceBranch'], 'refs/heads/${{ parameters.branch }}')
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/${{ parameters.branch }}'))
 
   variables:
   - name: buildConfiguration
