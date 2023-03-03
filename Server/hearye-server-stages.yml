@@ -24,6 +24,7 @@
 
   - job: build
     displayName: 'build docker image and push'
+    timeoutInMinutes: 10
     pool:
       vmImage: 'ubuntu-latest' # for list, see https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/hosted?view=azure-devops&tabs=yaml
     workspace:
@@ -38,6 +39,7 @@
 
   #- deployment: deploy
   #  displayName: 'deploy container app'
+  #  timeoutInMinutes: 10
   #  dependsOn: build
   #  pool:
   #    vmImage: ubuntu-latest
