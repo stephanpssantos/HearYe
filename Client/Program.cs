@@ -34,7 +34,7 @@ builder.Services.AddHttpClient("HearYe.ServerAPI", client => client.BaseAddress 
     .AddPolicyHandler(Policies.GetRetryPolicy());
 
 /* BaseAddressAuthorizationMessageHandler will not send auth claims to the server address unless it matches the client's
-   address. Therefore, a custom message handler (with the API's server address configured) must be used. */
+   address. Therefore a custom message handler (with the API's server address configured) must be used. */
 
 // builder.Services.AddHttpClient("HearYe.ServerAPI", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))
 //    .AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>()
