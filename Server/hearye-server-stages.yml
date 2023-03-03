@@ -48,6 +48,7 @@
       runOnce:
         deploy:
           steps:
+          - checkout: self
           - template: 'hearye-server-tasks-deploy.yml'
             parameters:
               azureSubscription: ${{ parameters.azureSubscription }} # AzDO will not allow a variable for this field in the task
