@@ -4,6 +4,7 @@
 
 using System.Text.Json.Serialization;
 using HearYe.Server;
+using HearYe.Server.Helpers;
 using HearYe.Shared;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpLogging; // HttpLoggingFields
@@ -177,6 +178,11 @@ app.UseHealthChecks(path: "/healthcheck");
 
 // app.MapRazorPages();
 app.MapControllers();
+
+if (app.Environment.IsProduction())
+{
+    app.UseSecretHeader(builder.Configuration["APIM_Secret"] !, "APIM_Secret");
+}
 
 // app.MapFallbackToFile("index.html");
 app.Run();
