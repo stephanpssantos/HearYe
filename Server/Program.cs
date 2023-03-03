@@ -22,7 +22,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 /* It's possible to use this code to check claims. Use with the Authorize attribute
  * e.g. [Authorize(Policy = "RequireDbIdClaim")]. I'm not doing this because I often
  * need to use the claim value within the method, and I'd rather not repeat this
- * check.
+ * check..
 
 builder.Services.AddAuthorization(options =>
 {
