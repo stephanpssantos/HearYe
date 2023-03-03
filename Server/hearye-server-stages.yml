@@ -51,3 +51,5 @@
               azureSubscription: ${{ parameters.azureSubscription }} # AzDO will not allow a variable for this field in the task
               kvName: ${{ parameters.kvName }}
               apiName: ${{ parameters.apiName }}
+              resourceGroup: ${{ parameters.resourceGroup }}
+              buildId: ${{ parameters.buildId }}

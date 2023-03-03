@@ -67,4 +67,5 @@ stages:
     apiName: '$(projectName)-api'
     azureSubscription: 'stephan-hearye-sc'
     dockerRegistry: 'stephan-dockerhub-sc'
-    kvName: 'hearye-kv'
+    kvName: '$(projectName)-kv'
+    resourceGroup: '$(projectName)'

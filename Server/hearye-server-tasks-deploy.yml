@@ -1,28 +1,38 @@
 ﻿steps:
 
 # Get azuresql-appregsecret from keyvault
-#- task: AzureKeyVault@1
-#  displayName: 'Get db key from kv'
-#  inputs:
-#    azureSubscription: ${{ parameters.azureSubscription }}
-#    KeyVaultName: ${{ parameters.kvName }}
-#    SecretsFilter: 'azuresql-appregsecret'
-#    RunAsPreJob: false
-
-# Get graph-appregsecret from keyvault
-#- task: AzureKeyVault@1
-#  displayName: 'Get graph key from kv'
-#  inputs:
-#    azureSubscription: ${{ parameters.azureSubscription }}
-#    KeyVaultName: ${{ parameters.kvName }}
-#    SecretsFilter: 'graph-appregsecret'
-#    RunAsPreJob: false
-
-# Azure Container Apps deploy
-- task: AzureContainerAppsRC@0
-  displayName: 'Deploy to azure container app'
+- task: AzureKeyVault@1
+  displayName: 'Get db key from kv'
   inputs:
     azureSubscription: ${{ parameters.azureSubscription }}
-    containerAppName: ${{ parameters.apiName }}
-    resourceGroup: 'hearye'
-    imageToDeploy: 'docker.io/stephansantos/hearye-docker:v1.$(Build.BuildId)'
+    KeyVaultName: ${{ parameters.kvName }}
+    SecretsFilter: 'azuresql-appregsecret'
+    RunAsPreJob: false
+
+# Get graph-appregsecret from keyvault
+- task: AzureKeyVault@1
+  displayName: 'Get graph key from kv'
+  inputs:
+    azureSubscription: ${{ parameters.azureSubscription }}
+    KeyVaultName: ${{ parameters.kvName }}
+    SecretsFilter: 'graph-appregsecret'
+    RunAsPreJob: false
+
+# Azure Container Apps ARM template deployment
+- task: AzureResourceGroupDeployment@2
+  displayName: 'Deploy Container App'
+  inputs:
+    azureSubscription: ${{ parameters.azureSubscription }}
+    action: 'Create Or Update Resource Group' # Options: create Or Update Resource Group, select Resource Group, start, stop, stopWithDeallocate, restart, delete, deleteRG
+    resourceGroupName: ${{ parameters.resourceGroup }}
+    location: 'westus2' # Required when action = Create Or Update Resource Group
+    templateLocation: 'Linked artifact' # Options: linked Artifact, uRL Of The File
+    csmFile: './containerAppARM.json' # Required when  TemplateLocation = Linked Artifact
+    csmParametersFile: './containerAppARM.parameters.json' # Optional
+    overrideParameters: >
+      -azuresql-appregsecret $($(azuresql-appregsecret))
+      -graph-appregsecret $($(graph-appregsecret)) 
+      -container-image 'docker.io/stephansantos/hearye-docker:v1.${{ format('v1.{0}', parameters.buildId) }}'
+    # NOTE - $($(parameters.keyVaultAppRegSecret)) is taking the value of a variable (the secret's name) 
+    #        and placing it inside variable brackets to call on a variable with that name and get the secret's value
+    deploymentMode: 'Incremental' # Options: incremental, complete, validation
