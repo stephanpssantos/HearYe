@@ -1,5 +1,37 @@
 ﻿steps:
 
+# This is a workaround. MS hosted agents are not trusted MS services.
+# Therefore, their (constantly changing) IP addresses must be added
+# to the KV firewall's whitelist at runtime.
+
+# Azure CLI; Get hosted agent IP
+- task: AzureCLI@2
+  displayName: 'Get hosted agent IP'
+  inputs:
+    # Name of the ARM connection
+    azureSubscription: ${{ parameters.azureSubscription }}
+    # All Platforms
+    scriptType: 'pscore' 
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      $ipInfo = $(az rest --method get --url https://api.ipify.org?format=json) | ConvertFrom-JSON
+      Write-Host "##vso[task.setvariable variable=hostedagent_ip;issecret=false;isreadonly=true;]$($ipInfo.ip)"
+
+# Azure CLI; Add ADO hosted agent to KV whitelist
+- task: AzureCLI@2
+  displayName: 'Add ADO hosted agent to KV whitelist'
+  env:
+    KV_NAME: ${{ parameters.kvName }}
+    HA_IP: $(hostedagent_ip)
+  inputs:
+    # Name of the ARM connection
+    azureSubscription: ${{ parameters.azureSubscription }}
+    # All Platforms
+    scriptType: 'pscore'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      az keyvault network-rule add --name $env:KV_NAME --ip-address $env:HA_IP
+
 # Get azuresql-appregsecret from keyvault
 - task: AzureKeyVault@1
   displayName: 'Get db key from kv'
@@ -17,6 +49,21 @@
     KeyVaultName: ${{ parameters.kvName }}
     SecretsFilter: 'graph-appregsecret'
     RunAsPreJob: false
+
+# Azure CLI; Remove ADO hosted agent from KV whitelist
+- task: AzureCLI@2
+  displayName: 'Remove ADO hosted agent from KV whitelist'
+  env:
+    KV_NAME: ${{ parameters.kvName }}
+    HA_IP: $(hostedagent_ip)
+  inputs:
+    # Name of the ARM connection
+    azureSubscription: ${{ parameters.azureSubscription }}
+    # All Platforms
+    scriptType: 'pscore'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      az keyvault network-rule remove --name $env:KV_NAME --ip-address $env:HA_IP
 
 # Azure Container Apps ARM template deployment
 - task: AzureResourceGroupDeployment@2
