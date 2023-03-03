@@ -36,20 +36,20 @@
 
 # Deploy
 
-  - deployment: deploy
-    displayName: 'deploy container app'
-    dependsOn: build
-    pool:
-      vmImage: ubuntu-latest
-    environment: ${{ parameters.azdoEnv }}
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - template: 'hearye-server-tasks-deploy.yml'
-            parameters:
-              azureSubscription: ${{ parameters.azureSubscription }} # AzDO will not allow a variable for this field in the task
-              kvName: ${{ parameters.kvName }}
-              apiName: ${{ parameters.apiName }}
-              resourceGroup: ${{ parameters.resourceGroup }}
-              buildId: ${{ parameters.buildId }}
+  #- deployment: deploy
+  #  displayName: 'deploy container app'
+  #  dependsOn: build
+  #  pool:
+  #    vmImage: ubuntu-latest
+  #  environment: ${{ parameters.azdoEnv }}
+  #  strategy:
+  #    runOnce:
+  #      deploy:
+  #        steps:
+  #        - template: 'hearye-server-tasks-deploy.yml'
+  #          parameters:
+  #            azureSubscription: ${{ parameters.azureSubscription }} # AzDO will not allow a variable for this field in the task
+  #            kvName: ${{ parameters.kvName }}
+  #            apiName: ${{ parameters.apiName }}
+  #            resourceGroup: ${{ parameters.resourceGroup }}
+  #            buildId: ${{ parameters.buildId }}
