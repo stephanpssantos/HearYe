@@ -1,6 +1,10 @@
 ﻿steps:
 
-# Azure CLI; KV Secrets
+# This is a workaround. MS hosted agents are not trusted MS services.
+# Therefore, their (constantly changing) IP addresses must be added
+# to the KV firewall's whitelist at runtime.
+
+# Azure CLI; Get hosted agent IP and add to KV whitelist
 - task: AzureCLI@2
   displayName: 'Get hosted agent IP and add to KV whitelist'
   inputs:
@@ -10,10 +14,42 @@
     scriptType: 'pscore' 
     scriptLocation: 'inlineScript'
     inlineScript: |
-      $key1 = $(az keyvault secret show --name graph-appregsecret --vault-name ${{ parameters.kvName }}) | ConvertFrom-JSON
-      $key2 = $(az keyvault secret show --name azuresql-appregsecret --vault-name ${{ parameters.kvName }}) | ConvertFrom-JSON
-      Write-Host "##vso[task.setvariable variable=graph-appregsecret;issecret=true;isreadonly=true;]$($key1.value)"
-      Write-Host "##vso[task.setvariable variable=azuresql-appregsecret;issecret=true;isreadonly=true;]$($key2.value)"
+      $ipInfo = $(az rest --method get --url https://api.ipify.org?format=json) | ConvertFrom-JSON
+      Write-Host "##vso[task.setvariable variable=hostedagent_ip;issecret=false;isreadonly=true;]$($ipInfo.ip)"
+      az keyvault network-rule add --name $env:KV_NAME --ip-address $ipInfo.ip
+
+# Get azuresql-appregsecret from keyvault
+- task: AzureKeyVault@1
+  displayName: 'Get db key from kv'
+  inputs:
+    azureSubscription: ${{ parameters.azureSubscription }}
+    KeyVaultName: ${{ parameters.kvName }}
+    SecretsFilter: 'azuresql-appregsecret'
+    RunAsPreJob: false
+
+# Get graph-appregsecret from keyvault
+- task: AzureKeyVault@1
+  displayName: 'Get graph key from kv'
+  inputs:
+    azureSubscription: ${{ parameters.azureSubscription }}
+    KeyVaultName: ${{ parameters.kvName }}
+    SecretsFilter: 'graph-appregsecret'
+    RunAsPreJob: false
+
+# Azure CLI; Remove ADO hosted agent from KV whitelist
+- task: AzureCLI@2
+  displayName: 'Remove ADO hosted agent from KV whitelist'
+  env:
+    KV_NAME: ${{ parameters.kvName }}
+    HA_IP: $(hostedagent_ip)
+  inputs:
+    # Name of the ARM connection
+    azureSubscription: ${{ parameters.azureSubscription }}
+    # All Platforms
+    scriptType: 'pscore'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      az keyvault network-rule remove --name $env:KV_NAME --ip-address $env:HA_IP
 
 # Azure Container Apps ARM template deployment
 - task: AzureResourceGroupDeployment@2
