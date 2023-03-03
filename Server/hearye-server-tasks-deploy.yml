@@ -66,8 +66,8 @@
     csmFile: '$(System.DefaultWorkingDirectory)/Server/containerAppARM.json' # Required when  TemplateLocation = Linked Artifact
     csmParametersFile: '$(System.DefaultWorkingDirectory)/Server/containerAppARM.parameters.json' # Optional
     overrideParameters: >
-      -azuresql-appregsecret $($(azuresql-appregsecret))
-      -graph-appregsecret $($(graph-appregsecret)) 
+      -azuresql-appregsecret $(azuresql-appregsecret)
+      -graph-appregsecret $(graph-appregsecret) 
       -container-image ${{ format('docker.io/stephansantos/hearye-docker:v1.{0}', parameters.buildId) }}
     # NOTE - $($(parameters.keyVaultAppRegSecret)) is taking the value of a variable (the secret's name) 
     #        and placing it inside variable brackets to call on a variable with that name and get the secret's value
