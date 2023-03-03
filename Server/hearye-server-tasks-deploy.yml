@@ -7,6 +7,8 @@
 # Azure CLI; Get hosted agent IP and add to KV whitelist
 - task: AzureCLI@2
   displayName: 'Get hosted agent IP and add to KV whitelist'
+  env:
+    KV_NAME: ${{ parameters.kvName }}
   inputs:
     # Name of the ARM connection
     azureSubscription: ${{ parameters.azureSubscription }}
