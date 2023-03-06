@@ -54,7 +54,7 @@ builder.Services.AddSingleton<StateContainer>();
 builder.Services.AddMsalAuthentication(options =>
 {
     builder.Configuration.Bind("AzureAdB2C", options.ProviderOptions.Authentication);
-    options.ProviderOptions.DefaultAccessTokenScopes.Add("https://StephansDomain.onmicrosoft.com/5bcd9a8a-252d-4c87-af83-56d0638a4356/API.Access");
+    options.ProviderOptions.DefaultAccessTokenScopes.Add(builder.Configuration["AzureTokenScope"] !);
     options.ProviderOptions.LoginMode = "redirect"; // Popup(default) or login.
     options.ProviderOptions.Cache.CacheLocation = "localStorage"; // Cache auth token. Local or session(default).
     options.AuthenticationPaths.LogOutSucceededPath = "/landing";
