@@ -14,13 +14,13 @@
         </main>
         <Footer />
     }
-    else if (attempts >= 30)
+    else if (cantWakeUp)
     {
         <div>
             Can't wake up! Try again another time.
         </div>
     }
-    else if (attempts == 0)
+    else if (!waiting)
     {
         <div />
     }
@@ -35,43 +35,46 @@
 @code
 {
     private bool apiAwake = false;
-    private int attempts = 0;
+    private bool waiting = false;
+    private bool cantWakeUp = false;
 
     protected override async Task OnInitializedAsync()
     {
-        // 3 second buffer between requests to the health check endpoint.
-        var timer = new PeriodicTimer(TimeSpan.FromSeconds(3));
         var httpClient = Factory.CreateClient("HearYe.ServerAPI.HealthCheck");
         await DoHealthCheck(httpClient);
-
-        while (!apiAwake && attempts < 30)
-        {
-            attempts++;
-            await timer.WaitForNextTickAsync();
-            await DoHealthCheck(httpClient);
-        }
     }
 
     private async Task DoHealthCheck(HttpClient httpClient)
     {
         try
         {
+            // Display waiting screen after 3 seconds of no response.
+            await DisplayWakeScreen(3);
             var healthCheck = await httpClient.GetAsync("healthcheck");
             var healthCheckBody = await healthCheck.Content.ReadAsStringAsync();
 
             if (healthCheckBody == "Healthy")
             {
                 apiAwake = true;
-                StateHasChanged();
             }
-            else if (attempts >= 30)
+            else if (waiting == true)
             {
-                StateHasChanged();
+                cantWakeUp = true;
             }
+
+            StateHasChanged();
         }
         catch(HttpRequestException)
         {
             // Swallow http exception.
+            StateHasChanged();
         }
+    }
+
+    private async Task DisplayWakeScreen(int waitTimeInSeconds)
+    {
+        await Task.Delay(TimeSpan.FromSeconds(waitTimeInSeconds));
+        waiting = true;
+        StateHasChanged();
     }
 }

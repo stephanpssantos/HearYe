@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using HearYe.Client;
 using HearYe.Client.Data;
 using Microsoft.AspNetCore.Components;
+using Polly;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -34,7 +35,8 @@ builder.Services.AddHttpClient("HearYe.ServerAPI", client => client.BaseAddress 
     .AddPolicyHandler(Policies.GetRetryPolicy());
 
 builder.Services.AddHttpClient("HearYe.ServerAPI.HealthCheck", client => client.BaseAddress = new Uri(apiURI))
-    .SetHandlerLifetime(TimeSpan.FromMinutes(5));
+    .SetHandlerLifetime(TimeSpan.FromMinutes(3))
+    .AddPolicyHandler(Policies.GetRetryPolicy());
 
 /* BaseAddressAuthorizationMessageHandler will not send auth claims to the server address unless it matches the client's
    address. Therefore a custom message handler (with the API's server address configured) must be used. */
