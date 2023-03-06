@@ -1,11 +1,73 @@
-﻿@inherits LayoutComponentBase
+﻿@inject IHttpClientFactory Factory
+@inject HttpClient Http
+@inherits LayoutComponentBase
 
 <div class="page">
-    <NavMenu />
-    <main>
-        <article>
-            @Body
-        </article>
-    </main>
-    <Footer />
+    <!--if attempts == 0, Loading...-->
+    @if (apiAwake)
+    {
+       <NavMenu />
+        <main>
+            <article>
+                @Body
+            </article>
+        </main>
+        <Footer />
+    }
+    else if (attempts >= 30)
+    {
+        <div>
+            Can't wake up! Try again another time.
+        </div>
+    }
+    else
+    {
+        <div>
+            I'm waking up!
+        </div>
+    }
 </div>
+
+@code
+{
+    private bool apiAwake = false;
+    private int attempts = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // 3 second buffer between requests to the health check endpoint.
+        var timer = new PeriodicTimer(TimeSpan.FromSeconds(3));
+        var httpClient = Factory.CreateClient("HearYe.ServerAPI.HealthCheck");
+        await DoHealthCheck(httpClient);
+
+        while (!apiAwake && attempts < 30)
+        {
+            attempts++;
+            await timer.WaitForNextTickAsync();
+            await DoHealthCheck(httpClient);
+        }
+    }
+
+    private async Task DoHealthCheck(HttpClient httpClient)
+    {
+        try
+        {
+            var healthCheck = await httpClient.GetAsync("healthcheck");
+            var healthCheckBody = await healthCheck.Content.ReadAsStringAsync();
+
+            if (healthCheckBody == "Healthy")
+            {
+                apiAwake = true;
+                StateHasChanged();
+            }
+            else if (attempts >= 30)
+            {
+                StateHasChanged();
+            }
+        }
+        catch(HttpRequestException)
+        {
+            // Swallow http exception.
+        }
+    }
+}

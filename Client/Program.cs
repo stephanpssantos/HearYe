@@ -33,6 +33,9 @@ builder.Services.AddHttpClient("HearYe.ServerAPI", client => client.BaseAddress 
     .SetHandlerLifetime(TimeSpan.FromMinutes(5))
     .AddPolicyHandler(Policies.GetRetryPolicy());
 
+builder.Services.AddHttpClient("HearYe.ServerAPI.HealthCheck", client => client.BaseAddress = new Uri(apiURI))
+    .SetHandlerLifetime(TimeSpan.FromMinutes(5));
+
 /* BaseAddressAuthorizationMessageHandler will not send auth claims to the server address unless it matches the client's
    address. Therefore a custom message handler (with the API's server address configured) must be used. */
 
