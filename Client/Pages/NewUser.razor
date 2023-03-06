@@ -32,9 +32,7 @@
         if (claimId is not null)
         {
             // User already registered.
-            UriBuilder builder = new(NavigationManager.ToAbsoluteUri("landing"));
-            string newPath = QueryHelpers.AddQueryString(builder.ToString(), "registrationSuceeded", "true");
-            NavigationManager.NavigateToLogout("authentication/logout", newPath);
+            NavigationManager.NavigateToLogout("authentication/logout");
             return;
         }
 
