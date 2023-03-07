@@ -48,8 +48,8 @@
     {
         try
         {
-            // Display waiting screen after 3 seconds of no response.
-            await DisplayWakeScreen(3);
+            // Display waiting screen after 4 seconds of no response.
+            await DisplayWakeScreen(4);
             var healthCheck = await httpClient.GetAsync("healthcheck");
             var healthCheckBody = await healthCheck.Content.ReadAsStringAsync();
 
