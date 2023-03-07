@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using HearYe.Client;
 using HearYe.Client.Data;
 using Microsoft.AspNetCore.Components;
-using Polly;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
