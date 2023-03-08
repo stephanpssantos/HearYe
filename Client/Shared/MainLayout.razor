@@ -1,9 +1,9 @@
-﻿@inject IHttpClientFactory Factory
+﻿@using System.Timers
+@inject IHttpClientFactory Factory
 @inject HttpClient Http
 @inherits LayoutComponentBase
 
 <div class="page">
-    <!--if attempts == 0, Loading...-->
     @if (apiAwake)
     {
         <NavMenu />
@@ -53,6 +53,17 @@
     private bool apiAwake = false;
     private bool waiting = false;
     private bool cantWakeUp = false;
+    private Timer timer = new Timer(TimeSpan.FromSeconds(4));
+
+    protected override void OnInitialized()
+    {
+        timer.Elapsed += DisplayWakeScreen;
+    }
+
+    public void Dispose()
+    {
+        timer.Elapsed -= DisplayWakeScreen;
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -64,8 +75,10 @@
     {
         try
         {
-            // Display waiting screen after 5 seconds of no response.
-            await DisplayWakeScreen(5);
+            // Display waiting screen after 4 seconds of no response.
+            timer.AutoReset = false;
+            timer.Enabled = true;
+
             var healthCheck = await httpClient.GetAsync("healthcheck");
             var healthCheckBody = await healthCheck.Content.ReadAsStringAsync();
 
@@ -78,19 +91,21 @@
                 cantWakeUp = true;
             }
 
+            timer.Stop();
             StateHasChanged();
         }
         catch (HttpRequestException)
         {
             // Swallow http exception.
+            timer.Stop();
             StateHasChanged();
         }
     }
 
-    private async Task DisplayWakeScreen(int waitTimeInSeconds)
+    private void DisplayWakeScreen(Object? source, ElapsedEventArgs e)
     {
-        await Task.Delay(TimeSpan.FromSeconds(waitTimeInSeconds));
         waiting = true;
+        timer.Stop();
         StateHasChanged();
     }
 }

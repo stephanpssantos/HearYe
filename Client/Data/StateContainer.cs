@@ -27,8 +27,11 @@ namespace HearYe.Client.Data
             get => initiated;
             set
             {
-                initiated = value;
-                NotifyStateChanged();
+                if (initiated != value)
+                {
+                    initiated = value;
+                    NotifyStateChanged();
+                }
             }
         }
 
@@ -36,8 +39,11 @@ namespace HearYe.Client.Data
             get => userDbId; 
             set
             {
-                userDbId = value;
-                NotifyStateChanged();
+                if (userDbId != value)
+                {
+                    userDbId = value;
+                    NotifyStateChanged();
+                }
             }
         }
 
@@ -46,8 +52,11 @@ namespace HearYe.Client.Data
             get => userGroups;
             set 
             {
-                userGroups = value;
-                NotifyStateChanged();
+                if (userGroups != value)
+                {
+                    userGroups = value;
+                    NotifyStateChanged();
+                }
             } 
         }
 
@@ -56,8 +65,11 @@ namespace HearYe.Client.Data
             get => userShortcutGroups;
             set
             {
-                userShortcutGroups = value;
-                NotifyStateChanged();
+                if (userShortcutGroups != value)
+                {
+                    userShortcutGroups = value;
+                    NotifyStateChanged();
+                }
             }
         }
 
@@ -66,8 +78,11 @@ namespace HearYe.Client.Data
             get => defaultGroupId;
             set
             {
-                defaultGroupId = value;
-                NotifyStateChanged();
+                if (defaultGroupId != value)
+                {
+                    defaultGroupId = value;
+                    NotifyStateChanged();
+                }
             }
         }
 
@@ -76,8 +91,11 @@ namespace HearYe.Client.Data
             get => activeGroupId;
             set
             {
-                activeGroupId = value;
-                NotifyStateChanged();
+                if (activeGroupId != value)
+                {
+                    activeGroupId = value;
+                    NotifyStateChanged();
+                }
             }
         }
 
@@ -86,8 +104,11 @@ namespace HearYe.Client.Data
             get => activeGroupName;
             set
             {
-                activeGroupName = value;
-                NotifyStateChanged();
+                if (activeGroupName != value)
+                {
+                    activeGroupName = value;
+                    NotifyStateChanged();
+                }
             }
         }
 
@@ -96,8 +117,11 @@ namespace HearYe.Client.Data
             get => postCollection;
             set
             {
-                postCollection = value;
-                NotifyStateChanged();
+                if (postCollection != value)
+                {
+                    postCollection = value;
+                    NotifyStateChanged();
+                }
             }
         }
 
@@ -106,8 +130,11 @@ namespace HearYe.Client.Data
             get => activePostType;
             set
             {
-                activePostType = value;
-                NotifyStateChanged();
+                if (activePostType != value)
+                {
+                    activePostType = value;
+                    NotifyStateChanged();
+                }
             }
         }
 
@@ -116,8 +143,11 @@ namespace HearYe.Client.Data
             get => activeLocation;
             set
             {
-                activeLocation = value;
-                NotifyStateChanged();
+                if (activeLocation != value)
+                {
+                    activeLocation = value;
+                    NotifyStateChanged();
+                }
             }
         }
 
@@ -126,8 +156,11 @@ namespace HearYe.Client.Data
             get => postCount;
             set
             {
-                postCount = value;
-                NotifyStateChanged();
+                if (postCount != value)
+                {
+                    postCount = value;
+                    NotifyStateChanged();
+                }
             }
         }
 
@@ -136,8 +169,11 @@ namespace HearYe.Client.Data
             get => postSkip;
             set
             {
-                postSkip = value;
-                NotifyStateChanged();
+                if (postSkip != value)
+                {
+                    postSkip = value;
+                    NotifyStateChanged();
+                }
             }
         }
 
@@ -146,8 +182,11 @@ namespace HearYe.Client.Data
             get => modalIsOpen;
             set
             {
-                modalIsOpen = value;
-                NotifyStateChanged();
+                if (modalIsOpen!= value)
+                {
+                    modalIsOpen = value;
+                    NotifyStateChanged();
+                }
             }
         }
 
@@ -156,8 +195,11 @@ namespace HearYe.Client.Data
             get => acknowledgedModalId;
             set
             {
-                acknowledgedModalId = value;
-                NotifyStateChanged();
+                if (acknowledgedModalId != value)
+                {
+                    acknowledgedModalId = value;
+                    NotifyStateChanged();
+                }
             }
         }
 
@@ -166,8 +208,11 @@ namespace HearYe.Client.Data
             get => membersModalId;
             set
             {
-                membersModalId = value;
-                NotifyStateChanged();
+                if (membersModalId != value)
+                {
+                    membersModalId = value;
+                    NotifyStateChanged();
+                }
             }
         }
 
@@ -176,8 +221,11 @@ namespace HearYe.Client.Data
             get => inviteModalId;
             set
             {
-                inviteModalId = value;
-                NotifyStateChanged();
+                if (inviteModalId != value)
+                {
+                    inviteModalId = value;
+                    NotifyStateChanged();
+                }
             }
         }
 
@@ -186,8 +234,11 @@ namespace HearYe.Client.Data
             get => leaveModalId;
             set
             {
-                leaveModalId = value;
-                NotifyStateChanged();
+                if (leaveModalId != value)
+                {
+                    leaveModalId = value;
+                    NotifyStateChanged();
+                }
             }
         }
 
