@@ -6,7 +6,7 @@
     <!--if attempts == 0, Loading...-->
     @if (apiAwake)
     {
-       <NavMenu />
+        <NavMenu />
         <main>
             <article>
                 @Body
@@ -17,7 +17,15 @@
     else if (cantWakeUp)
     {
         <div>
-            Can't wake up! Try again another time.
+            <GarbagePattern FillColor="#DDDDDD" />
+            <div class="absoluteCenter">
+                <div class="card p-5">
+                    <div class="card-body text-center">
+                        <h1>Can't wake up</h1>
+                        <p>Sorry! Please try again another time.</p>
+                    </div>
+                </div>
+            </div>
         </div>
     }
     else if (!waiting)
@@ -27,7 +35,15 @@
     else
     {
         <div>
-            I'm waking up!
+            <GarbagePattern FillColor="#DDDDDD" />
+            <div class="absoluteCenter">
+                <div class="card p-5">
+                    <div class="card-body text-center">
+                        <h1>I'm waking up!</h1>
+                        <p>This might take a minute. Thanks for your patience.</p>
+                    </div>
+                </div>
+            </div>
         </div>
     }
 </div>
@@ -48,8 +64,8 @@
     {
         try
         {
-            // Display waiting screen after 4 seconds of no response.
-            await DisplayWakeScreen(4);
+            // Display waiting screen after 5 seconds of no response.
+            await DisplayWakeScreen(5);
             var healthCheck = await httpClient.GetAsync("healthcheck");
             var healthCheckBody = await healthCheck.Content.ReadAsStringAsync();
 
@@ -64,7 +80,7 @@
 
             StateHasChanged();
         }
-        catch(HttpRequestException)
+        catch (HttpRequestException)
         {
             // Swallow http exception.
             StateHasChanged();
