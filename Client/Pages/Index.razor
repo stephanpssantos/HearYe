@@ -1,21 +1,119 @@
-﻿@page "/landing"
+﻿@page "/"
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using HearYe.Client.Data
+@using HearYe.Shared
 @inject NavigationManager Navigation
+@inject StateContainer State
+@attribute [Authorize]
 
-<AuthorizeView>
-    <Authorized>
-        <RedirectToHome />
-    </Authorized>
-    <NotAuthorized>
-        <PageTitle>Hear Ye</PageTitle>
+<PageTitle>Okay</PageTitle>
 
-        <h1>Hear Ye</h1>
-        <h3>Announcement Board</h3>
-
-        <div>
+<div class="container-lg">
+    <div class="modal fade" id="indexModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            @if (State.ModalIsOpen)
+            {
+                @if (State.AcknowledgedModalId > 0)
+                {
+                    <AcknowledgedModal />
+                }
+            }
         </div>
-        <button onclick="@(() => Navigation.NavigateToLogin("authentication/login"))">
-            Sign in
-        </button>
-    </NotAuthorized>
-</AuthorizeView>
+    </div>
+    <div class="d-flex flex-column align-items-center">
+        @if (State.ActivePostType == PostTypes.New && State.ActiveGroupId != 0)
+        {
+            <div class="w-md-75">
+                <NewMessage />
+            </div>
+        }
+        else if (State.ActivePostType == PostTypes.New && State.Initiated)
+        {
+            <div class="w-md-75 m-3 p-3">
+                <p class="lead text-center">
+                    You don't currently belong to any groups. Ask someone to add you to an
+                    existing group, or <a href="newgroup">create a new group</a>.
+                </p>
+            </div>
+        }
+        <div class="w-md-75 d-flex flex-column flex-md-row justify-content-between">
+            @if (State.ActivePostType == PostTypes.New)
+            {
+                <h1 class="mt-3 mb-1 mb-md-3">New Messages</h1>
+            }
+            else if (State.ActivePostType == PostTypes.Acknowledged)
+            {
+                <h1 class="mt-3 mb-3">Acknowledged Messages</h1>
+            }
+            else if (State.ActivePostType == PostTypes.Stale)
+            {
+                <h1 class="mt-3 mb-3">Old Messages</h1>
+            }
+
+            <Paginator />
+        </div>
+
+        <div class="w-md-75">
+            @if (State.PostCollection is not null && State.PostCollection.Any() && State.ActiveGroupId != 0)
+            {
+                @foreach (PostWithUserName post in State.PostCollection.Take(State.PostCount))
+                {
+                    <PostTemplate Post="@post" />
+                }
+                <div class="d-flex justify-content-end w-100">
+                    <Paginator />
+                </div>
+            }
+            else if (State.PostCollection is not null && !State.PostCollection.Any())
+            {
+                <h3 class="text-muted">No posts found.</h3>
+            }
+            else
+            {
+                <div class="card">
+                    <div class="card-header">
+                        <div class="placeholder-glow d-flex pt-2 pb-2">
+                            <span class="placeholder col-3" />
+                            <span class="placeholder col-6" style="visibility: hidden" />
+                            <span class="placeholder col-3" />
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-text placeholder-glow">
+                            <span class="placeholder col-12"></span>
+                            <br />
+                            <div class="d-flex mt-2">
+                                <span class="placeholder col-2"></span>
+                                <span class="placeholder col-6" style="visibility: hidden"></span>
+                                <span class="placeholder col-4"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+@code
+{
+    protected override void OnInitialized()
+    {
+        State.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        State.OnChange -= StateHasChanged;
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (State.ActiveLocation != ActiveLocations.Index)
+        {
+            State.ActiveLocation = ActiveLocations.Index;    
+        }
+    }
+}

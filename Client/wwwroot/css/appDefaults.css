@@ -1,0 +1,94 @@
+﻿* {
+    font-family: 'Segoe UI', 'SegoeUI', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+html, body {
+    background-color: #ecf0f5;
+    color: #333;
+}
+
+.okSvg1 {
+    height: 1em;
+}
+
+.okSvg2 {
+    height: 2em;
+}
+
+.absoluteCenter {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+}
+
+.addUpArrow::after {
+    display: inline-block;
+    margin-left: 0.255em;
+    vertical-align: 0.255em;
+    content: "";
+    border-top: 0;
+    border-right: 0.3em solid transparent;
+    border-bottom: 0.3em solid;
+    border-left: 0.3em solid transparent;
+}
+
+.addDownArrow::after {
+    display: inline-block;
+    margin-left: 0.255em;
+    vertical-align: 0.255em;
+    content: "";
+    border-top: 0.3em solid;
+    border-right: 0.3em solid transparent;
+    border-bottom: 0;
+    border-left: 0.3em solid transparent;
+}
+
+.w-sm-75
+{
+    width: 100%;
+}
+
+.w-md-75 {
+    width: 100%;
+}
+
+.w-lg-75 {
+    width: 100%;
+}
+
+.w-xl-75 {
+    width: 100%;
+}
+
+@media(min-width: 576px)
+{
+    .w-sm-75
+    {
+        width: 75%;
+    }
+}
+
+@media(min-width: 768px) {
+    .w-md-75 {
+        width: 75%;
+    }
+}
+
+@media(min-width: 960px) {
+    .w-xl-75 {
+        width: 75%;
+    }
+}
+
+@media(min-width: 1200px) {
+    .w-xl-75 {
+        width: 75%;
+    }
+}
+
+@media(min-width: 1200px) {
+    .w-xlonly-100 {
+        width: 100%;
+    }
+}

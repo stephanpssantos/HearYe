@@ -1,0 +1,74 @@
+﻿@page "/newuser"
+@layout NoNavLayout
+@using HearYe.Client.Data
+@using HearYe.Shared
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Microsoft.AspNetCore.WebUtilities
+@using Microsoft.Identity.Client
+@inject IHearYeService service
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@attribute [Authorize]
+
+<div>
+    Finalizing new user account. This may take a moment, please do not close or move away from this page...
+</div>
+
+@code {
+    protected async override Task OnParametersSetAsync()
+    {
+        var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authenticationState.User;
+
+        if (user.Identity is null)
+        {
+            // Clear leftover credentials before trying again.
+            NavigationManager.NavigateToLogout("authentication/logout");
+            return;
+        }
+
+        string? claimId = user.Claims.FirstOrDefault(x => x.Type.Equals("extension_DatabaseId"))?.Value;
+        if (claimId is not null)
+        {
+            // User already registered.
+            NavigationManager.NavigateToLogout("authentication/logout");
+            return;
+        }
+
+        string? aadOidString = user.Claims.FirstOrDefault(x => x.Type.Equals("oid"))?.Value;
+        string? displayName = user.Identity.Name ?? String.Empty;
+        bool aadOidParsed = Guid.TryParse(aadOidString, out Guid aadOid);
+
+        if (aadOidString == null || !aadOidParsed)
+        {
+            // Abormal access token.
+            NavigationManager.NavigateToLogout("authentication/logout");
+            return;
+        }
+
+        User newUser = new()
+            {
+                AadOid = aadOid,
+                DisplayName = displayName,
+                AcceptGroupInvitations = true,
+                IsDeleted = false,
+                CreatedDate = DateTimeOffset.Now
+            };
+
+        User? response = await service.NewUserAsync(newUser);
+
+        if (response is null)
+        {
+            UriBuilder builder = new(NavigationManager.ToAbsoluteUri("landing"));
+            string newPath = QueryHelpers.AddQueryString(builder.ToString(), "registrationSuceeded", "false");
+            NavigationManager.NavigateToLogout("authentication/logout", newPath);
+        }
+        else
+        {
+            UriBuilder builder = new(NavigationManager.ToAbsoluteUri("landing"));
+            string newPath = QueryHelpers.AddQueryString(builder.ToString(), "registrationSuceeded", "true");
+            NavigationManager.NavigateToLogout("authentication/logout", newPath);
+        }
+    }
+}

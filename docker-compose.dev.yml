@@ -1,0 +1,17 @@
+# Probably not a good idea. The MS docs suggest debugging in VS as you usually would.
+# I'm leaving this anyway here as a reference, but it doesn't really work.
+
+services:
+  hearye-docker-api:
+    image: "mcr.microsoft.com/dotnet/sdk:7.0"
+    volumes:
+     - type: bind
+       source: "."
+       target: "/src"
+    working_dir: "/src"
+    environment:
+      Graph_AppRegSecret: ${Graph_AppRegSecret:?Graph secret not set}
+      AzureSQL_AppRegSecret: ${AzureSQL_AppRegSecret:?SQL secret not set}
+    command: sh -c "cd Server && dotnet run -c Debug"
+    ports:
+     - 7193:7193

@@ -1,0 +1,85 @@
+﻿@using HearYe.Client.Data
+@using HearYe.Shared;
+@inject IHearYeService Service
+@inject StateContainer State
+
+<div class="modal-content">
+    <div class="modal-header">
+        <h5 class="modal-title">@modalTitle</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="CloseModal"></button>
+    </div>
+    <div class="modal-body">
+        @if (displayError)
+        {
+            <p>Error loading user list. Please try again later.</p>
+        }
+        else if (userList is not null && userList.Any())
+        {
+            <ul class="list-group">
+                @foreach (UserPublicInfo user in userList)
+                {
+                    <li class="list-group-item">
+                        <strong>@user.DisplayName</strong> <span class="text-muted">(ID: @user.Id)</span>
+                    </li>
+                }
+            </ul>
+        }
+        else if (userList is not null && !userList.Any())
+        {
+            <p>Nobody has acknowledged this post so far.</p>
+        }
+        else
+        {
+            <ul class="list-group placeholder-glow">
+                <li class="list-group-item placeholder"></li>
+                <li class="list-group-item placeholder"></li>
+                <li class="list-group-item placeholder"></li>
+                <li class="list-group-item placeholder"></li>
+            </ul>
+        }
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick="CloseModal">Close</button>
+    </div>
+</div>
+
+@code {
+    private string modalTitle = "Loading...";
+    private bool displayError = false;
+    private IEnumerable<UserPublicInfo>? userList;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (State.ModalIsOpen && State.AcknowledgedModalId > 0)
+        {
+            userList = await Service.GetPostAcknowledgedUsersAsync(State.AcknowledgedModalId);
+
+            if (userList is null)
+            {
+                displayError = true;
+            }
+
+            modalTitle = userList?.Count() == 1 ?
+                "1 person has acknowledged this message" :
+                $"{userList?.Count()} people have acknowledged this message.";
+
+            StateHasChanged();
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        State.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        State.OnChange -= StateHasChanged;
+    }
+
+    private void CloseModal()
+    {
+        State.AcknowledgedModalId = 0;
+        State.ModalIsOpen = false;
+    }
+}

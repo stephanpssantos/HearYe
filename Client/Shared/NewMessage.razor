@@ -1,0 +1,120 @@
+﻿@using HearYe.Client.Data
+@using HearYe.Shared
+@using System.Text.Json
+@inject IHearYeService Service
+@inject StateContainer State
+
+<EditForm EditContext="@editContext" OnSubmit="@HandleNewPost" class="mt-3">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    @if (bannerMessage is not null && bannerType is not null)
+    {
+        <div class="alert @bannerType" role="alert">
+            @bannerMessage
+        </div>
+    }
+    <label for="newMessageText" class="visually-hidden">Write a new message.</label>
+    <InputTextArea @bind-Value="newPost.Message" id="newMessageText" placeholder="Write a new message" class="form-control" aria-describedby="messageHelpBlock" />
+    <div class="row align-top">
+        <div id="messageHelpBlock" class="form-text col-sm-5">
+            Your new message must be under 256 characters.
+        </div>
+        <div class="col-2 text-end d-none d-sm-block">
+            <label for="newMessageStaleDate" class="form-text">(Optional) Expiry:</label>
+        </div>
+        <div class="col-3 mt-2 d-none d-sm-block">
+            <InputDate @bind-Value="newPost.StaleDate" id="newMessageStaleDate" class="form-control" />
+        </div>
+        <div class="col-2 mt-2 d-none d-sm-block">
+            <button type="submit" class="btn btn-primary w-100">Post</button>
+        </div>
+    </div>
+    <div class="row d-sm-none">
+        <div class="col-6">
+            <label for="newMessageStaleDate" class="form-text">(Optional) Expiry:</label>
+            <InputDate @bind-Value="newPost.StaleDate" id="newMessageStaleDate" class="form-control" />
+        </div>
+        <div class="col-6 align-self-end">
+            <button type="submit" class="btn btn-primary w-100">Post</button>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    private Post newPost = new();
+    private EditContext? editContext;
+    private string? bannerMessage;
+    private string? bannerType;
+
+    protected override void OnInitialized()
+    {
+        editContext = new(newPost);
+        State.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        State.OnChange -= StateHasChanged;
+    }
+
+    private async void HandleNewPost()
+    {
+        int userDbId;
+        bool validDbId = int.TryParse(State.UserDbId, out userDbId);
+
+        if (!validDbId || State.ActiveGroupId == 0)
+        {
+            bannerType = "alert-warning";
+            bannerMessage = "⚠ Message posting failed. Please try again later.";
+            StateHasChanged();
+            return;
+        }
+
+        newPost.UserId = userDbId;
+        newPost.MessageGroupId = State.ActiveGroupId;
+        newPost.CreatedDate = DateTime.Now;
+
+        if (editContext != null && editContext.Validate())
+        {
+            Post? postSuccessful = await Service.NewPostAsync(newPost);
+
+            if (postSuccessful is null)
+            {
+                bannerType = "alert-warning";
+                bannerMessage = "⚠ Message posting failed. Please try again later.";
+                StateHasChanged();
+                return;
+            }
+            else
+            {
+                // Success message: Successfully posted
+                newPost = new();
+                editContext = new(newPost);
+                List<PostWithUserName> newPostCollection = new();
+
+                // I could just prepend the post to State.PostCollection, but
+                // that wouldn't trigger StateHasChanged on StateContainer.
+                if (State.ActivePostType == PostTypes.New)
+                {
+                    string postSuccessfulSerialized = JsonSerializer.Serialize<Post>(postSuccessful);
+                    PostWithUserName postWithUserName = JsonSerializer.Deserialize<PostWithUserName>(postSuccessfulSerialized)!;
+                    postWithUserName.DisplayName = "You";
+                    newPostCollection.Add(postWithUserName);
+                }
+
+                if (State.PostCollection is not null)
+                {
+                    foreach (PostWithUserName oldPost in State.PostCollection)
+                    {
+                        newPostCollection.Add(oldPost);
+                    }
+                }
+
+                bannerType = "alert-success";
+                bannerMessage = "👌 Message posted!";
+                State.PostCollection = newPostCollection;
+                return;
+            }
+        }
+    }
+}

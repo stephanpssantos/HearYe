@@ -1,0 +1,105 @@
+﻿@using HearYe.Client.Data
+@using HearYe.Shared;
+@inject IHearYeService Service
+@inject StateContainer State
+
+<div class="modal-content">
+    <div class="modal-header">
+        <h5 class="modal-title">@modalTitle</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="CloseModal"></button>
+    </div>
+    <div class="modal-body">
+        @if (bannerMessage is not null && bannerType is not null)
+        {
+            <div class="alert @bannerType" role="alert">
+                @bannerMessage
+            </div>
+        }
+        @if (displayError)
+        {
+            <p>Error loading user list. Please try again later.</p>
+        }
+        else if (displayConfirmation)
+        {
+            <div class="mt-3 mb-3">
+                <p>Are you sure you want to remove @confirmationUserName (ID: @confirmationUserId) from the group?</p>
+                <div class="d-flex gap-2 justify-content-center">
+                    <button class="btn btn-danger" @onclick="ConfirmRemoval">Remove</button>
+                    <button class="btn btn-secondary" @onclick="CloseConfirmation">Cancel</button>
+                </div>
+            </div>
+        }
+        else if (userList is not null && userList.Any())
+        {
+            <h4><span class="badge text-bg-dark">Group admins</span></h4>
+            <ul class="list-group list-group-flush">
+                @foreach (var user in userList.Where(u => u.MessageGroupRoleId == 1))
+                {
+                    <li class="list-group-item d-flex justify-content-between">
+                        <div>
+                            <strong>@user.UserName</strong> <span class="text-muted">(ID: @user.UserId)</span>
+                        </div>
+                        <div class="d-flex gap-2">
+                            @if (userRole == 1 && user.UserId != userId)
+                            {
+                                <div class="dropdown">
+                                    <button class="btn btn-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Admin</button>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <button class="dropdown-item active" type="button" aria-current="true">Admin</button>
+                                        </li>
+                                        <li>
+                                            <button class="dropdown-item" type="button" @onclick="(() => MakeUserMember(user))">Member</button>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <button class="btn btn-danger btn-sm" @onclick="(() => DisplayConfirmation(user))">Remove user</button>
+                            }
+                        </div>
+                    </li>
+                }
+            </ul>
+            <hr class="mt-3 mb-3" />
+            <h4><span class="badge text-bg-dark">Group members</span></h4>
+            <ul class="list-group list-group-flush">
+                @foreach (var user in userList.Where(u => u.MessageGroupRoleId == 2))
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>@user.UserName</strong> <span class="text-muted">(ID: @user.UserId)</span>
+                        </div>
+                        <div class="d-flex gap-2">
+                            @if (userRole == 1 && user.Id != userId)
+                            {
+                                <div class="dropdown">
+                                    <button class="btn btn-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Member</button>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <button class="dropdown-item" type="button" @onclick="(() => MakeUserAdmin(user))">Admin</button>
+                                        </li>
+                                        <li>
+                                            <button class="dropdown-item active" type="button" aria-current="true">Member</button>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <button class="btn btn-danger btn-sm" @onclick="(() => DisplayConfirmation(user))">Remove user</button>
+                            }
+                        </div>
+                    </li>
+                }
+            </ul>
+        }
+        else
+        {
+            <ul class="list-group placeholder-glow">
+                <li class="list-group-item placeholder"></li>
+                <li class="list-group-item placeholder"></li>
+                <li class="list-group-item placeholder"></li>
+                <li class="list-group-item placeholder"></li>
+            </ul>
+        }
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick="CloseModal">Close</button>
+    </div>
+</div>

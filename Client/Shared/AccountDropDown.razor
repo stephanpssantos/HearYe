@@ -1,39 +1,31 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Microsoft.AspNetCore.WebUtilities
 @inject NavigationManager Navigation
 
-<div>
-    <button @onclick="ToggleAccountDD">
+<div class="dropdown">
+    <button class="btn btn-outline-secondary dropdown-toggle border-white" type="button" data-bs-toggle="dropdown" aria-expanded="false">
         @UserName
-        <span class=""></span>
     </button>
-</div>
-
-<div class="@AccountDDCssClass">
-    <button @onclick="BeginEditProfile">Account settings</button>
-    <button @onclick="BeginLogOut">Log out</button>
+    <ul class="dropdown-menu">
+        <li><a class="dropdown-item disabled" role="button">Account Settings</a></li>
+        <li><a class="dropdown-item" role="button" @onclick="BeginLogOut">Log Out</a></li>
+    </ul>
 </div>
 
 @code {
-    private bool collapseAccountDD = true;
-
     [Parameter]
     public string? UserName { get; set; }
 
-    private string? AccountDDCssClass => collapseAccountDD ? "collapse" : null;
-
-    public void BeginEditProfile()
+    private void BeginEditProfile()
     {
         Navigation.NavigateToLogout("authentication/profile");
     }
 
-    public void BeginLogOut()
+    private void BeginLogOut()
     {
-        Navigation.NavigateToLogout("authentication/logout");
-    }
-
-    private void ToggleAccountDD()
-    {
-        collapseAccountDD = !collapseAccountDD;
+        UriBuilder builder = new(Navigation.ToAbsoluteUri("landing"));
+        string newPath = QueryHelpers.AddQueryString(builder.ToString(), "logoutSuceeded", "true");
+        Navigation.NavigateToLogout("authentication/logout", newPath);
     }
 }

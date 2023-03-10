@@ -1,13 +1,111 @@
-﻿@inherits LayoutComponentBase
+﻿@using System.Timers
+@inject IHttpClientFactory Factory
+@inject HttpClient Http
+@inherits LayoutComponentBase
 
 <div class="page">
-    <div class="navbar">
+    @if (apiAwake)
+    {
         <NavMenu />
-    </div>
-
-    <main>
-        <article>
-            @Body
-        </article>
-    </main>
+        <main>
+            <article>
+                @Body
+            </article>
+        </main>
+        <Footer />
+    }
+    else if (cantWakeUp)
+    {
+        <div>
+            <GarbagePattern FillColor="#DDDDDD" />
+            <div class="absoluteCenter">
+                <div class="card p-5">
+                    <div class="card-body text-center">
+                        <h1>Can't wake up</h1>
+                        <p>Sorry! Please try again another time.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else if (!waiting)
+    {
+        <div />
+    }
+    else
+    {
+        <div>
+            <GarbagePattern FillColor="#DDDDDD" />
+            <div class="absoluteCenter">
+                <div class="card p-5">
+                    <div class="card-body text-center">
+                        <h1>I'm waking up!</h1>
+                        <p>This might take a minute. Thanks for your patience.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 </div>
+
+@code
+{
+    private bool apiAwake = false;
+    private bool waiting = false;
+    private bool cantWakeUp = false;
+    private Timer timer = new Timer(TimeSpan.FromSeconds(4));
+
+    protected override void OnInitialized()
+    {
+        timer.Elapsed += DisplayWakeScreen;
+    }
+
+    public void Dispose()
+    {
+        timer.Elapsed -= DisplayWakeScreen;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var httpClient = Factory.CreateClient("HearYe.ServerAPI.HealthCheck");
+        await DoHealthCheck(httpClient);
+    }
+
+    private async Task DoHealthCheck(HttpClient httpClient)
+    {
+        try
+        {
+            // Display waiting screen after 4 seconds of no response.
+            timer.AutoReset = false;
+            timer.Enabled = true;
+
+            var healthCheck = await httpClient.GetAsync("healthcheck");
+            var healthCheckBody = await healthCheck.Content.ReadAsStringAsync();
+
+            if (healthCheckBody == "Healthy")
+            {
+                apiAwake = true;
+            }
+            else if (waiting == true)
+            {
+                cantWakeUp = true;
+            }
+
+            timer.Stop();
+            StateHasChanged();
+        }
+        catch (HttpRequestException)
+        {
+            // Swallow http exception.
+            timer.Stop();
+            StateHasChanged();
+        }
+    }
+
+    private void DisplayWakeScreen(Object? source, ElapsedEventArgs e)
+    {
+        waiting = true;
+        timer.Stop();
+        StateHasChanged();
+    }
+}

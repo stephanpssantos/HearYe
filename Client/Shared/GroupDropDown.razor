@@ -1,0 +1,97 @@
+﻿@using HearYe.Client.Data
+@using HearYe.Shared
+@inject IHearYeService Service
+@inject StateContainer State
+@inject NavigationManager Navigation
+
+<div class="dropdown w-100">
+    <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        @if (State is not null && State.UserShortcutGroups is not null && State.ActiveLocation == ActiveLocations.Index)
+        {
+            @(State.ActiveGroupName ?? "No groups")
+        }
+        else if (State is not null && State.ActiveLocation == ActiveLocations.Groups)
+        {
+            <span>All groups</span>
+        }
+        else if (State is not null && State.ActiveLocation == ActiveLocations.Invite)
+        {
+            <span>Group invitations</span>
+        }
+        else if (State is not null && State.ActiveLocation == ActiveLocations.CreateGroup)
+        {
+            <span>Create new group</span>
+        }
+        else
+        {
+            <span>Loading groups</span>
+        }
+    </button>
+    <ul class="dropdown-menu w-100">
+        @if (State is not null && State.UserShortcutGroups is not null)
+        {
+            @foreach (MessageGroup group in State.UserShortcutGroups)
+            {
+                if (group.Id == State.ActiveGroupId && State.ActiveLocation == ActiveLocations.Index)
+                {
+                    <li><a class="dropdown-item active text-truncate" aria-current="true" role="button">@group.MessageGroupName</a></li>
+                }
+                else
+                {
+                    <li>
+                        <a class="dropdown-item text-truncate" role="button" @onclick="(() => SetActiveGroup(group))">
+                            @group.MessageGroupName
+                        </a>
+                    </li>
+                }
+            }
+        }
+        <li><hr class="dropdown-divider"></li>
+        <li><NavLink href="/allgroups" class="dropdown-item" role="button">All groups</NavLink></li>
+        <li><NavLink href="/managegroupinvitations" class="dropdown-item" role="button">Group invitations</NavLink></li>
+        <li><NavLink href="/newgroup" class="dropdown-item" role="button">Create new group</NavLink></li>
+    </ul>
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        State.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        State.OnChange -= StateHasChanged;
+    }
+
+    private async void SetActiveGroup(MessageGroup group)
+    {
+        if (State is not null)
+        {
+            State.ActiveGroupId = group.Id;
+            State.ActiveGroupName = group.MessageGroupName;
+
+            IEnumerable<PostWithUserName>? postCollection;
+            switch (State.ActivePostType)
+            {
+                case PostTypes.Acknowledged:
+                    postCollection = await Service.GetAcknowledgedPostsAsync(group.Id.ToString(), State.PostCount, State.PostSkip);
+                    break;
+                case PostTypes.Stale:
+                    postCollection = await Service.GetStalePostsAsync(group.Id.ToString(), State.PostCount, State.PostSkip);
+                    break;
+                case PostTypes.New:
+                default:
+                    postCollection = await Service.GetNewPostsAsync(group.Id.ToString(), State.PostCount, State.PostSkip);
+                    break;
+            }
+
+            State.PostCollection = postCollection;
+
+            if (State.ActiveLocation != ActiveLocations.Index)
+            {
+                Navigation.NavigateTo("/");
+            }
+        }
+    }
+}

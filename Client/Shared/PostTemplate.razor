@@ -1,0 +1,33 @@
+﻿@using HearYe.Client.Data
+@using HearYe.Shared;
+@inject IHearYeService Service
+@inject StateContainer State
+
+<div class="card mb-3">
+    <div class="card-header d-flex justify-content-between">
+        <div>
+            @GetDisplayName()
+        </div>
+        <div>
+            @if(Post is not null)
+            {
+                @GetPostTime(Post.CreatedDate)
+            }
+        </div>
+    </div>
+    <div class="card-body">
+        <p class="card-text">@Post?.Message</p>
+        <div class="d-flex justify-content-between align-items-end mt-3">
+            <div class="btn-group" role="group" aria-label="@acknowledgementCount acknowledgements">
+                <button type="button" disabled="@acknowledgeDisabled" 
+                    class="btn @(isAcknowledged ? "btn-primary" : "btn-outline-dark")" @onclick="AcknowledgePost">
+                    OK
+                </button>
+                <button type="button" class="btn @(isAcknowledged ? "btn-outline-primary" : "btn-outline-dark")" @onclick="OpenAcknowledgedList" data-bs-toggle="modal" data-bs-target="#indexModal">
+                    @acknowledgementCount
+                </button>
+            </div>
+            <span>Old news on: @(Post?.StaleDate is null ? "Never" : Post?.StaleDate.Value.Date.ToShortDateString())</span>
+        </div>
+    </div>
+</div>

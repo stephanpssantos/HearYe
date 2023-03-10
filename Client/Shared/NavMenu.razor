@@ -1,23 +1,43 @@
-﻿<AuthorizeView>
+﻿@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using HearYe.Client.Data
+@using HearYe.Shared
+@inject NavigationManager Navigation
+@inject StateContainer State
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IHearYeService Service
+
+<AuthorizeView>
     <Authorized>
-        <div>
-            Hear Ye
-        </div>
-        <div>
-            <NavLink href="/" Match="NavLinkMatch.All">
-                New
-            </NavLink>
-            <NavLink href="/">
-                Acknowledged
-            </NavLink>
-            <NavLink href="/">
-                Expired
-            </NavLink>
-        </div>
-        <AccountDropDown UserName="@context.User.Identity?.Name" />
+        <nav class="navbar bg-white p-2 border-bottom border-2">
+            <div class="container-lg justify-content-center">
+                <div class="d-flex justify-content-between align-items-center w-md-75">
+                    <div class="d-flex gap-2 align-items-center col-md-4">
+                        <a href="/">
+                            <img src="OKHand1.svg" class="fs-3 okSvg1" />
+                        </a>
+                        <a href="/" class="fs-3 me-3 text-reset text-decoration-none">
+                            <strong>Okay</strong>
+                        </a>
+                        <div class="d-none d-xl-block w-100">
+                            <GroupDropDown />
+                        </div>
+                    </div>
+                    @if(State.ActiveLocation == ActiveLocations.Index)
+                    {
+                       <div class="d-none d-xl-block col-xl-4">
+                            <PostTypeSelector />
+                       </div> 
+                    }
+                    <AccountDropDown UserName="@context.User.Identity?.Name" />
+                </div>
+                <div class="d-flex d-xl-none flex-column align-items-end w-md-75 gap-2 mt-1">
+                    <GroupDropDown />
+                    @if (State.ActiveLocation == ActiveLocations.Index)
+                    {
+                        <PostTypeSelector />
+                    }
+                </div>
+            </div>
+        </nav>
     </Authorized>
 </AuthorizeView>
-
-@code {
-
-}
