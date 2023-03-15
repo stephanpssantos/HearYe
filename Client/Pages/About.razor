@@ -1,0 +1,92 @@
+﻿@page "/about"
+@layout NoNavLayout
+
+<PageTitle>About</PageTitle>
+
+<div class="container-lg">
+    <div class="d-flex flex-column align-items-center">
+        <div class="w-md-75">
+            <div class="mt-4 mb-1"><span>About <strong>Okay</strong></span></div>
+            <hr class="border-2 border-top border-dark"/>
+            <div class="d-flex gap-4 flex-column flex-sm-row w-100">
+                <img src="about/OKHand.png" class="img-thumbnail" style="max-height:210px; max-width:210px" alt="OK hand symbol"/>
+                <div class="d-flex flex-column justify-content-around w-100">
+                    <div class="d-flex flex-column">
+                        <h2 class="mb-0"><strong>Okay</strong></h2>
+                        <span class="small">An Announcement Board</span>
+                        <span class="mt-1">by Stephan Santos</span>
+                    </div>
+                    <div class="d-flex flex-column gap-2 w-100">
+                        <a href="/landing" class="btn btn-dark text-nowrap w-100">Try <strong>Okay</strong></a>
+                        <span class="text-secondary small">The application goes to sleep after 5 minutes of inactivity. It may take up to a minute for it to wake up.</span>
+                    </div>
+                </div>
+            </div>
+            <hr class="border-2 border-top border-dark" />
+            <div class="mt-2 mb-2"><span><strong>Screenshots</strong></span></div>
+            <AboutScreenshots />
+            <hr class="border-2 border-top border-dark" />
+            <div class="mt-2 mb-2"><span><strong>Overview</strong></span></div>
+            <p style="line-height: 1.25rem;">
+                "<strong>Okay</strong>" is an online announcement board that lets you create and join groups, post messages to those groups, and acknowledge other people's messages.
+            </p>
+            <p style="line-height: 1.25rem;">
+                "Okay" was <strong>not</strong> created to be a fully-fledged social media platform. Rather, it was created with the intention of developing from scratch the infrastructure and processes involved with a project of this nature; putting past knowledge to practice, learning about new technologies, and getting experience overcoming the challenges that arise.
+            </p>
+            <p class="mb-0">
+                To that end, the following were the main goals of the project:
+            </p>
+            <ul style="line-height: 1.25rem; margin-bottom: 2rem;">
+                <li>Develop this project with a front-end framework that isn't React to gain exposure with other frameworks</li>
+                <li>
+                    <span>Create a back-end that can be utilized by different front-end clients</span>
+                    <ul>
+                        <li>Document back-end endpoints using OpenAPI specifications</li>
+                        <li>Utilize Azure API Management to avoid exposing the back-end service directly and to introduce controls for accessing it</li>
+                    </ul>
+                </li>
+                <li>Containerize the back-end application for consistency and potential scalability</li>
+                <li>Deploy and utilize an Azure B2C instance to have a more secure authentication process, to easily integrate identity providers, and to reduce development time</li>
+                <li>Create build and deployment templates for all resources and deploy with CI/CD pipelines in Azure DevOps</li>
+                <li>Minimize cost by keeping within Azure free tier limits as much as possible</li>
+            </ul>
+            <hr class="border-2 border-top border-dark" />
+            <div class="mt-2 mb-2"><span><strong>Technical Information</strong></span></div>
+            <p class="small" style="line-height: 1.25rem;">
+                Languages: <br />
+                C#, HTML/CSS, PowerShell, YAML
+            </p>
+            <p class="small" style="line-height: 1.25rem;">
+                Front-end: <br />
+                Blazor WebAssembly, Bootstrap
+            </p>
+            <p class="small" style="line-height: 1.25rem;">
+                Back-end: <br />
+                .NET WebAPI, Entity Framework Core, SQL Server, Docker
+            </p>
+            <p class="small" style="line-height: 1.25rem;">
+                Auth: <br />
+                Azure B2C, MS Graph, Google IDP
+            </p>
+            <p class="small" style="line-height: 1.25rem;">
+                Deployment: <br />
+                YAML and ARM templates via Azure DevOps
+            </p>
+            <p class="small" style="line-height: 1.25rem;">
+                Azure Cloud Resources: <br />
+                API Management, SQL, Container App, Key Vault, Static Web App, Log Analytics, B2C
+            </p>
+            <p class="small" style="line-height: 1.25rem;">
+                Repo Link: <br />
+                <a href="https://github.com/stephanpssantos/HearYe" target="_blank">https://github.com/stephanpssantos/HearYe</a><br />
+                The above link is a public copy of the repo. The application was developed in an Azure DevOps repo.
+            </p>
+        </div>
+    </div>
+</div>
+<br />
+<Footer />
+
+@code {
+
+}
