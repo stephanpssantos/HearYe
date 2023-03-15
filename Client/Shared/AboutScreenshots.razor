@@ -1,0 +1,93 @@
+﻿@inject IJSRuntime JS
+
+<!-- Button trigger modal -->
+<div class="d-flex gap-2 flex-wrap">
+    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#scModal" @onclick="(() => setActive(0))">
+        <div class="ratio ratio-4x3" style="width: 150px; height: 112px;">
+            <img src="about/Landing.png" class="img-thumbnail" alt="Landing Page Thumbnail">
+        </div>
+    </button>
+    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#scModal" @onclick="(() => setActive(1))">
+        <div class="ratio ratio-4x3" style="width: 150px; height: 112px;">
+            <img src="about/Login.png" class="img-thumbnail" alt="Login Page Thumbnail">
+        </div>
+    </button>
+    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#scModal" @onclick="(() => setActive(2))">
+        <div class="ratio ratio-4x3" style="width: 150px; height: 112px;">
+            <img src="about/FrontPage.png" class="img-thumbnail" alt="Front Page Thumbnail">
+        </div>
+    </button>
+    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#scModal" @onclick="(() => setActive(3))">
+        <div class="ratio ratio-4x3" style="width: 150px; height: 112px;">
+            <img src="about/Invites.png" class="img-thumbnail" alt="Invite Page Thumbnail">
+        </div>
+    </button>
+    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#scModal" @onclick="(() => setActive(4))">
+        <div class="ratio ratio-4x3" style="width: 150px; height: 112px;">
+            <img src="about/GroupMgmt.png" class="img-thumbnail" alt="Group Management Page Thumbnail">
+        </div>
+    </button>
+    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#scModal" @onclick="(() => setActive(5))">
+        <div class="ratio ratio-4x3" style="width: 150px; height: 112px;">
+            <img src="about/Architecture.png" class="img-thumbnail" alt="App Architecture Thumbnail">
+        </div>
+    </button>
+    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#scModal" @onclick="(() => setActive(6))">
+        <div class="ratio ratio-4x3" style="width: 150px; height: 112px;">
+            <img src="about/DbSchema.png" class="img-thumbnail" alt="DB Schema Thumbnail">
+        </div>
+    </button>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="scModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div style="position:absolute; top: 20px; right: 40px">
+                    <button type="button" style="position: absolute; z-index: 2" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div id="scCarousel" class="carousel slide">
+                    <div class="carousel-inner">
+                        <div class="carousel-item ratio ratio-4x3 active">
+                            <img src="about/Landing.png" class="d-block w-100" alt="Landing Page">
+                        </div>
+                        <div class="carousel-item ratio ratio-4x3">
+                            <img src="about/Login.png" class="d-block w-100" alt="Login Page">
+                        </div>
+                        <div class="carousel-item ratio ratio-4x3">
+                            <img src="about/FrontPage.png" class="d-block w-100" alt="Front Page">
+                        </div>
+                        <div class="carousel-item ratio ratio-4x3">
+                            <img src="about/Invites.png" class="d-block w-100" alt="Invitations Page">
+                        </div>
+                        <div class="carousel-item ratio ratio-4x3">
+                            <img src="about/GroupMgmt.png" class="d-block w-100" alt="Group Management Page">
+                        </div>
+                        <div class="carousel-item ratio ratio-4x3">
+                            <img src="about/Architecture.png" class="d-block w-100" alt="App Architecture">
+                        </div>
+                        <div class="carousel-item ratio ratio-4x3">
+                            <img src="about/DBSchema.png" class="d-block w-100" alt="Database Schema">
+                        </div>
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#scCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon btn btn-secondary" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#scCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon btn btn-secondary" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private async Task setActive(int imageNo)
+    {
+        await JS.InvokeVoidAsync("customMethods.carouselTo", "#scCarousel", imageNo);
+    }
+}
