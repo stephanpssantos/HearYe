@@ -170,7 +170,12 @@ app.UseHttpsRedirection();
 // app.UseBlazorFrameworkFiles();
 // app.UseStaticFiles();
 app.UseRouting();
-app.UseCors();
+
+if (app.Environment.IsDevelopment())
+{
+	app.UseCors();
+}
+
 app.UseAuthentication();
 app.UseAuthorization();
 
